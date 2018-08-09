@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+<group android:id="@+id/group_emucntrl">
+	<item android:id="@+id/main_pausemi" android:title="@string/pause"/>
+	<item android:id="@+id/main_resetmi" android:title="@string/reset"/>
+	<item android:id="@+id/main_exitmi" android:title="@string/selectgame"/>
+	<item android:id="@+id/main_prefsmi" android:title="@string/preferences"/>
+	<item android:id="@+id/main_togcntrlmi" android:title="@string/togglescreencontrols"/>
+</group>
+</menu>

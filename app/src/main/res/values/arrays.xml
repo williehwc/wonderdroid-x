@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="bloodtypes">
+        <item>A</item>
+        <item>B</item>
+        <item>O</item>
+        <item>AB</item>
+    </string-array>
+    <string-array name="bloodtypevalues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <string-array name="sexvalues">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="frameskip">
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string-array name="sharpness">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+        <item>Very High</item>
+    </string-array>
+    <string-array name="vibration">
+        <item>Off</item>
+        <item>1 ms</item>
+        <item>3 ms</item>
+        <item>5 ms</item>
+        <item>8 ms</item>
+        <item>10 ms</item>
+        <item>15 ms</item>
+    </string-array>
+    <string-array name="vibrationvalues">
+        <item>0</item>
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>8</item>
+        <item>10</item>
+        <item>15</item>
+    </string-array>
+
+</resources>

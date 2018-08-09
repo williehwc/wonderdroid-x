@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ワンダドロイド X</string>
+    <string name="nosdcard">注意: 携帯のディスクがないか、または使用できません</string>
+    <string name="noroms">ロムのファイルを見つけられませんでした (ロムのディレクトリ: ???)</string>
+    <string name="colour">カラー –\u00A0</string>
+    <string name="mono">モノクロ –\u00A0</string>
+    <string name="vertical">横</string>
+    <string name="horizontal">縦</string>
+    <string name="selectgame">ゲームを選ぶ</string>
+    <string name="exit">終了</string>
+    <string name="preferences">設定</string>
+    <string name="togglescreencontrols">画面のコントラを出す・隠す</string>
+    <string name="pause">停止</string>
+    <string name="reset">リセット</string>
+    <string name="settings_cat_controls">コントロール設定</string>
+    <string name="settings_cat_ws">ワンダースワン設定</string>
+    <string name="control_x2">X2 (右)</string>
+    <string name="control_x3">X3 (下)</string>
+    <string name="control_x4">X4 (左)</string>
+    <string name="control_x1">X1 (上)</string>
+    <string name="set">セット</string>
+    <string name="clear">クリア</string>
+    <string name="pressakey">ボタンを押してください</string>
+    <string name="crash_string">WonderDroid crashed!</string>
+    <string name="birthday">誕生日</string>
+    <string name="sex">性別</string>
+    <string name="bloodtype">血液型</string>
+    <string name="name">名前</string>
+
+    <string-array name="sexes">
+        <item>男性</item>
+        <item>女性</item>
+    </string-array>
+    
+</resources>

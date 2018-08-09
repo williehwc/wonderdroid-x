@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <RelativeLayout
+        android:id="@+id/helptranslate"
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:padding="0dp"
+        android:visibility="gone">
+    
+	    <Button
+		    android:id="@+id/helptranslatebutton"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
+		    android:text="@string/helptranslate"
+		    android:drawableLeft="@drawable/ic_action_translate"
+			android:background="#000000"
+			android:paddingLeft="16dp"
+			android:paddingRight="16dp"
+			android:gravity="left|center_vertical" />
+	    
+	    <Button
+		    android:id="@+id/hidehelptranslate"
+		    android:layout_width="48dp"
+		    android:layout_height="fill_parent"
+		    android:drawableLeft="@android:drawable/ic_menu_close_clear_cancel"
+			android:background="#222222"
+			android:paddingLeft="8dp"
+			android:gravity="left|center_vertical"
+			android:layout_alignParentRight="true" />
+    
+    </RelativeLayout>
+    
+    <ImageView
+        android:id="@+id/select_bg1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:contentDescription="background"
+        android:scaleType="centerCrop"
+        android:tint="#BB111111" />
+
+    <Gallery
+        android:id="@+id/select_gallery"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/select_noroms"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/noroms" />
+
+    <TextView
+        android:id="@+id/select_screenformat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:padding="5dp"
+        android:shadowColor="#000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="2"
+        android:textColor="#fff"
+        android:textStyle="bold"
+        android:visibility="invisible" />
+
+    <FrameLayout
+        android:id="@+id/adbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" />
+
+</RelativeLayout>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">WonderDroid X</string>
+    <string name="crash_string">WonderDroid X crashed!</string>
+    <string name="noroms">No ROMs found — Please exit, add ROMs to your ROM folder ???, and try again.</string>
+    <string name="nosdcard">Warning: main storage volume is unavailable.</string>
+    <string name="colour">Color —\u00A0</string>
+    <string name="mono">Monochrome —\u00A0</string>
+    <string name="vertical">Vertical</string>
+    <string name="horizontal">Horizontal</string>
+    <string name="selectgame">Select Game</string>
+    <string name="exit">Exit</string>
+    <string name="preferences">Preferences</string>
+    <string name="importgame">Import Game</string>
+    <string name="togglescreencontrols">Toggle Screen Controls</string>
+    <string name="pause">Pause</string>
+    <string name="reset">Reset</string>
+    <string name="settings_cat_controls">Controls</string>
+    <string name="control_x2">X2 (Right)</string>
+    <string name="control_x3">X3 (Down)</string>
+    <string name="control_x4">X4 (Left)</string>
+    <string name="control_x1">X1 (Up)</string>
+    <string name="set">Set</string>
+    <string name="clear">Clear</string>
+    <string name="pressakey">Press a key</string>
+    <string name="birthday">Birthday</string>
+    <string name="sex">Sex</string>
+    <string name="bloodtype">Bloodtype</string>
+    <string name="settings_cat_ws">WonderSwan Profile</string>
+    <string name="name">Name</string>
+    <string name="overriderompath">ROM path</string>
+    <string name="overridemempath">Save path</string>
+    <string name="emulatorsettings">Preferences</string>
+    <string name="enablesound">Enable sound</string>
+    <string name="showcontrols">Show controls automatically</string>
+    <string name="showcontrolsdescription">When starting a game</string>
+    <string name="onscreencontrolsettings">Onscreen controls</string>
+    <string name="vibratedown">Button-down vibration</string>
+    <string name="vibratedowndescription">When pressing an onscreen control</string>
+    <string name="vibrateup">Button-up vibration</string>
+    <string name="vibrateupdescription">When releasing an onscreen control</string>
+    <string name="relocate">Relocate Start to top-right</string>
+    <string name="relocatedescription">Requires emulator restart</string>
+    <string name="graphicssettings">Graphics</string>
+    <string name="frameskip">Frame skip</string>
+    <string name="frameskipdescription">Skip one out of every how many frames?</string>
+    <string name="sharpness">Screen sharpness</string>
+    <string name="sharpnessdescription">May cause display lag; requires emulator restart</string>
+    <string name="reversehorizontalorientation">Reverse horizontal orientation</string>
+    <string name="stretchtofill">Stretch to fill screen</string>
+    <string name="stretchtofilldescription">May improve performance; requires emulator restart</string>
+    <string name="showbackground">Show game select background</string>
+    <string name="showbackgrounddescription">Disable for smoother scrolling</string>
+    <string name="about">About</string>
+    <string name="aboutdescription">Developed by Willie Chang\nPublished by Yearbook Labs\nWonderDroid is originally written by Daniel Palmer.\nLicensed under GPL 2.0\nThis product includes other open-source software including ActionBarSherlock, Blip_Buffer, Bryan McPhail\'s NEC V30MZ emulator, Cygne, and Mednafen.\nOriginal icon designed by Bostwickenator on DeviantArt.</string>
+    <string name="visit">Visit our website</string>
+    <string name="close">Close</string>
+    <string name="report">Report an issue</string>
+    <string name="reportdescription">If you are having performance issues, try changing the frame skip and sharpness first. If this does not help, or you are having another issue, please let us know. Thanks!</string>
+    <string name="issues">GitHub Issues</string>
+    <string name="moreapps">More YL apps</string>
+    <string name="cannotopenurl">Cannot find your browser</string>
+    <string name="cannotopenurldescription">But don\'t worry, we\'ve copied the URL to your clipboard. Simply paste it into your browser\'s address bar.</string>
+    <string name="sdcardinfo">Help on using SD cards</string>
+    <string name="rompatherror">ROM Path Error</string>
+    <string name="rompatherrordescription">The path ??? is unavailable. Please enter a different path in Preferences.</string>
+    <string name="mempatherror">Save Path Error</string>
+    <string name="mempatherrordescription">The path ??? is unavailable or read-only. Please enter a different path in Preferences.</string>
+    <string name="gotopreferences">Go to Preferences</string>
+    <string name="readmemfileerror">Cannot read save file</string>
+    <string name="writememfileerror">Cannot write save file</string>
+    <string name="helptranslate">\u00A0\u00A0\u00A0Help translate to Japanese »</string>
+    <string name="needpermissions">Please turn on the file access permission for WonderDroid X in your device settings.</string>
+    <string name="askpermissions">File access permission is required for reading ROMs.</string>
+    <string name="ok">OK</string>
+
+    <string-array name="sexes">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+
+</resources>

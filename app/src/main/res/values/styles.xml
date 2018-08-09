@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="button">
+        <item name="android:background">@drawable/button</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:layout_width">54dp</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:shadowColor">#dddddddd</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">2</item>
+    </style>
+
+    <style name="AppTheme" parent="Theme.AppCompat">
+        <!-- your app branding color for the app bar -->
+        <item name="colorPrimary">#1e5292</item>
+        <!-- theme UI controls like checkboxes and text fields -->
+        <item name="colorAccent">#5B82B1</item>
+    </style>
+
+    <style name="Overflow" parent="@android:style/Widget.Holo.ActionButton.Overflow">
+        <item name="android:src">@null</item>
+    </style>
+
+    <style name="ActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="android:background">@null</item>
+        <item name="background">@null</item>
+        <item name="android:height">1px</item>
+        <item name="height">1px</item>
+    </style>
+
+    <style name="MainTheme" parent="Theme.AppCompat">
+        <item name="colorAccent">#5B82B1</item>
+        <item name="android:actionBarStyle">@style/ActionBar</item>
+        <item name="actionBarStyle">@style/ActionBar</item>
+        <item name="android:actionOverflowButtonStyle">@style/Overflow</item>
+        <item name="actionOverflowButtonStyle">@style/Overflow</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+    </style>
+
+    <style name="PrefsTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- your app branding color for the app bar -->
+        <item name="colorPrimary">#1e5292</item>
+        <!-- theme UI controls like checkboxes and text fields -->
+        <item name="colorAccent">#1e5292</item>
+    </style>
+
+</resources>

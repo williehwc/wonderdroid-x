@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:id="@+id/group_emucntrl" >
+        <item
+            android:id="@+id/select_prefsmi"
+            android:icon="@drawable/ic_menu_preferences"
+            app:showAsAction="ifRoom"
+            android:title="@string/preferences"/>
+        <!--
+        <item
+            android:id="@+id/select_importmi"
+            android:icon="@drawable/ic_menu_import"
+            android:showAsAction="always|withText"
+            android:title="@string/importgame"/>
+        <item
+            android:id="@+id/select_exitmi"
+            android:icon="@drawable/ic_menu_exit"
+            android:showAsAction="always|withText"
+            android:title="@string/exit"/>
+        -->
+        <item
+            android:id="@+id/select_reportmi"
+            app:showAsAction="never"
+            android:title="@string/report"/>
+        <item
+            android:id="@+id/select_moreappsmi"
+            app:showAsAction="never"
+            android:title="@string/moreapps"/>
+        <item
+            android:id="@+id/select_aboutmi"
+            app:showAsAction="never"
+            android:title="@string/about"/>
+    </group>
+
+</menu>

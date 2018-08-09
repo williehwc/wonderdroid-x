@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="274dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:paddingBottom="25dp"
+    android:paddingLeft="25dp"
+    android:paddingRight="25dp" >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:duplicateParentState="true"
+        android:ellipsize="middle"
+        android:gravity="center"
+        android:maxLines="1"
+        android:minLines="1"
+        android:paddingBottom="25dp"
+        android:shadowColor="#000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="2"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="144dp"
+        android:layout_gravity="center"
+        android:contentDescription="Game Screenshot"
+        android:duplicateParentState="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/unknownrom" />
+
+</LinearLayout>

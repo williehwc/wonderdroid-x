@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">WonderDroid X</string>
+    <string name="crash_string">WonderDroid X 崩潰了!</string>
+    <string name="noroms">沒有找到 ROM – 請退出, 下載 ROM 放到 ROM 資料夾 ???, 然後再重試。</string>
+    <string name="nosdcard">注意: 硬碟不可用。</string>
+    <string name="colour">彩色 —\u00A0</string>
+    <string name="mono">黑白 —\u00A0</string>
+    <string name="vertical">垂直</string>
+    <string name="horizontal">水平</string>
+    <string name="selectgame">返回主頁</string>
+    <string name="exit">退出</string>
+    <string name="preferences">選項</string>
+    <string name="importgame">導入遊戲</string>
+    <string name="togglescreencontrols">虛擬控制器</string>
+    <string name="pause">暫停</string>
+    <string name="reset">重置</string>
+    <string name="settings_cat_controls">控制按鍵設置</string>
+    <string name="control_x2">X2 (右)</string>
+    <string name="control_x3">X3 (下)</string>
+    <string name="control_x4">X4 (左)</string>
+    <string name="control_x1">X1 (上)</string>
+    <string name="set">設置</string>
+    <string name="clear">清除</string>
+    <string name="pressakey">請按下一個按鍵</string>
+    <string name="birthday">生日</string>
+    <string name="sex">性別</string>
+    <string name="bloodtype">血型</string>
+    <string name="settings_cat_ws">WonderSwan 剖析</string>
+    <string name="name">姓名</string>
+    <string name="overriderompath">ROM 路徑</string>
+    <string name="overridemempath">存檔路徑</string>
+    <string name="emulatorsettings">偏好</string>
+    <string name="enablesound">打開聲音</string>
+    <string name="showcontrols">自動打開虛擬控制器</string>
+    <string name="showcontrolsdescription">開始遊戲中</string>
+    <string name="onscreencontrolsettings">虛擬控制器</string>
+    <string name="vibratedown">按鈕時震動</string>
+    <string name="vibratedowndescription"></string>
+    <string name="vibrateup">按鈕放開震動</string>
+    <string name="vibrateupdescription"></string>
+    <string name="relocate">Start 按鈕移到右上角</string>
+    <string name="relocatedescription">需要重新開始模擬器</string>
+    <string name="graphicssettings">畫面</string>
+    <string name="frameskip">跳幀</string>
+    <string name="frameskipdescription">每多少幀跳過一個?</string>
+    <string name="sharpness">銳利度</string>
+    <string name="sharpnessdescription">May cause display lag; 需要重新開始模擬器</string>
+    <string name="reversehorizontalorientation">水平時，轉動180度</string>
+    <string name="stretchtofill">畫面自動調整到螢幕的形狀</string>
+    <string name="stretchtofilldescription">可改善性能; 需要重新開始模擬器</string>
+    <string name="showbackground">打開遊戲選項背景</string>
+    <string name="showbackgrounddescription">Disable for smoother scrolling</string>
+    <string name="about">關於</string>
+    <string name="aboutdescription">Developed by Willie Chang\nPublished by Yearbook Labs\nWonderDroid is originally written by Daniel Palmer.\nLicensed under GPL 2.0\nThis product includes other open-source software including ActionBarSherlock, Blip_Buffer, Bryan McPhail\'s NEC V30MZ emulator, Cygne, and Mednafen.\nOriginal icon designed by Bostwickenator on DeviantArt.</string>
+    <string name="visit">參觀我們的網站</string>
+    <string name="close">關閉</string>
+    <string name="report">反映問題</string>
+    <string name="reportdescription">如果遊戲性能及速度不佳，可嘗試調整跳幀或銳利度，如果無效請po問題於 GitHub，謝謝。</string>
+    <string name="issues">GitHub 問題</string>
+    <string name="moreapps">下載更多 YL APP</string>
+    <string name="sdcardinfo">如何使用SD卡</string>
+    <string name="rompatherror">ROM 路徑錯誤</string>
+	<string name="rompatherrordescription">路徑 ??? 不可用。請在選項裡輸入別的路徑。</string>
+	<string name="mempatherror">存檔路徑錯誤</string>
+	<string name="mempatherrordescription">路徑 ??? 只讀或不可用。請在選項裡輸入別的路徑。</string>
+	<string name="gotopreferences">選項</string>
+	<string name="readmemfileerror">無法讀取存檔</string>
+	<string name="writememfileerror">無法存檔</string>
+
+    <string-array name="sexes">
+        <item>男</item>
+        <item>女</item>
+    </string-array>
+
+</resources>
