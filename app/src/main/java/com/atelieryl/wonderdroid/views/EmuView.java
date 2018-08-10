@@ -99,7 +99,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		sharpness = Integer.parseInt(prefs.getString("sharpness", "3"));
-		mThread.setFrameskip(Integer.parseInt(prefs.getString("frameskip", "2")));
+		mThread.setFrameskip(Integer.parseInt(prefs.getString("frameskip", "0")));
 		stretchToFill = prefs.getBoolean("stretchtofill", false);
 		renderer.setClearBeforeDraw(!stretchToFill);
 		
@@ -264,12 +264,13 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 
 	public void onResume () {
 		if (started) {
+			renderer.restartDrawThread();
 			mThread = new EmuThread(renderer);
 			start();
 		}
 		mThread.setSurfaceHolder(mHolder);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		mThread.setFrameskip(Integer.parseInt(prefs.getString("frameskip", "2")));
+		mThread.setFrameskip(Integer.parseInt(prefs.getString("frameskip", "0")));
 		vibratedown = Integer.parseInt(prefs.getString("vibratedown", "5"));
 		vibrateup = Integer.parseInt(prefs.getString("vibrateup", "1"));
 	}
@@ -280,6 +281,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 			Log.d(TAG, "shutting down emulation");
 
 			mThread.clearRunning();
+			renderer.stopDrawThread();
 
 			synchronized (mThread) {
 				try {

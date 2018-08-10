@@ -74,6 +74,7 @@
     <string name="needpermissions">Please turn on the file access permission for WonderDroid X in your device settings.</string>
     <string name="askpermissions">File access permission is required for reading ROMs.</string>
     <string name="ok">OK</string>
+    <string name="cannotloadrom">Cannot load ROM. Please try again.</string>
 
     <string-array name="sexes">
         <item>Male</item>

@@ -195,10 +195,14 @@ public class Select extends BaseActivity {
     }
 
     private void startEmu(int romid) {
-        Intent intent = new Intent(this, Main.class);
-        intent.putExtra(Main.ROM, mRAdapter.getItem(romid));
-        intent.putExtra(Main.ROMHEADER, mRAdapter.getHeader(romid));
-        startActivity(intent);
+        try {
+            Intent intent = new Intent(this, Main.class);
+            intent.putExtra(Main.ROM, mRAdapter.getItem(romid));
+            intent.putExtra(Main.ROMHEADER, mRAdapter.getHeader(romid));
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, R.string.cannotloadrom, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

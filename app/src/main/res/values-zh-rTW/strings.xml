@@ -68,6 +68,9 @@
 	<string name="gotopreferences">選項</string>
 	<string name="readmemfileerror">無法讀取存檔</string>
 	<string name="writememfileerror">無法存檔</string>
+    <string name="needpermissions">請在安卓（系統）設定裡打開 WonderDroid X 的儲存權限。</string>
+    <string name="askpermissions">有檔案存取的權限才能讀取ROM。</string>
+    <string name="cannotloadrom">無法載入ROM。請再試一次。</string>
 
     <string-array name="sexes">
         <item>男</item>

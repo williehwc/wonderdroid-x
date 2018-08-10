@@ -68,7 +68,7 @@ public class WonderSwan {
 
     static public native void reset();
 
-    static public void execute_frame(ShortBuffer framebuffer, boolean skipframe) {
+    /*static public void execute_frame(ShortBuffer framebuffer, boolean skipframe) {
         if (buttonsDirty) {
             WonderSwan.updatebuttons(WonderSwanButton.Y1.down, WonderSwanButton.Y2.down,
                     WonderSwanButton.Y3.down, WonderSwanButton.Y4.down, WonderSwanButton.X1.down,
@@ -93,6 +93,22 @@ public class WonderSwan {
 	        }
         }
         
+        synchronized (audiobuffer) {
+            audiobuffer.notify();
+        }
+    }*/
+
+    static public void execute_frame(ShortBuffer framebuffer, boolean skipframe) {
+        if (buttonsDirty) {
+            WonderSwan.updatebuttons(WonderSwanButton.Y1.down, WonderSwanButton.Y2.down,
+                    WonderSwanButton.Y3.down, WonderSwanButton.Y4.down, WonderSwanButton.X1.down,
+                    WonderSwanButton.X2.down, WonderSwanButton.X3.down, WonderSwanButton.X4.down,
+                    WonderSwanButton.A.down, WonderSwanButton.B.down, WonderSwanButton.START.down);
+            buttonsDirty = false;
+        }
+
+        samples = _execute_frame(skipframe, audioEnabled, framebuffer, audioEnabled ? audiobuffer
+                : null);
         synchronized (audiobuffer) {
             audiobuffer.notify();
         }

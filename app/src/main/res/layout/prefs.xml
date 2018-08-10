@@ -142,10 +142,10 @@
             android:summary="@string/stretchtofilldescription" />
         <ListPreference
             android:entries="@array/frameskip"
-            android:entryValues="@array/frameskip"
+            android:entryValues="@array/frameskipvalues"
             android:key="frameskip"
             android:title="@string/frameskip"
-            android:defaultValue="3"
+            android:defaultValue="0"
             android:summary="@string/frameskipdescription" />
         <ListPreference
             android:entries="@array/sharpness"

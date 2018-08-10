@@ -14,8 +14,8 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.view.SurfaceHolder;
 
+import com.atelieryl.wonderdroid.utils.DrawThread;
 import com.atelieryl.wonderdroid.utils.EmuThread;
-import com.atelieryl.wonderdroid.utils.DrawRunnable;
 import com.atelieryl.wonderdroid.utils.AudioRunnable;
 
 @SuppressLint("NewApi")
@@ -40,11 +40,13 @@ public class WonderSwanRenderer implements EmuThread.Renderer {
 
     private final Paint textPaint = new Paint();
     
-    private DrawRunnable drawRunnable;
+    private DrawThread drawThread;
     
     private AudioRunnable audioRunnable;
     
     private boolean surfaceHolderIsSet = false;
+
+    private boolean clearBeforeDraw = true;
 
     public WonderSwanRenderer() {
 
@@ -57,8 +59,11 @@ public class WonderSwanRenderer implements EmuThread.Renderer {
         framebuffer = Bitmap.createBitmap(WonderSwan.SCREEN_WIDTH, WonderSwan.SCREEN_HEIGHT,
                 Bitmap.Config.RGB_565);
         
-        drawRunnable = new DrawRunnable(framebuffer, scale, paint);
+        drawThread = new DrawThread(framebuffer, scale, paint);
+        drawThread.start();
+
         audioRunnable = new AudioRunnable(audio);
+
     }
 
     @Override
@@ -66,10 +71,10 @@ public class WonderSwanRenderer implements EmuThread.Renderer {
     	
         // c.drawARGB(0xff, 0, 0, 0);
     	if (!surfaceHolderIsSet) {
-    		drawRunnable.setSurfaceHolder(surfaceHolder);
+            drawThread.setSurfaceHolder(surfaceHolder);
     		surfaceHolderIsSet = true;
     	}
-    	drawRunnable.run();
+    	drawThread.setDraw();
         // c.drawBitmap(framebuffer, scale, paint);
         // c.drawBitmap(framebuffer, 0, 0, null);
 
@@ -101,27 +106,41 @@ public class WonderSwanRenderer implements EmuThread.Renderer {
     @Override
     public void update(boolean skip) {
         WonderSwan.execute_frame(frameone, skip);
+        audioRunnable.run();
 
         if (!skip) {
             frameone.rewind();
             framebuffer.copyPixelsFromBuffer(frameone);
-            audioRunnable.run();
         }
     }
 
     @Override
     public void setButtons(Button[] buttons) {
         this.buttons = buttons;
-        drawRunnable.setButtons(buttons);
+        drawThread.setButtons(buttons);
     }
 
     @Override
     public void showButtons(boolean show) {
         this.showButtons = show;
-        drawRunnable.setShowButtons(show);
+        drawThread.setShowButtons(show);
     }
     
     public void setClearBeforeDraw(boolean clearBeforeDraw) {
-    	drawRunnable.setClearBeforeDraw(clearBeforeDraw);
+        this.clearBeforeDraw = clearBeforeDraw;
+        drawThread.setClearBeforeDraw(clearBeforeDraw);
+    }
+
+    public void restartDrawThread() {
+        surfaceHolderIsSet = false;
+        drawThread = new DrawThread(framebuffer, scale, paint);
+        drawThread.start();
+        drawThread.setButtons(buttons);
+        drawThread.setShowButtons(showButtons);
+        drawThread.setClearBeforeDraw(clearBeforeDraw);
+    }
+
+    public void stopDrawThread() {
+        drawThread.clearRunning();
     }
 }

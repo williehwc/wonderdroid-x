@@ -27,7 +27,8 @@ public class EmuThread extends Thread {
 
     private Renderer renderer;
 
-    private static final long TARGETFRAMETIME = 6;
+    private static final long[] TARGETFRAMETIME = {12, 13};
+    private static int frameTimeIndex = 0;
 
     private boolean mIsRunning = false;
     private boolean isPaused = false;
@@ -45,7 +46,7 @@ public class EmuThread extends Thread {
     boolean skip = false;
     boolean behind = false;
 
-    private int frameskip = 2;
+    private int frameskip = 0;
 
     public EmuThread (Renderer renderer) {
         this.renderer = renderer;
@@ -72,6 +73,8 @@ public class EmuThread extends Thread {
     @Override
     public void run () {
 
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE);
+
         while (mSurfaceHolder == null) {
             SystemClock.sleep(20);
         }
@@ -80,19 +83,30 @@ public class EmuThread extends Thread {
 
             if (isPaused) {
                 //Log.d(TAG, "Paused!!!");
-                SystemClock.sleep(TARGETFRAMETIME);
+                SystemClock.sleep(TARGETFRAMETIME[0]);
             } else {
 
                 frameStart = System.currentTimeMillis();
 
                 renderer.update(frame % 2 != 0);
 
-                if (frame % frameskip != 0) {
+                if (frameskip == 0 || frame % frameskip != 0) {
                     renderer.render(mSurfaceHolder);
                 }
 
                 frameEnd = System.currentTimeMillis();
                 frametime = (int)(frameEnd - frameStart);
+
+                if (frametime < TARGETFRAMETIME[frameTimeIndex]) {
+                    SystemClock.sleep(TARGETFRAMETIME[frameTimeIndex] - frametime);
+                } else if (frametime > TARGETFRAMETIME[frameTimeIndex]) {
+                    Log.d(TAG, "Overtime " + frametime);
+                }
+
+                frameTimeIndex++;
+                if (frameTimeIndex >= TARGETFRAMETIME.length) {
+                    frameTimeIndex = 0;
+                }
 
                 frame++;
             }

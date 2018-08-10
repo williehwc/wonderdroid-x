@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import com.atelieryl.wonderdroid.Button;
 
-public class DrawRunnable extends Thread {
+public class DrawThread extends Thread {
 	
 	private Canvas c;
 	private Bitmap framebuffer;
@@ -20,8 +20,10 @@ public class DrawRunnable extends Thread {
 	private Button[] buttons;
 	private boolean showButtons;
 	private boolean clearBeforeDraw;
+	private boolean draw = false;
+	private boolean running = true;
 	
-	public DrawRunnable(Bitmap framebuffer, Matrix scale, Paint paint) {
+	public DrawThread(Bitmap framebuffer, Matrix scale, Paint paint) {
 		this.framebuffer = framebuffer;
 		this.scale = scale;
 		this.paint = paint;
@@ -42,29 +44,45 @@ public class DrawRunnable extends Thread {
 	public void setClearBeforeDraw(boolean clearBeforeDraw) {
 		this.clearBeforeDraw = clearBeforeDraw;
 	}
+
+	public void setDraw() {
+		draw = true;
+	}
+
+	public void clearRunning() {
+		running = false;
+	}
 	
 	@Override
     public void run() {
 		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE);
-		c = null;
-		try {
-			while (c == null) {
-				c = mSurfaceHolder.lockCanvas();
+		while (running) {
+			if (draw) {
+				c = null;
+				try {
+					while (c == null) {
+						c = mSurfaceHolder.lockCanvas();
+					}
+					//boolean x = c.isHardwareAccelerated();
+					if (clearBeforeDraw) {
+						c.drawColor(Color.BLACK); // Make sure out-of-bounds areas remain black
+					}
+					c.drawBitmap(framebuffer, scale, paint);
+					if (showButtons && buttons != null) {
+						for (Button button : buttons) {
+							c.drawBitmap(button.normal, button.drawrect, button.rect, null);
+						}
+					}
+				} finally {
+					if (c != null) {
+						mSurfaceHolder.unlockCanvasAndPost(c);
+					}
+				}
+				draw = false;
 			}
-			//boolean x = c.isHardwareAccelerated();
-			if (clearBeforeDraw) {
-				c.drawColor(Color.BLACK); // Make sure out-of-bounds areas remain black
-			}
-			c.drawBitmap(framebuffer, scale, paint);
-			if (showButtons && buttons != null) {
-	            for (Button button : buttons) {
-	                c.drawBitmap(button.normal, button.drawrect, button.rect, null);
-	            }
-			}
-		} finally {
-			if (c != null) {
-				mSurfaceHolder.unlockCanvasAndPost(c);
-			}
+		}
+		synchronized (this) {
+			notifyAll();
 		}
 	}
 	
