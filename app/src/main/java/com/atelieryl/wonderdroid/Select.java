@@ -142,7 +142,7 @@ public class Select extends BaseActivity {
                 .setMessage(R.string.reportdescription)
                 .setPositiveButton(R.string.issues, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) { 
-                    	openURL("https://github.com/williehwc/wonderdroid/issues");
+                    	openURL("https://github.com/williehwc/wonderdroid-x/issues");
                     }
                  })
                 .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
@@ -283,9 +283,7 @@ public class Select extends BaseActivity {
         
         if (!currentRomPath.equals("") && !romPath.equals(currentRomPath)) {
             galleryPosition = 0;
-        	Intent intent = getIntent();
-        	finish();
-        	startActivity(intent);
+        	recreate();
         }
         currentRomPath = romPath;
         

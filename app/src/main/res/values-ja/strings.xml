@@ -28,6 +28,19 @@
     <string name="sex">性別</string>
     <string name="bloodtype">血液型</string>
     <string name="name">名前</string>
+    <string name="about">ワンダドロイド X について</string>
+    <string name="close">閉じる</string>
+    <string name="gotopreferences">設定</string>
+    <string name="emulatorsettings">設定</string>
+    <string name="enablesound">オーディオ有効</string>
+    <string name="onscreencontrolsettings">画面のコントラ</string>
+    <string name="graphicssettings">ビデオ</string>
+    <string name="frameskip">フレームスキップ</string>
+    <string name="sharpness">画像のシャープネス</string>
+    <string name="savestate">保存</string>
+    <string name="loadstate">読み込み</string>
+    <string name="understand">分かりました</string>
+    <string name="visit">yearbooklabs.com</string>
 
     <string-array name="sexes">
         <item>男性</item>

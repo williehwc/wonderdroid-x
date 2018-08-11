@@ -28,37 +28,37 @@
 #include "v30mz.h"
 #include "rtc.h"
 
-static uint32_t wsMonoPal[16][4];
-static uint32_t wsColors[8];
-static uint32_t wsCols[16][16];
+uint32_t wsMonoPal[16][4];
+uint32_t wsColors[8];
+uint32_t wsCols[16][16];
 
-static uint16_t ColorMapG[16];
-static uint16_t ColorMap[16 * 16 * 16];
+uint16_t ColorMapG[16];
+uint16_t ColorMap[16 * 16 * 16];
 static uint32_t LayerEnabled = 7; // BG, FG, sprites
 
 /*current scanline*/
 
-static uint8_t SpriteTable[0x80][4];
-static uint32_t SpriteCountCache;
-static uint8_t DispControl;
-static uint8_t BGColor;
-static uint8_t LineCompare;
-static uint8_t SPRBase;
-static uint8_t SpriteStart, SpriteCount;
-static uint8_t FGBGLoc;
-static uint8_t FGx0, FGy0, FGx1, FGy1;
-static uint8_t SPRx0, SPRy0, SPRx1, SPRy1;
+uint8_t SpriteTable[0x80][4];
+uint32_t SpriteCountCache;
+uint8_t DispControl;
+uint8_t BGColor;
+uint8_t LineCompare;
+uint8_t SPRBase;
+uint8_t SpriteStart, SpriteCount;
+uint8_t FGBGLoc;
+uint8_t FGx0, FGy0, FGx1, FGy1;
+uint8_t SPRx0, SPRy0, SPRx1, SPRy1;
 
-static uint8_t BGXScroll, BGYScroll;
-static uint8_t FGXScroll, FGYScroll;
-static uint8_t LCDControl, LCDIcons;
+uint8_t BGXScroll, BGYScroll;
+uint8_t FGXScroll, FGYScroll;
+uint8_t LCDControl, LCDIcons;
 
-static uint8_t BTimerControl;
-static uint16_t HBTimerPeriod;
-static uint16_t VBTimerPeriod;
+uint8_t BTimerControl;
+uint16_t HBTimerPeriod;
+uint16_t VBTimerPeriod;
 
-static uint16_t HBCounter, VBCounter;
-static uint8_t VideoMode;
+uint16_t HBCounter, VBCounter;
+uint8_t VideoMode;
 
 void WSwan_GfxInit(void) {
 }

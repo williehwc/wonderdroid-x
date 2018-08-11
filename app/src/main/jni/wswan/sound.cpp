@@ -32,38 +32,38 @@ extern "C" {
 
 #include "../blip/Blip_Buffer.h"
 
-static Blip_Synth<blip_med_quality, 256> WaveSynth;
-static Blip_Synth<blip_low_quality, 256> NoiseSynth;
-static Blip_Synth<blip_med_quality, 256 * 15> VoiceSynth;
+Blip_Synth<blip_med_quality, 256> WaveSynth;
+Blip_Synth<blip_low_quality, 256> NoiseSynth;
+Blip_Synth<blip_med_quality, 256 * 15> VoiceSynth;
 
-static Blip_Buffer sbuf[2];
+Blip_Buffer sbuf[2];
 //static int16 WaveIL[8000];
 
-static uint16_t period[4];
-static uint8_t volume[4]; // left volume in upper 4 bits, right in lower 4 bits
-static uint8_t voice_volume;
+uint16_t period[4];
+uint8_t volume[4]; // left volume in upper 4 bits, right in lower 4 bits
+uint8_t voice_volume;
 
-static uint8_t sweep_step, sweep_value;
-static uint8_t noise_control;
-static uint8_t control;
-static uint8_t output_control;
+uint8_t sweep_step, sweep_value;
+uint8_t noise_control;
+uint8_t control;
+uint8_t output_control;
 
-static int32_t sweep_8192_divider;
-static uint8_t sweep_counter;
-static uint8_t SampleRAMPos;
+int32_t sweep_8192_divider;
+uint8_t sweep_counter;
+uint8_t SampleRAMPos;
 
-static int32_t sample_cache[4][2];
+int32_t sample_cache[4][2];
 
-static int32_t last_v_val;
+int32_t last_v_val;
 
-static uint8_t HyperVoice;
-static int32_t last_hv_val;
+uint8_t HyperVoice;
+int32_t last_hv_val;
 
-static int32_t period_counter[4];
-static int32_t last_val[4][2]; // Last outputted value, l&r
-static uint8_t sample_pos[4];
-static uint16_t nreg;
-static uint32_t last_ts;
+int32_t period_counter[4];
+int32_t last_val[4][2]; // Last outputted value, l&r
+uint8_t sample_pos[4];
+uint16_t nreg;
+uint32_t last_ts;
 
 #define MK_SAMPLE_CACHE	\
    {    \

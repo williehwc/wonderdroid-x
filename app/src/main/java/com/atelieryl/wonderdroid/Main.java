@@ -1,6 +1,8 @@
 
 package com.atelieryl.wonderdroid;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.Toolbar;
@@ -11,7 +13,11 @@ import android.view.MenuItem;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import com.atelieryl.wonderdroid.utils.RomAdapter.Rom;
 import com.atelieryl.wonderdroid.views.EmuView;
@@ -52,6 +58,18 @@ public class Main extends BaseActivity {
     
     private String memPath = "wonderdroid/cartmem";
 
+    private String shortMemPath = "wonderdroid/cartmem";
+
+    private Menu menu;
+
+    private String packageName = "com.atelieryl.wonderdroid"; // Will be checked and replaced automatically if different
+
+    private boolean showStateWarning = true;
+
+    private int currentBackupNo = 0;
+
+    private final int maxBackupNo = 4;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,11 +93,12 @@ public class Main extends BaseActivity {
         parseKeys(prefs);
         
         memPath = prefs.getString("emu_mempath", "wonderdroid/cartmem");
-        if (!memPath.startsWith("/")) {
-        	memPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + memPath;
-        }
         if (!memPath.endsWith("/")) {
         	memPath = memPath + "/";
+        }
+        shortMemPath = memPath;
+        if (!memPath.startsWith("/")) {
+            memPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + memPath;
         }
 
         mPB = (ProgressBar)this.findViewById(R.id.romloadprogressbar);
@@ -121,9 +140,9 @@ public class Main extends BaseActivity {
                 }
 
                 WonderSwan.reset();
-                
-                if (checkFileAccess(mCartMem, false) && (mCartMem.length() > 0)) {
-                    WonderSwan.loadbackupdata(mCartMem.getAbsolutePath());
+
+                if (checkFileAccess(mCartMem, false, false) && (mCartMem.length() > 0)) {
+                    WonderSwan.loadbackup(mCartMem.getAbsolutePath());
                 }
                 view.start();
                 // Show controls automatically
@@ -135,6 +154,9 @@ public class Main extends BaseActivity {
         };
 
         loader.execute((Void[])null);
+
+        packageName = getPackageName();
+        showStateWarning = !prefs.getBoolean("hidestatewarning", false);
     }
 
     @Override
@@ -150,7 +172,8 @@ public class Main extends BaseActivity {
                 return true;
 
             case R.id.main_resetmi:
-                WonderSwan.reset();
+                recreate();
+                //WonderSwan.reset();
                 return true;
 
             case R.id.main_prefsmi:
@@ -161,9 +184,63 @@ public class Main extends BaseActivity {
             case R.id.main_togcntrlmi:
                 toggleControls();
                 return true;
-                // case R.id.quit:
-                // quit();
-                // return true;
+
+            case R.id.main_savestate:
+            case R.id.main_loadstate:
+                updateStateMenuTitles();
+                if (showStateWarning) {
+                    AlertDialog.Builder builder;
+                    builder = new AlertDialog.Builder(this);
+                    builder.setMessage(getResources().getString(R.string.statewarning).replace("???", shortMemPath))
+                            .setPositiveButton(R.string.understand, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    showStateWarning = false;
+                                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+                                    SharedPreferences.Editor editor = prefs.edit();
+                                    editor.putBoolean("hidestatewarning", true);
+                                    editor.commit();
+                                }
+                            })
+                            .show();
+                }
+                return true;
+            case R.id.load_a1:
+                loadState(-1);
+                return true;
+            case R.id.load_0:
+                loadState(0);
+                return true;
+            case R.id.load_1:
+                loadState(1);
+                return true;
+            case R.id.load_2:
+                loadState(2);
+                return true;
+            case R.id.load_3:
+                loadState(3);
+                return true;
+            case R.id.load_4:
+                loadState(4);
+                return true;
+            case R.id.load_5:
+                loadState(5);
+                return true;
+            case R.id.save_1:
+                saveState(1);
+                return true;
+            case R.id.save_2:
+                saveState(2);
+                return true;
+            case R.id.save_3:
+                saveState(3);
+                return true;
+            case R.id.save_4:
+                saveState(4);
+                return true;
+            case R.id.save_5:
+                saveState(5);
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -173,8 +250,37 @@ public class Main extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
-
+        this.menu = menu;
         return true;
+    }
+
+    public void updateStateMenuTitles() {
+        for (int i = -1; i <= 5; i++) {
+            String statePath = memPath + mRomHeader.internalname + "_" + Integer.toString(i).replace("-", "a") + "_0.sav";
+            String menuTitle = getResources().getString(R.string.slot) + " " + Integer.toString(i).replace("-", "a");
+            if (i < 0) {
+                menuTitle = getResources().getString(R.string.auto);
+            } else if (i == 0) {
+                menuTitle = getResources().getString(R.string.undo);
+            }
+            menuTitle += ": ";
+            File stateFile = new File(statePath);
+            int loadStateMenuItemId = getResources().getIdentifier("load_" + Integer.toString(i).replace("-", "a"), "id", packageName);
+            MenuItem loadStateMenuItem = menu.findItem(loadStateMenuItemId);
+            if (checkFileAccess(stateFile, false, true)) {
+                menuTitle += formatDate(stateFile.lastModified());
+                loadStateMenuItem.setEnabled(true);
+            } else {
+                menuTitle += getResources().getString(R.string.empty);
+                loadStateMenuItem.setEnabled(false);
+            }
+            loadStateMenuItem.setTitle(menuTitle);
+            if (i > 0) {
+                int saveStateMenuItemId = getResources().getIdentifier("save_" + Integer.toString(i), "id", packageName);
+                MenuItem saveStateMenuItem = menu.findItem(saveStateMenuItemId);
+                saveStateMenuItem.setTitle(menuTitle);
+            }
+        }
     }
 
     @Override
@@ -232,18 +338,63 @@ public class Main extends BaseActivity {
     	// Called first when switching away or sleeping
         super.onPause();
         view.stop();
+        saveState(-1);
+        if (checkFileAccess(mCartMem, true, false)) {
+            WonderSwan.savebackup(mCartMem.getAbsolutePath());
+        }
     }
     
     @Override
     public void onStop() {
     	// Called second when switching away or sleeping
-        if (checkFileAccess(mCartMem, true)) {
-            WonderSwan.storebackupdata(mCartMem.getAbsolutePath());
-        }
     	super.onStop();
     }
-    
-    public boolean checkFileAccess(File file, boolean write) {
+
+    public void saveState(int stateNo) {
+        for (int backupNo = 0; backupNo <= maxBackupNo; backupNo++) {
+            String statePath = memPath + mRomHeader.internalname + "_" + Integer.toString(stateNo).replace("-", "a") + "_" + Integer.toString(backupNo) + ".sav";
+            File stateFile = new File(statePath);
+            try {
+                stateFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                //throw new RuntimeException();
+            }
+            if (checkFileAccess(stateFile, true, false)) {
+                for (int i = 0; i < 2; i++) {
+                    WonderSwan.savestate(stateFile.getAbsolutePath());
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    public void loadState(int stateNo) {
+        String statePath;
+        File stateFile;
+        int startingBackupNo = currentBackupNo;
+        while (true) {
+            statePath = memPath + mRomHeader.internalname + "_" + Integer.toString(stateNo).replace("-", "a") + "_" + Integer.toString(currentBackupNo) + ".sav";
+            currentBackupNo++;
+            if (currentBackupNo > maxBackupNo) {
+                currentBackupNo = 0;
+            }
+            stateFile = new File(statePath);
+            if (checkFileAccess(stateFile, false, true)) {
+                break;
+            } else if (startingBackupNo == currentBackupNo) {
+                Toast.makeText(this, R.string.readmemfileerror, Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+        if (stateNo != 0) {
+            saveState(0);
+        }
+        WonderSwan.loadstate(stateFile.getAbsolutePath());
+    }
+
+    public boolean checkFileAccess(File file, boolean write, boolean suppressToasts) {
     	boolean accessOK = false;
     	try {
     		if (file.isFile() && (!write || file.canWrite()) && (write || file.canRead())) {
@@ -252,7 +403,7 @@ public class Main extends BaseActivity {
     	} catch (Exception e) {
     		
     	}
-    	if (!accessOK) {
+        if (!accessOK && !suppressToasts) {
     		if (write) {
     			Toast.makeText(this, R.string.writememfileerror, Toast.LENGTH_SHORT).show();
     		} else {
@@ -260,6 +411,17 @@ public class Main extends BaseActivity {
     		}
     	}
     	return accessOK;
+    }
+
+    private String formatDate(long milliseconds) {
+        // From https://stackoverflow.com/questions/36831597/android-convert-int-timestamp-to-human-datetime
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliseconds);
+        TimeZone tz = TimeZone.getDefault();
+        sdf.setTimeZone(tz);
+        return sdf.format(calendar.getTime());
     }
 
 }

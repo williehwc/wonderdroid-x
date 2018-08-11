@@ -125,7 +125,11 @@ public class WonderSwan {
                 "Audio buffer min " + AudioTrack.getMinBufferSize(audiofreq, channelconf, encoding));
     }
 
-    public static native void storebackupdata(String filename);
+    public static native void savebackup(String filename);
 
-    public static native void loadbackupdata(String filename);
+    public static native void loadbackup(String filename);
+
+    public static native void savestate(String filename);
+
+    public static native void loadstate(String filename);
 }

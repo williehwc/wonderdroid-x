@@ -41,19 +41,19 @@ uint8_t *wsCartROM;
 uint32_t sram_size;
 uint32_t eeprom_size;
 
-static uint8_t ButtonWhich, ButtonReadLatch;
+uint8_t ButtonWhich, ButtonReadLatch;
 
-static uint32_t DMASource, DMADest;
-static uint16_t DMALength;
-static uint8_t DMAControl;
+uint32_t DMASource, DMADest;
+uint16_t DMALength;
+uint8_t DMAControl;
 
-static uint32_t SoundDMASource;
-static uint16_t SoundDMALength;
-static uint8_t SoundDMAControl;
+uint32_t SoundDMASource;
+uint16_t SoundDMALength;
+uint8_t SoundDMAControl;
 
-static uint8_t BankSelector[4];
+uint8_t BankSelector[4];
 
-static uint8_t CommControl, CommData;
+uint8_t CommControl, CommData;
 
 extern uint16_t WSButtonStatus;
 

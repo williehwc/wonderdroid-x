@@ -20,9 +20,30 @@ enum {
 	NEC_DS0
 };
 
+typedef union { /* eight general registers */
+	uint16_t w[8]; /* viewed as 16 bits registers */
+	uint8_t b[16]; /* or as 8 bit registers */
+} v30mz_basicregs_t;
+
+typedef struct {
+	v30mz_basicregs_t regs;
+	uint16_t sregs[4];
+
+	uint16_t pc;
+
+	int32_t SignVal;
+	uint32_t AuxVal, OverVal, ZeroVal, CarryVal, ParityVal; /* 0 or non-0 valued flags */
+	uint8_t TF, IF, DF;
+} v30mz_regs_t;
+
 /* Public variables */
-int v30mz_ICount;
-uint32_t v30mz_timestamp;
+extern int v30mz_ICount; // 4 B
+extern uint32_t v30mz_timestamp; // 4 B
+extern v30mz_regs_t I; // 56 B
+extern bool InHLT; // 1 B
+extern uint32_t prefix_base; // 4 B
+extern char seg_prefix; // 1 B
+extern uint8_t parity_table[256]; // 256 B
 
 /* Public functions */
 void v30mz_execute(int cycles);

@@ -75,6 +75,17 @@
     <string name="askpermissions">File access permission is required for reading ROMs.</string>
     <string name="ok">OK</string>
     <string name="cannotloadrom">Cannot load ROM. Please try again.</string>
+    <string name="savestate">Save State</string>
+    <string name="loadstate">Load State</string>
+    <string name="auto">Auto</string>
+    <string name="undo">Undo</string>
+    <string name="slot">Slot</string>
+    <string name="empty">Empty</string>
+    <string name="memreplaceprompt">Warning: the state you are loading includes a cartridge save that is different from the current one. Replace your current cartridge save?</string>
+    <string name="replace">Yes, replace</string>
+    <string name="keep">No, keep current</string>
+    <string name="statewarning">[1] State saving and loading are experimental features. We recommend you back up your cartridge saves in ??? regularly.\n[2] When loading a state, if its corresponding cartridge save is different from the current cartridge save, the latter will be replaced.\n[3] Loading a state occationally causes the game to freeze or crash. If this happens, please try loading the state again.</string>
+    <string name="understand">I understand</string>
 
     <string-array name="sexes">
         <item>Male</item>

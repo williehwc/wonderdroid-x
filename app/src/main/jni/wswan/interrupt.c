@@ -2,13 +2,13 @@
 #include "interrupt.h"
 #include "v30mz.h"
 
-static uint8_t IStatus;
-static uint8_t IEnable;
-static uint8_t IVectorBase;
+uint8_t IStatus;
+uint8_t IEnable;
+uint8_t IVectorBase;
 
-static bool IOn_Cache = FALSE;
-static uint32_t IOn_Which = 0;
-static uint32_t IVector_Cache = 0;
+bool IOn_Cache = FALSE;
+uint32_t IOn_Which = 0;
+uint32_t IVector_Cache = 0;
 
 static void RecalcInterrupt(void) {
 	IOn_Cache = FALSE;

@@ -53,18 +53,34 @@ JNIEXPORT void JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_updatebuttons
 
 /*
  * Class:     com_atelieryl_wonderdroid_WonderSwan
- * Method:    storebackupdata
+ * Method:    savebackup
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_storebackupdata
+JNIEXPORT void JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_savebackup
   (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     com_atelieryl_wonderdroid_WonderSwan
- * Method:    loadbackupdata
+ * Method:    loadbackup
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_loadbackupdata
+JNIEXPORT void JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_loadbackup
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     com_atelieryl_wonderdroid_WonderSwan
+ * Method:    savestate
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_savestate
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     com_atelieryl_wonderdroid_WonderSwan
+ * Method:    loadstate
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_loadstate
   (JNIEnv *, jclass, jstring);
 
 #ifdef __cplusplus

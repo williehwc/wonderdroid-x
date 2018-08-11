@@ -44,22 +44,6 @@
 
 #define ADDBRANCHTRACE(x,y)
 
-typedef union { /* eight general registers */
-	uint16_t w[8]; /* viewed as 16 bits registers */
-	uint8_t b[16]; /* or as 8 bit registers */
-} v30mz_basicregs_t;
-
-typedef struct {
-	v30mz_basicregs_t regs;
-	uint16_t sregs[4];
-
-	uint16_t pc;
-
-	int32_t SignVal;
-	uint32_t AuxVal, OverVal, ZeroVal, CarryVal, ParityVal; /* 0 or non-0 valued flags */
-	uint8_t TF, IF, DF;
-} v30mz_regs_t;
-
 static void (*cpu_writemem20)(uint32_t, uint8_t) = NULL;
 static uint8_t (*cpu_readport)(uint32_t) = NULL;
 static void (*cpu_writeport)(uint32_t, uint8_t) = NULL;
@@ -72,16 +56,16 @@ static uint8_t (*cpu_readmem20)(uint32_t) = NULL;
 uint32_t v30mz_timestamp;
 int32_t v30mz_ICount;
 
-static v30mz_regs_t I;
+v30mz_regs_t I;
 bool InHLT = false;
 
-static uint32_t prefix_base; /* base address of the latest prefix segment */
-static char seg_prefix; /* prefix segment indicator */
+uint32_t prefix_base; /* base address of the latest prefix segment */
+char seg_prefix; /* prefix segment indicator */
 
 #include "v30mz-ea.h"
 #include "v30mz-modrm.h"
 
-static uint8_t parity_table[256];
+uint8_t parity_table[256];
 
 static inline void i_real_pushf(void) {
 	PUSH( CompressFlags());

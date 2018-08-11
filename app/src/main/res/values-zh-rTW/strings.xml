@@ -71,6 +71,17 @@
     <string name="needpermissions">請在安卓（系統）設定裡打開 WonderDroid X 的儲存權限。</string>
     <string name="askpermissions">有檔案存取的權限才能讀取ROM。</string>
     <string name="cannotloadrom">無法載入ROM。請再試一次。</string>
+    <string name="savestate">儲存記憶狀態</string>
+    <string name="loadstate">載入記憶狀態</string>
+    <string name="auto">自動</string>
+    <string name="undo">復原</string>
+    <string name="slot">狀態</string>
+    <string name="empty">空</string>
+    <string name="memreplaceprompt">注意：要載入的記憶狀態的卡匣存檔跟當前存檔不同。要覆蓋當前存檔？</string>
+    <string name="replace">是，覆蓋</string>
+    <string name="keep">否，留當前存檔</string>
+    <string name="statewarning">【一】儲存和載入記憶狀態是在測試的功能。我們建議您備份您的卡匣存檔（在 ???）。\n【二】載入記憶狀態時，如果要載入的記憶狀態的卡匣存檔跟當前存檔不同，本模擬器會覆蓋當前存檔。\n【三】載入記憶狀態有時會使遊戲當機。如有這情形，請再一次載入記憶狀態。</string>
+    <string name="understand">我瞭解</string>
 
     <string-array name="sexes">
         <item>男</item>
