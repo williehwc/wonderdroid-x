@@ -282,6 +282,7 @@ public class Select extends BaseActivity {
         }
         
         if (!currentRomPath.equals("") && !romPath.equals(currentRomPath)) {
+            galleryPosition = 0;
         	Intent intent = getIntent();
         	finish();
         	startActivity(intent);
@@ -349,7 +350,12 @@ public class Select extends BaseActivity {
                 @Override
                 public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 
-                    WonderSwanHeader header = mRAdapter.getHeader(arg2);
+                    WonderSwanHeader header = null;
+                    try {
+                        header = mRAdapter.getHeader(arg2);
+                    } catch (Exception e) {
+                        Log.d(TAG, "Cannot get header for ROM at index " + arg2);
+                    }
                     if (header != null) {
                         String newtext;
                         if (header.isColor) {
@@ -365,6 +371,8 @@ public class Select extends BaseActivity {
                         }
 
                         mScreenFormat.setText(newtext);
+                    } else {
+                        mScreenFormat.setText("");
                     }
 
                     Bitmap newbitmap = mRAdapter.getBitmap(arg2);

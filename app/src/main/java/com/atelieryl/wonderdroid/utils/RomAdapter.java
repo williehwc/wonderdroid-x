@@ -169,13 +169,13 @@ public class RomAdapter extends BaseAdapter {
     }
 
     public Bitmap getBitmap(int index) {
-        WonderSwanHeader header = getHeader(index);
-        String internalname = header.internalname;
-        Bitmap splash = splashCache.get(internalname);
-        if (splash != null)
-            return splash;
-
         try {
+            WonderSwanHeader header = getHeader(index);
+            String internalname = header.internalname;
+            Bitmap splash = splashCache.get(internalname);
+            if (splash != null)
+                return splash;
+
             splash = BitmapFactory.decodeStream(mAssetManager
                     .open("snaps/" + internalname + ".png"));
             if (header.isVertical) {
@@ -189,7 +189,7 @@ public class RomAdapter extends BaseAdapter {
             return splash;
         } catch (IOException e) {
             // e.printStackTrace();
-            Log.d(TAG, "No shot for " + internalname);
+            Log.d(TAG, "No shot for ROM at index" + index);
             return null;
         }
 
@@ -223,13 +223,20 @@ public class RomAdapter extends BaseAdapter {
 
         view.setTitle(mRoms[position].displayName);
 
-        WonderSwanHeader header = getHeader(position);
+        WonderSwanHeader header = null;
+        try {
+            header = getHeader(position);
+        } catch (Exception e) {
+
+        }
         if (header != null) {
             Bitmap shot = getBitmap(position);
-                view.setSnap(shot);
-            if (shot != null) {
+            view.setSnap(shot);
+            /*if (shot != null) {
                 Log.d(TAG, "snap is null for " + mRoms[position].sourcefile);
-            }
+            }*/
+        } else {
+            view.setSnap(null);
         }
 
         return view;
