@@ -82,6 +82,8 @@
     <string name="keep">否，留當前存檔</string>
     <string name="statewarning">【一】儲存和載入記憶狀態是在測試的功能。我們建議您備份您的卡匣存檔（在 ???）。\n【二】載入記憶狀態時，如果要載入的記憶狀態的卡匣存檔跟當前存檔不同，本模擬器會覆蓋當前存檔。\n【三】載入記憶狀態有時會使遊戲當機。如有這情形，請再一次載入記憶狀態。</string>
     <string name="understand">我瞭解</string>
+    <string name="mapcontrols">選擇按鈕…</string>
+    <string name="mapcontrolsdescription">鍵盤和其他輸入設備</string>
 
     <string-array name="sexes">
         <item>男</item>

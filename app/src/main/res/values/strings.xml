@@ -9,14 +9,14 @@
     <string name="mono">Monochrome —\u00A0</string>
     <string name="vertical">Vertical</string>
     <string name="horizontal">Horizontal</string>
-    <string name="selectgame">Select Game</string>
+    <string name="selectgame">Exit Game</string>
     <string name="exit">Exit</string>
     <string name="preferences">Preferences</string>
     <string name="importgame">Import Game</string>
     <string name="togglescreencontrols">Toggle Screen Controls</string>
     <string name="pause">Pause</string>
     <string name="reset">Reset</string>
-    <string name="settings_cat_controls">Controls</string>
+    <string name="settings_cat_controls">Hardware controls</string>
     <string name="control_x2">X2 (Right)</string>
     <string name="control_x3">X3 (Down)</string>
     <string name="control_x4">X4 (Left)</string>
@@ -26,8 +26,8 @@
     <string name="pressakey">Press a key</string>
     <string name="birthday">Birthday</string>
     <string name="sex">Sex</string>
-    <string name="bloodtype">Bloodtype</string>
-    <string name="settings_cat_ws">WonderSwan Profile</string>
+    <string name="bloodtype">Blood type</string>
+    <string name="settings_cat_ws">WonderSwan profile</string>
     <string name="name">Name</string>
     <string name="overriderompath">ROM path</string>
     <string name="overridemempath">Save path</string>
@@ -86,6 +86,8 @@
     <string name="keep">No, keep current</string>
     <string name="statewarning">[1] State saving and loading are experimental features. We recommend you back up your cartridge saves in ??? regularly.\n[2] When loading a state, if its corresponding cartridge save is different from the current cartridge save, the latter will be replaced.\n[3] Loading a state occationally causes the game to freeze or crash. If this happens, please try loading the state again.</string>
     <string name="understand">I understand</string>
+    <string name="mapcontrols">Map controls…</string>
+    <string name="mapcontrolsdescription">For keyboards and other input peripherals</string>
 
     <string-array name="sexes">
         <item>Male</item>
