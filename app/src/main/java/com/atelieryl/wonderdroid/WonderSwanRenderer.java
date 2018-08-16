@@ -143,4 +143,14 @@ public class WonderSwanRenderer implements EmuThread.Renderer {
     public void stopDrawThread() {
         drawThread.clearRunning();
     }
+
+    public void setVolume(int volume) {
+        float volumeFloat = (float) volume / 100;
+        if (volumeFloat > 1) {
+            volumeFloat = 1;
+        } else if (volumeFloat < 0) {
+            volumeFloat = 0;
+        }
+        audio.setVolume(volumeFloat);
+    }
 }

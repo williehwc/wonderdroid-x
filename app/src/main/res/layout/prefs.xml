@@ -3,10 +3,11 @@
 
     <PreferenceCategory android:title="@string/emulatorsettings" >
 
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="emusound"
-            android:title="@string/enablesound" />
+        <SeekBarPreference
+            android:key="volume"
+            android:icon="@drawable/ic_volume"
+            android:defaultValue="100"
+            android:max="100" />
 
         <!--
        <CheckBoxPreference
@@ -91,8 +92,7 @@
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="relocate"
-            android:title="@string/relocate"
-            android:summary="@string/relocatedescription" />
+            android:title="@string/relocate" />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/graphicssettings" >
@@ -103,19 +103,19 @@
             android:title="@string/stretchtofill"
             android:summary="@string/stretchtofilldescription" />
         <ListPreference
-            android:entries="@array/frameskip"
-            android:entryValues="@array/frameskipvalues"
-            android:key="frameskip"
-            android:title="@string/frameskip"
-            android:defaultValue="0"
-            android:summary="@string/frameskipdescription" />
-        <ListPreference
             android:entries="@array/sharpness"
             android:entryValues="@array/bloodtypevalues"
             android:key="sharpness"
             android:title="@string/sharpness"
             android:defaultValue="3"
             android:summary="@string/sharpnessdescription" />
+        <ListPreference
+            android:entries="@array/frameskip"
+            android:entryValues="@array/frameskipvalues"
+            android:key="frameskip"
+            android:title="@string/frameskip"
+            android:defaultValue="0"
+            android:summary="@string/frameskipdescription" />
         
         
     </PreferenceCategory>

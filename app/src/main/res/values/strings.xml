@@ -13,7 +13,7 @@
     <string name="exit">Exit</string>
     <string name="preferences">Preferences</string>
     <string name="importgame">Import Game</string>
-    <string name="togglescreencontrols">Toggle Screen Controls</string>
+    <string name="togglescreencontrols">Toggle Touch Controls</string>
     <string name="pause">Pause</string>
     <string name="reset">Reset</string>
     <string name="settings_cat_controls">Hardware controls</string>
@@ -35,11 +35,11 @@
     <string name="enablesound">Enable sound</string>
     <string name="showcontrols">Show controls automatically</string>
     <string name="showcontrolsdescription">When starting a game</string>
-    <string name="onscreencontrolsettings">Onscreen controls</string>
+    <string name="onscreencontrolsettings">Touchscreen controls</string>
     <string name="vibratedown">Button-down vibration</string>
-    <string name="vibratedowndescription">When pressing an onscreen control</string>
+    <string name="vibratedowndescription">When pressing a touchscreen control</string>
     <string name="vibrateup">Button-up vibration</string>
-    <string name="vibrateupdescription">When releasing an onscreen control</string>
+    <string name="vibrateupdescription">When releasing a touchscreen control</string>
     <string name="relocate">Relocate Start to top-right</string>
     <string name="relocatedescription">Requires emulator restart</string>
     <string name="graphicssettings">Graphics</string>

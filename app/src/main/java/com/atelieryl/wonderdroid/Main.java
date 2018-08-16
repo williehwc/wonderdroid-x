@@ -294,7 +294,7 @@ public class Main extends BaseActivity {
     }
 
     private void parseEmuOptions(SharedPreferences prefs) {
-        WonderSwan.audioEnabled = prefs.getBoolean("emusound", true);
+        WonderSwan.audioEnabled = prefs.getInt("volume", 100) > 0;
         showControls = prefs.getBoolean("showcontrols", true);
     }
 

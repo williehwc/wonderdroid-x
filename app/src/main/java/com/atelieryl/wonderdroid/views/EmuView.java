@@ -54,7 +54,9 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 	static int vibratedown = 5;
 	static int vibrateup = 1;
 
-	boolean relocate = false;
+	private boolean relocate = false;
+	private int width = 0;
+	private int height = 0;
 
 	SurfaceHolder mHolder = null;
 
@@ -105,12 +107,10 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		
 		vibratedown = Integer.parseInt(prefs.getString("vibratedown", "5"));
 		vibrateup = Integer.parseInt(prefs.getString("vibrateup", "1"));
-
-		relocate = prefs.getBoolean("relocate", false);
 	}
 
 	@Override
-	public void surfaceChanged (SurfaceHolder holder, int format, int width, int height) {
+	public void surfaceChanged (SurfaceHolder holder, int format, int w, int h) {
 		if (actualHeightToDrawnHeightRatio == 0 || actualHeightToDrawnHeightRatio == 1) {
 			if (widthToHeightRatio == 0)
 				widthToHeightRatio = (float) this.getWidth() / (float) this.getHeight();
@@ -119,93 +119,21 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 			if (!stretchToFill) {
 				while ((float) newWidth / (float) newHeight < widthToHeightRatio) newWidth++;
 			}
-			actualWidthToDrawnWidthRatio = (float) width / (float) newWidth;
-			actualHeightToDrawnHeightRatio = (float) height / (float) newHeight;
+			actualWidthToDrawnWidthRatio = (float) w / (float) newWidth;
+			actualHeightToDrawnHeightRatio = (float) h / (float) newHeight;
 			width = newWidth;
 			height = newHeight;
 			
-			int spacing = -1 * height / 50;
-			int buttonsize = (int)(height / 6.7);
-			for (int i = 0; i < buttons.length; i++) {
-				buttons[i].setSize(buttonsize, buttonsize);
-	
-				int updownleft = buttonsize + spacing;
-				int updownright = buttonsize + buttonsize + spacing;
-				int bottomrowtop = height - buttonsize;
-	
-				switch (i) {
-				// Y
-				case 0: //up
-					buttons[i].setBounds(updownleft, 0, updownright, buttonsize);
-					break;
-				case 1: //left
-					buttons[i].setBounds(0, buttonsize + spacing, buttonsize, (buttonsize * 2) + spacing);
-					break;
-				case 2: //right
-					buttons[i].setBounds(2 * (buttonsize + spacing), buttonsize + spacing, buttonsize + 2 * (buttonsize + spacing), (buttonsize * 2)
-						+ spacing);
-					break;
-				case 3: //down
-					buttons[i].setBounds(updownleft, (buttonsize * 2) + (spacing * 2), updownright, (buttonsize * 3) + (spacing * 2));
-					break;
-				// X
-				case 4:
-					buttons[i].setBounds(updownleft, height - buttonsize, updownright, height);
-					break;
-				case 5:
-					buttons[i].setBounds(0, height - (buttonsize * 2) - spacing, buttonsize, height - buttonsize - spacing);
-					break;
-				case 6:
-					buttons[i].setBounds(2 * (buttonsize + spacing), height - (buttonsize * 2) - spacing, buttonsize + 2 * (buttonsize + spacing), height
-						- buttonsize - spacing);
-					break;
-				case 7:
-					buttons[i].setBounds(updownleft, (height - (buttonsize * 3)) - (2 * spacing), updownright,
-						(height - (buttonsize * 2)) - (2 * spacing));
-					break;
-				// A,B
-				case 8:
-					buttons[i].setBounds(width - buttonsize, bottomrowtop, width, height);
-					break;
-				case 9:
-					buttons[i].setBounds(width - (buttonsize * 2) + spacing * 2, bottomrowtop, (width - buttonsize) + spacing * 2, height);
-					break;
-				// Start
-				case 10:
-					buttons[i].setSize(buttonsize * 2, buttonsize);
-					if (relocate) {
-						buttons[i].setBounds(width - buttonsize * 2, 0, width, buttonsize);
-					} else {
-						buttons[i].setBounds((width / 2) - buttonsize, bottomrowtop, (width / 2) + buttonsize, height);
-					}
-					break;
-				}
-			}
-	
-			Button[] buts = new Button[buttons.length];
-	
-			if (buttons != null) {
-				Paint textPaint = new Paint();
-				textPaint.setColor(0xFFFFFFFF);
-				textPaint.setTextSize(height / 30);
-				textPaint.setShadowLayer(3, 1, 1, 0x99000000);
-				textPaint.setAntiAlias(true);
-	
-				for (int i = 0; i < buttons.length; i++) {
-					buts[i] = new Button(buttons[i], textPaint, WonderSwanButton.values()[i].name());
-				}
-			}
-	
+			makeButtons();
+
 			float postscale = (float)width / (float)WonderSwan.SCREEN_WIDTH;
-	
+
 			if (WonderSwan.SCREEN_HEIGHT * postscale > height) {
 				postscale = (float)height / (float)WonderSwan.SCREEN_HEIGHT;
-	
+
 			}
-	
+
 			Matrix scale = renderer.getMatrix();
-	
-			renderer.setButtons(buts);
 	
 			scale.reset();
 			scale.postScale(sharpness, sharpness);
@@ -273,6 +201,11 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		mThread.setFrameskip(Integer.parseInt(prefs.getString("frameskip", "0")));
 		vibratedown = Integer.parseInt(prefs.getString("vibratedown", "5"));
 		vibrateup = Integer.parseInt(prefs.getString("vibrateup", "1"));
+		relocate = prefs.getBoolean("relocate", false);
+		if (width > 0 && height > 0) {
+			makeButtons();
+		}
+		renderer.setVolume(prefs.getInt("volume", 100));
 	}
 
 	public void stop () {
@@ -293,6 +226,82 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 
 		}
+	}
+
+	public void makeButtons() {
+		int spacing = -1 * height / 50;
+		int buttonsize = (int)(height / 6.7);
+		for (int i = 0; i < buttons.length; i++) {
+			buttons[i].setSize(buttonsize, buttonsize);
+
+			int updownleft = buttonsize + spacing;
+			int updownright = buttonsize + buttonsize + spacing;
+			int bottomrowtop = height - buttonsize;
+
+			switch (i) {
+				// Y
+				case 0: //up
+					buttons[i].setBounds(updownleft, 0, updownright, buttonsize);
+					break;
+				case 1: //left
+					buttons[i].setBounds(0, buttonsize + spacing, buttonsize, (buttonsize * 2) + spacing);
+					break;
+				case 2: //right
+					buttons[i].setBounds(2 * (buttonsize + spacing), buttonsize + spacing, buttonsize + 2 * (buttonsize + spacing), (buttonsize * 2)
+							+ spacing);
+					break;
+				case 3: //down
+					buttons[i].setBounds(updownleft, (buttonsize * 2) + (spacing * 2), updownright, (buttonsize * 3) + (spacing * 2));
+					break;
+				// X
+				case 4:
+					buttons[i].setBounds(updownleft, height - buttonsize, updownright, height);
+					break;
+				case 5:
+					buttons[i].setBounds(0, height - (buttonsize * 2) - spacing, buttonsize, height - buttonsize - spacing);
+					break;
+				case 6:
+					buttons[i].setBounds(2 * (buttonsize + spacing), height - (buttonsize * 2) - spacing, buttonsize + 2 * (buttonsize + spacing), height
+							- buttonsize - spacing);
+					break;
+				case 7:
+					buttons[i].setBounds(updownleft, (height - (buttonsize * 3)) - (2 * spacing), updownright,
+							(height - (buttonsize * 2)) - (2 * spacing));
+					break;
+				// A,B
+				case 8:
+					buttons[i].setBounds(width - buttonsize, bottomrowtop, width, height);
+					break;
+				case 9:
+					buttons[i].setBounds(width - (buttonsize * 2) + spacing * 2, bottomrowtop, (width - buttonsize) + spacing * 2, height);
+					break;
+				// Start
+				case 10:
+					buttons[i].setSize(buttonsize * 2, buttonsize);
+					if (relocate) {
+						buttons[i].setBounds(width - buttonsize * 2, 0, width, buttonsize);
+					} else {
+						buttons[i].setBounds((width / 2) - buttonsize, bottomrowtop, (width / 2) + buttonsize, height);
+					}
+					break;
+			}
+		}
+
+		Button[] buts = new Button[buttons.length];
+
+		if (buttons != null) {
+			Paint textPaint = new Paint();
+			textPaint.setColor(0xFFFFFFFF);
+			textPaint.setTextSize(height / 30);
+			textPaint.setShadowLayer(3, 1, 1, 0x99000000);
+			textPaint.setAntiAlias(true);
+
+			for (int i = 0; i < buttons.length; i++) {
+				buts[i] = new Button(buttons[i], textPaint, WonderSwanButton.values()[i].name());
+			}
+		}
+
+		renderer.setButtons(buts);
 	}
 
 	public static void changeButton (WonderSwanButton button, boolean newState, boolean touch) {
