@@ -355,12 +355,12 @@ public class Select extends BaseActivity {
                         Log.d(TAG, "Cannot get header for ROM at index " + arg2);
                     }
                     if (header != null) {
-                        String newtext;
-                        if (header.isColor) {
-                            newtext = getString(R.string.colour);
+                        String newtext = "";
+                        /*if (header.isColor) {
+                            newtext += getString(R.string.colour);
                         } else {
-                            newtext = getString(R.string.mono);
-                        }
+                            newtext += getString(R.string.mono);
+                        }*/
 
                         if (header.isVertical) {
                             newtext += getString(R.string.vertical);
