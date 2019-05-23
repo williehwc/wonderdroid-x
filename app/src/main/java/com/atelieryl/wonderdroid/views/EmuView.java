@@ -51,6 +51,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 	private boolean started = false;
 	private int sharpness = 3;
 	private boolean stretchToFill = false;
+	private double scaling = 1;
 	
 	static int vibratedown = 5;
 	static int vibrateup = 1;
@@ -104,6 +105,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		sharpness = Integer.parseInt(prefs.getString("sharpness", "3"));
 		mThread.setFrameskip(Integer.parseInt(prefs.getString("frameskip", "0")));
 		stretchToFill = prefs.getBoolean("stretchtofill", false);
+		scaling = (prefs.getInt("scaling", 95) + 5) / 100.;
 		renderer.setClearBeforeDraw(!stretchToFill);
 		
 		vibratedown = Integer.parseInt(prefs.getString("vibratedown", "5"));
@@ -134,11 +136,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 
 			}
 
-			Matrix scale = renderer.getMatrix();
-	
-			scale.reset();
-			scale.postScale(sharpness, sharpness);
-			scale.postTranslate((width - WonderSwan.SCREEN_WIDTH * sharpness) / 2, 0);
+			rescale();
 		}
 		mHolder = holder;
 	}
@@ -162,6 +160,15 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 	public void surfaceDestroyed (SurfaceHolder holder) {
 		mHolder = null;
 		//mThread.clearRunning();
+	}
+
+	public void rescale () {
+		Matrix scale = renderer.getMatrix();
+
+		scale.reset();
+		scale.postScale(sharpness * (float) scaling, sharpness * (float) scaling);
+		scale.postTranslate((width - WonderSwan.SCREEN_WIDTH * sharpness * (float) scaling) / 2,
+				(height - WonderSwan.SCREEN_HEIGHT * sharpness * (float) scaling) / 2);
 	}
 
 	public void start () {
@@ -200,12 +207,14 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		mThread.setSurfaceHolder(mHolder);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		mThread.setFrameskip(Integer.parseInt(prefs.getString("frameskip", "0")));
+		scaling = (prefs.getInt("scaling", 95) + 5) / 100.;
 		vibratedown = Integer.parseInt(prefs.getString("vibratedown", "5"));
 		vibrateup = Integer.parseInt(prefs.getString("vibrateup", "1"));
 		if (width > 0 && height > 0) {
 			makeButtons(prefs);
 		}
 		renderer.setVolume(prefs.getInt("volume", 100));
+		rescale();
 	}
 
 	public void stop () {
@@ -482,6 +491,14 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 	public void showButtons (boolean show) {
 		controlsVisible = show;
 		renderer.showButtons(show);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		if (prefs.getString("opacity", "4").equals("0") && !prefs.getBoolean("showbuttonlabels", true)) {
+			if (show) {
+				Toast.makeText(mContext, "Touch controls are enabled but not visible due to your settings.", Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(mContext, "Touch controls are disabled.", Toast.LENGTH_SHORT).show();
+			}
+		}
 	}
 
 }

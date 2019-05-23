@@ -113,7 +113,12 @@
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/graphicssettings" >
-         
+
+        <SeekBarPreference
+            android:key="scaling"
+            android:icon="@drawable/ic_scaling"
+            android:defaultValue="95"
+            android:max="95" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="stretchtofill"
