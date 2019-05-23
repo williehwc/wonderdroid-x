@@ -1,9 +1,6 @@
 
 package com.atelieryl.wonderdroid;
 
-import org.acra.ACRA;
-import org.acra.annotation.ReportsCrashes;
-
 import com.atelieryl.wonderdroid.utils.ZipCache;
 
 import android.app.Application;
@@ -23,7 +20,6 @@ public class WonderDroid extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        ACRA.init(this);
         WonderSwan.outputDebugShizzle();
         ZipCache.dumpInfo(this.getBaseContext());
         ZipCache.clean(this.getBaseContext());

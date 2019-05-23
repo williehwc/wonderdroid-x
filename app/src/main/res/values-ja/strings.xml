@@ -28,11 +28,11 @@
     <string name="sex">性別</string>
     <string name="bloodtype">血液型</string>
     <string name="name">名前</string>
-    <string name="about">ワンダドロイド X について</string>
+    <string name="about">このアプリについて</string>
     <string name="close">閉じる</string>
     <string name="gotopreferences">設定</string>
     <string name="emulatorsettings">設定</string>
-    <string name="enablesound">オーディオ有効</string>
+    <string name="enablesound">音声を有効にする</string>
     <string name="onscreencontrolsettings">画面のコントラ</string>
     <string name="graphicssettings">ビデオ</string>
     <string name="frameskip">フレームスキップ</string>
@@ -40,11 +40,58 @@
     <string name="savestate">保存</string>
     <string name="loadstate">読み込み</string>
     <string name="understand">分かりました</string>
-    <string name="visit">yearbooklabs.com</string>
+    <string name="visit">当社のウェブサイトを訪問する</string>
 
     <string-array name="sexes">
         <item>男性</item>
         <item>女性</item>
     </string-array>
-    
+    <string name="report">問題を報告する</string>
+    <string name="reportdescription">パフォーマンスに問題がある場合は、まずフレームスキップとシャープネスの設定を変更してみて下さい。それでも解決しない場合や他に問題がある場合は、GitHubにてご報告下さい。ご協力をお待ちしております！</string>
+    <string name="issues">GitHubへ移動する</string>
+    <string name="reversehorizontalorientation">画面を逆向きにする</string>
+    <string name="showbackground">ゲーム選択時に背景を表示する</string>
+    <string name="showbackgrounddescription">無効にするとスクロールが滑らかになります。</string>
+    <string name="overriderompath">ROMフォルダー</string>
+    <string name="overridemempath">セーブフォルダー</string>
+    <string name="showcontrols">ゲームを開始する時に自動表示する</string>
+    <string name="showcontrolsdescription">プレイ中に手動で切り替える事も可能です。</string>
+    <string name="vibratedown">ボタンを押した時に振動させる</string>
+    <string name="vibrateup">ボタンを離した時に振動させる</string>
+    <string name="relocate">Start ボタンを右上に配置する</string>
+    <string name="relocatedescription">エミュレーターの再起動が必要です</string>
+    <string name="stretchtofill">画面いっぱいに引き伸ばす</string>
+    <string name="stretchtofilldescription">パフォーマンスが改善されるかもしれません; エミュレーターの再起動が必要です</string>
+    <string name="empty">無し</string>
+    <string name="slot">状態</string>
+    <string name="undo">戻す</string>
+    <string name="auto">自動</string>
+    <string name="mapcontrols">コントローラーのマッピング…</string>
+    <string name="cannotloadrom">ROMをロードできませんでした。再度お試し下さい。</string>
+    <string name="frameskipdescription">1回につき何フレームスキップしますか?</string>
+    <string name="mapcontrolsdescription">キーボード及びその他の入力周辺機器用</string>
+    <string name="sharpnessdescription">表示遅れの原因となる可能性があります; エミュレーターの再起動が必要です</string>
+    <string name="sdcardinfo">SDカードの使用に関するヘルプ</string>
+    <string name="rompatherror">ROMフォルダーエラー</string>
+    <string name="moreapps">他のYLアプリ一覧</string>
+    <string name="writememfileerror">セーブファイルに書き込めません</string>
+    <string name="readmemfileerror">セーブファイルを読み込めません</string>
+    <string name="needpermissions">あなたの端末設定からWonderDroid Xのファイルアクセス許可を有効にして下さい。</string>
+    <string name="askpermissions">ROMの読み込みにはファイルアクセス許可が必要です。</string>
+    <string name="mempatherror">セーブフォルダーエラー</string>
+    <string name="statewarning">[1] ステートセーブ及びロードは実験的な機能です。??? に保存された通常のセーブデータのバックアップを推奨します。\n[2] ステートをロードする場合、対応するカートリッジのセーブデータが現在のカートリッジのセーブデータと異なる場合は、後者が置き換えられます。\n[3] ステートをロードすると、ゲームがフリーズまたはクラッシュすることがあります。このような場合は、再度ステートをロードしてみて下さい。</string>
+    <string name="rompatherrordescription">フォルダー ??? は利用不可です。設定のゲームフォルダから別の場所を指定して下さい。</string>
+    <string name="mempatherrordescription">フォルダー ??? は利用不可/読み取り専用です。設定のゲームフォルダから別の場所を指定して下さい。</string>
+    <string name="vibratedowndescription"></string>
+    <string name="vibrateupdescription"></string>
+    <string name="swapab">AボタンとBボタンを入れ替える</string>
+    <string name="sizeposition">サイズと位置…</string>
+    <string name="abposition">AボタンとBボタンの位置</string>
+    <string name="sidebyside">左右</string>
+    <string name="topbottom">上下</string>
+    <string name="diagonal">対角</string>
+    <string name="opacity">不透明度</string>
+    <string name="buttoncolor">ボタンの色</string>
+    <string name="showbuttonlabels">ボタンのラベル</string>
+
 </resources>

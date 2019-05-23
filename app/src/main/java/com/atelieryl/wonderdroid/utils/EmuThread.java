@@ -100,7 +100,7 @@ public class EmuThread extends Thread {
                 if (frametime < TARGETFRAMETIME[frameTimeIndex]) {
                     SystemClock.sleep(TARGETFRAMETIME[frameTimeIndex] - frametime);
                 } else if (frametime > TARGETFRAMETIME[frameTimeIndex]) {
-                    Log.d(TAG, "Overtime " + frametime);
+                    //Log.d(TAG, "Overtime " + frametime);
                 }
 
                 frameTimeIndex++;

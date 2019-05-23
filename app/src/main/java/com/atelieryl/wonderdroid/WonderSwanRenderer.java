@@ -100,7 +100,11 @@ public class WonderSwanRenderer implements EmuThread.Renderer {
 
     @Override
     public void start() {
-        audio.play();
+        try {
+            audio.play();
+        } catch (Exception e) {
+
+        }
     }
 
     @Override

@@ -13,9 +13,6 @@ import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
 
 import com.atelieryl.wonderdroid.utils.RomAdapter;
 
@@ -92,7 +89,7 @@ public class Select extends BaseActivity {
         findViewById(android.R.id.content).setBackgroundColor(Color.parseColor("#303030"));
 
         // Help translate button
-        if (Locale.getDefault().getLanguage().equals("ja")) {
+        /*if (Locale.getDefault().getLanguage().equals("ja")) {
         	final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             boolean hideTranslate = prefs.getBoolean("hidetranslate", false);
             if (!hideTranslate) {
@@ -114,7 +111,7 @@ public class Select extends BaseActivity {
 	        	    }
 	        	});
             }
-        }
+        }*/
     }
 
     @Override

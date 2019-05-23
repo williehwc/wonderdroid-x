@@ -55,5 +55,39 @@
         <item>10</item>
         <item>15</item>
     </string-array>
+    <string-array name="opacity">
+        <item>None</item>
+        <item>Very Low</item>
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+        <item>Very High</item>
+    </string-array>
+    <string-array name="opacityvalues">
+        <item>0</item>
+        <item>1</item>
+        <item>4</item>
+        <item>7</item>
+        <item>a</item>
+        <item>d</item>
+    </string-array>
+    <string-array name="abposition">
+        <item>Side by side</item>
+        <item>Top-bottom</item>
+        <item>Diagonal</item>
+    </string-array>
+    <string-array name="abpositionvalues">
+        <item>sidebyside</item>
+        <item>topbottom</item>
+        <item>diagonal</item>
+    </string-array>
+    <string-array name="buttoncolor">
+        <item>Black</item>
+        <item>White</item>
+    </string-array>
+    <string-array name="buttoncolorvalues">
+        <item>black</item>
+        <item>white</item>
+    </string-array>
 
 </resources>

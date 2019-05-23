@@ -187,7 +187,7 @@ public class RomAdapter extends BaseAdapter {
             if (splash != null)
                 splashCache.put(internalname, splash);
             return splash;
-        } catch (IOException e) {
+        } catch (Exception e) {
             // e.printStackTrace();
             Log.d(TAG, "No shot for ROM at index" + index);
             return null;
@@ -221,7 +221,11 @@ public class RomAdapter extends BaseAdapter {
         else
             view = (RomGalleryView)oldview;
 
-        view.setTitle(mRoms[position].displayName);
+        try {
+            view.setTitle(mRoms[position].displayName);
+        } catch (Exception e) {
+            view.setTitle("");
+        }
 
         WonderSwanHeader header = null;
         try {

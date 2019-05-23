@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="frameskip">
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>无</item>
+    </string-array>
+    <string-array name="abposition">
+        <item>左右</item>
+        <item>上下</item>
+        <item>对角</item>
+    </string-array>
+    <string-array name="buttoncolor">
+        <item>黑</item>
+        <item>白</item>
+    </string-array>
+
+</resources>

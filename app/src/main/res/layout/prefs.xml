@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
 
     <PreferenceCategory android:title="@string/emulatorsettings" >
 
@@ -70,6 +72,9 @@
     </PreferenceCategory>
      
     <PreferenceCategory android:title="@string/onscreencontrolsettings">
+        <Preference
+            android:key="sizeposition"
+            android:title="@string/sizeposition" />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="showcontrols"
@@ -89,10 +94,22 @@
             android:title="@string/vibrateup"
             android:defaultValue="1"
             android:summary="@string/vibrateupdescription" />
+        <ListPreference
+            android:entries="@array/opacity"
+            android:entryValues="@array/opacityvalues"
+            android:key="opacity"
+            android:title="@string/opacity"
+            android:defaultValue="4" />
+        <ListPreference
+            android:entries="@array/buttoncolor"
+            android:entryValues="@array/buttoncolorvalues"
+            android:key="buttoncolor"
+            android:title="@string/buttoncolor"
+            android:defaultValue="black" />
         <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="relocate"
-            android:title="@string/relocate" />
+            android:defaultValue="true"
+            android:key="showbuttonlabels"
+            android:title="@string/showbuttonlabels" />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/graphicssettings" >

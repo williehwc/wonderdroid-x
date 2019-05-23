@@ -46,14 +46,13 @@
     <string name="frameskip">跳幀</string>
     <string name="frameskipdescription">每多少幀跳過一個?</string>
     <string name="sharpness">銳利度</string>
-    <string name="sharpnessdescription">May cause display lag; 需要重新開始模擬器</string>
+    <string name="sharpnessdescription">可能導致畫面不順; 需要重新開始模擬器</string>
     <string name="reversehorizontalorientation">水平時，轉動180度</string>
     <string name="stretchtofill">畫面自動調整到螢幕的形狀</string>
     <string name="stretchtofilldescription">可改善性能; 需要重新開始模擬器</string>
     <string name="showbackground">打開遊戲選項背景</string>
-    <string name="showbackgrounddescription">Disable for smoother scrolling</string>
+    <string name="showbackgrounddescription">Off 時，滾動會比較順暢。</string>
     <string name="about">關於</string>
-    <string name="aboutdescription">Developed by Willie Chang\nPublished by Yearbook Labs\nWonderDroid is originally written by Daniel Palmer.\nLicensed under GPL 2.0\nThis product includes other open-source software including ActionBarSherlock, Blip_Buffer, Bryan McPhail\'s NEC V30MZ emulator, Cygne, and Mednafen.\nOriginal icon designed by Bostwickenator on DeviantArt.</string>
     <string name="visit">參觀我們的網站</string>
     <string name="close">關閉</string>
     <string name="report">反映問題</string>
@@ -89,5 +88,14 @@
         <item>男</item>
         <item>女</item>
     </string-array>
+    <string name="swapab">交換 A + B 按鈕</string>
+    <string name="sizeposition">大小和位置…</string>
+    <string name="abposition">A + B 按鈕位置</string>
+    <string name="sidebyside">左右</string>
+    <string name="topbottom">上下</string>
+    <string name="diagonal">對角</string>
+    <string name="opacity">不透明度</string>
+    <string name="buttoncolor">按鈕顏色</string>
+    <string name="showbuttonlabels">顯示按鈕標籤</string>
 
 </resources>

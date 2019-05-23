@@ -73,6 +73,8 @@ public class DrawThread extends Thread {
 							c.drawBitmap(button.normal, button.drawrect, button.rect, null);
 						}
 					}
+				} catch (Exception e) {
+
 				} finally {
 					if (c != null) {
 						mSurfaceHolder.unlockCanvasAndPost(c);

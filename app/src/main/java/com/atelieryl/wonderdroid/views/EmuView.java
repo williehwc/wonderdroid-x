@@ -14,6 +14,7 @@ import com.atelieryl.wonderdroid.VibrateTask;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -39,7 +40,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 	private EmuThread mThread;
 	private final WonderSwanRenderer renderer;
 	private boolean controlsVisible = false;
-	private final GradientDrawable[] buttons;
+	private GradientDrawable[] buttons;
 	private final TouchInputHandler inputHandler;
 	private static Context mContext;
 	
@@ -54,9 +55,15 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 	static int vibratedown = 5;
 	static int vibrateup = 1;
 
-	private boolean relocate = false;
 	private int width = 0;
 	private int height = 0;
+
+	private static final float[] NEGATIVE = {
+			-1.0f,     0,     0,    0, 255, // red
+			0, -1.0f,     0,    0, 255, // green
+			0,     0, -1.0f,    0, 255, // blue
+			0,     0,     0, 1.0f,   0  // alpha
+	};
 
 	SurfaceHolder mHolder = null;
 
@@ -84,12 +91,6 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		this.mContext = context;
 		
 		inputHandler = new TouchInputHandler(context);
-
-		buttons = new GradientDrawable[WonderSwanButton.values().length];
-
-		for (int i = 0; i < buttons.length; i++) {
-			buttons[i] = (GradientDrawable)getResources().getDrawable(R.drawable.button);
-		}
 
 		setZOrderOnTop(true); // FIXME any advantage to this?
 
@@ -124,7 +125,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 			width = newWidth;
 			height = newHeight;
 			
-			makeButtons();
+			makeButtons(PreferenceManager.getDefaultSharedPreferences(mContext));
 
 			float postscale = (float)width / (float)WonderSwan.SCREEN_WIDTH;
 
@@ -201,9 +202,8 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		mThread.setFrameskip(Integer.parseInt(prefs.getString("frameskip", "0")));
 		vibratedown = Integer.parseInt(prefs.getString("vibratedown", "5"));
 		vibrateup = Integer.parseInt(prefs.getString("vibrateup", "1"));
-		relocate = prefs.getBoolean("relocate", false);
 		if (width > 0 && height > 0) {
-			makeButtons();
+			makeButtons(prefs);
 		}
 		renderer.setVolume(prefs.getInt("volume", 100));
 	}
@@ -228,60 +228,130 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		}
 	}
 
-	public void makeButtons() {
-		int spacing = -1 * height / 50;
-		int buttonsize = (int)(height / 6.7);
+	public void makeButtons(SharedPreferences prefs) {
+		buttons = new GradientDrawable[WonderSwanButton.values().length];
+		int buttonBaseId = mContext.getResources().getIdentifier(
+				"button_" + prefs.getString("opacity", "4"), "drawable", mContext.getPackageName());
 		for (int i = 0; i < buttons.length; i++) {
+			buttons[i] = (GradientDrawable)getResources().getDrawable(buttonBaseId);
+			if (prefs.getString("buttoncolor", "black").equals("white"))
+				buttons[i].setColorFilter(new ColorMatrixColorFilter(NEGATIVE));
+		}
+
+		int defaultSpacing = -1 * height / 50;
+		int defaultButtonsize = (int)(height / 6.7);
+		for (int i = 0; i < buttons.length; i++) {
+			int spacing = 0;
+			int buttonsize = 0;
+			switch (i) {
+				case 0:
+				case 1:
+				case 2:
+				case 3:
+					spacing = (int) ((prefs.getInt("size_y", 20) + 5) / 25. * defaultSpacing);
+					buttonsize = (int) ((prefs.getInt("size_y", 20) + 5) / 25. * defaultButtonsize);
+					break;
+				case 4:
+				case 5:
+				case 6:
+				case 7:
+					spacing = (int) ((prefs.getInt("size_x", 20) + 5) / 25. * defaultSpacing);
+					buttonsize = (int) ((prefs.getInt("size_x", 20) + 5) / 25. * defaultButtonsize);
+					break;
+				case 8:
+				case 9:
+					spacing = (int) ((prefs.getInt("size_ab", 20) + 5) / 25. * defaultSpacing);
+					buttonsize = (int) ((prefs.getInt("size_ab", 20) + 5) / 25. * defaultButtonsize);
+					break;
+				case 10:
+					spacing = (int) ((prefs.getInt("size_start", 20) + 5) / 25. * defaultSpacing);
+					buttonsize = (int) ((prefs.getInt("size_start", 20) + 5) / 25. * defaultButtonsize);
+					break;
+			}
+
 			buttons[i].setSize(buttonsize, buttonsize);
 
 			int updownleft = buttonsize + spacing;
 			int updownright = buttonsize + buttonsize + spacing;
 			int bottomrowtop = height - buttonsize;
 
+			int marginTop = prefs.getInt("margin_top", 0) * 2;
+			int marginLeft = prefs.getInt("margin_left", 0) * 2;
+			int marginRight = prefs.getInt("margin_right", 0) * 3;
+			int marginBottom = prefs.getInt("margin_bottom", 0) * 3;
+
 			switch (i) {
 				// Y
 				case 0: //up
-					buttons[i].setBounds(updownleft, 0, updownright, buttonsize);
+					buttons[i].setBounds(marginLeft + updownleft, marginTop, marginLeft + updownright, marginTop + buttonsize);
 					break;
 				case 1: //left
-					buttons[i].setBounds(0, buttonsize + spacing, buttonsize, (buttonsize * 2) + spacing);
+					buttons[i].setBounds(marginLeft, marginTop + buttonsize + spacing, marginLeft + buttonsize, marginTop + (buttonsize * 2) + spacing);
 					break;
 				case 2: //right
-					buttons[i].setBounds(2 * (buttonsize + spacing), buttonsize + spacing, buttonsize + 2 * (buttonsize + spacing), (buttonsize * 2)
+					buttons[i].setBounds(marginLeft + 2 * (buttonsize + spacing), marginTop + buttonsize + spacing, marginLeft + buttonsize + 2 * (buttonsize + spacing), marginTop + (buttonsize * 2)
 							+ spacing);
 					break;
 				case 3: //down
-					buttons[i].setBounds(updownleft, (buttonsize * 2) + (spacing * 2), updownright, (buttonsize * 3) + (spacing * 2));
+					buttons[i].setBounds(marginLeft + updownleft, marginTop + (buttonsize * 2) + (spacing * 2), marginLeft + updownright, marginTop + (buttonsize * 3) + (spacing * 2));
 					break;
 				// X
 				case 4:
-					buttons[i].setBounds(updownleft, height - buttonsize, updownright, height);
+					buttons[i].setBounds(marginLeft + updownleft, height - buttonsize - marginBottom, marginLeft + updownright, height - marginBottom);
 					break;
 				case 5:
-					buttons[i].setBounds(0, height - (buttonsize * 2) - spacing, buttonsize, height - buttonsize - spacing);
+					buttons[i].setBounds(marginLeft, height - (buttonsize * 2) - spacing - marginBottom, marginLeft + buttonsize, height - buttonsize - spacing - marginBottom);
 					break;
 				case 6:
-					buttons[i].setBounds(2 * (buttonsize + spacing), height - (buttonsize * 2) - spacing, buttonsize + 2 * (buttonsize + spacing), height
-							- buttonsize - spacing);
+					buttons[i].setBounds(marginLeft + 2 * (buttonsize + spacing), height - (buttonsize * 2) - spacing - marginBottom, marginLeft + buttonsize + 2 * (buttonsize + spacing), height
+							- buttonsize - spacing - marginBottom);
 					break;
 				case 7:
-					buttons[i].setBounds(updownleft, (height - (buttonsize * 3)) - (2 * spacing), updownright,
-							(height - (buttonsize * 2)) - (2 * spacing));
+					buttons[i].setBounds(marginLeft + updownleft, (height - (buttonsize * 3)) - (2 * spacing) - marginBottom, marginLeft + updownright,
+							(height - (buttonsize * 2)) - (2 * spacing) - marginBottom);
 					break;
 				// A,B
 				case 8:
-					buttons[i].setBounds(width - buttonsize, bottomrowtop, width, height);
+					if (!prefs.getBoolean("swapab", false)) {
+						if (prefs.getString("abposition", "sidebyside").equals("sidebyside"))
+							buttons[i].setBounds(width - buttonsize - marginRight, bottomrowtop - marginBottom, width - marginRight, height - marginBottom);
+						else if (prefs.getString("abposition", "sidebyside").equals("topbottom"))
+							buttons[i].setBounds(width - buttonsize - marginRight, height - (buttonsize * 2) + spacing - marginBottom, width - marginRight, height - buttonsize + spacing - marginBottom);
+						else if (prefs.getString("abposition", "sidebyside").equals("diagonal"))
+							buttons[i].setBounds(width - buttonsize - marginRight, height - (buttonsize * 2) - spacing - marginBottom, width - marginRight, height - buttonsize - spacing - marginBottom);
+					} else {
+						if (prefs.getString("abposition", "sidebyside").equals("sidebyside"))
+							buttons[i].setBounds(width - (buttonsize * 2) + spacing * 2 - marginRight, bottomrowtop - marginBottom, (width - buttonsize) + spacing * 2 - marginRight, height - marginBottom);
+						else if (prefs.getString("abposition", "sidebyside").equals("topbottom"))
+							buttons[i].setBounds(width - buttonsize - marginRight, bottomrowtop - marginBottom, width - marginRight, height - marginBottom);
+						else if (prefs.getString("abposition", "sidebyside").equals("diagonal"))
+							buttons[i].setBounds(width - (buttonsize * 2) - spacing - marginLeft, height - buttonsize - marginBottom, width - buttonsize - spacing - marginLeft, height - marginBottom);
+					}
 					break;
 				case 9:
-					buttons[i].setBounds(width - (buttonsize * 2) + spacing * 2, bottomrowtop, (width - buttonsize) + spacing * 2, height);
+					if (!prefs.getBoolean("swapab", false)) {
+						if (prefs.getString("abposition", "sidebyside").equals("sidebyside"))
+							buttons[i].setBounds(width - (buttonsize * 2) + spacing * 2 - marginRight, bottomrowtop - marginBottom, (width - buttonsize) + spacing * 2 - marginRight, height - marginBottom);
+						else if (prefs.getString("abposition", "sidebyside").equals("topbottom"))
+							buttons[i].setBounds(width - buttonsize - marginRight, bottomrowtop - marginBottom, width - marginRight, height - marginBottom);
+						else if (prefs.getString("abposition", "sidebyside").equals("diagonal"))
+							buttons[i].setBounds(width - (buttonsize * 2) - spacing - marginLeft, height - buttonsize - marginBottom, width - buttonsize - spacing - marginLeft, height - marginBottom);
+					} else {
+						if (prefs.getString("abposition", "sidebyside").equals("sidebyside"))
+							buttons[i].setBounds(width - buttonsize - marginRight, bottomrowtop - marginBottom, width - marginRight, height - marginBottom);
+						else if (prefs.getString("abposition", "sidebyside").equals("topbottom"))
+							buttons[i].setBounds(width - buttonsize - marginRight, height - (buttonsize * 2) + spacing - marginBottom, width - marginRight, height - buttonsize + spacing - marginBottom);
+						else if (prefs.getString("abposition", "sidebyside").equals("diagonal"))
+							buttons[i].setBounds(width - buttonsize - marginRight, height - (buttonsize * 2) - spacing - marginBottom, width - marginRight, height - buttonsize - spacing - marginBottom);
+					}
 					break;
 				// Start
 				case 10:
 					buttons[i].setSize(buttonsize * 2, buttonsize);
-					if (relocate) {
-						buttons[i].setBounds(width - buttonsize * 2, 0, width, buttonsize);
+					if (prefs.getBoolean("relocate", false)) {
+						buttons[i].setBounds(width - buttonsize * 2 - marginRight, marginTop, width - marginRight, marginTop + buttonsize);
 					} else {
-						buttons[i].setBounds((width / 2) - buttonsize, bottomrowtop, (width / 2) + buttonsize, height);
+						buttons[i].setBounds((width / 2) - buttonsize, bottomrowtop - marginBottom, (width / 2) + buttonsize, height - marginBottom);
 					}
 					break;
 			}
@@ -291,10 +361,20 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 
 		if (buttons != null) {
 			Paint textPaint = new Paint();
-			textPaint.setColor(0xFFFFFFFF);
-			textPaint.setTextSize(height / 30);
-			textPaint.setShadowLayer(3, 1, 1, 0x99000000);
 			textPaint.setAntiAlias(true);
+			textPaint.setTextSize(height / 30);
+
+			if (prefs.getBoolean("showbuttonlabels", true)) {
+				if (prefs.getString("buttoncolor", "black").equals("white")) {
+					textPaint.setColor(0xFF000000);
+				} else {
+					textPaint.setColor(0xFFFFFFFF);
+					textPaint.setShadowLayer(1, 1, 1, 0x99000000);
+				}
+			} else {
+				textPaint.setColor(0x00000000);
+			}
+
 
 			for (int i = 0; i < buttons.length; i++) {
 				buts[i] = new Button(buttons[i], textPaint, WonderSwanButton.values()[i].name());
