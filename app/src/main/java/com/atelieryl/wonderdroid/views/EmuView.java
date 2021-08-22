@@ -20,6 +20,7 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -28,6 +29,9 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
@@ -58,6 +62,8 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 
 	private int width = 0;
 	private int height = 0;
+
+	private float postscale;
 
 	private static final float[] NEGATIVE = {
 			-1.0f,     0,     0,    0, 255, // red
@@ -129,7 +135,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 			
 			makeButtons(PreferenceManager.getDefaultSharedPreferences(mContext));
 
-			float postscale = (float)width / (float)WonderSwan.SCREEN_WIDTH;
+			postscale = (float)width / (float)WonderSwan.SCREEN_WIDTH;
 
 			if (WonderSwan.SCREEN_HEIGHT * postscale > height) {
 				postscale = (float)height / (float)WonderSwan.SCREEN_HEIGHT;
@@ -247,6 +253,13 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 				buttons[i].setColorFilter(new ColorMatrixColorFilter(NEGATIVE));
 		}
 
+		// Fix for gesture conflicts: https://stackoverflow.com/questions/65056838
+		if (Build.VERSION.SDK_INT >= 29) {
+			List<Rect> exclusionRects = new ArrayList<>();
+			exclusionRects.add(new Rect(0, 0, 200, 2048));
+			this.setSystemGestureExclusionRects(exclusionRects);
+		}
+
 		int defaultSpacing = -1 * height / 50;
 		int defaultButtonsize = (int)(height / 6.7);
 		for (int i = 0; i < buttons.length; i++) {
@@ -284,10 +297,10 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 			int updownright = buttonsize + buttonsize + spacing;
 			int bottomrowtop = height - buttonsize;
 
-			int marginTop = prefs.getInt("margin_top", 0) * 2;
-			int marginLeft = prefs.getInt("margin_left", 0) * 2;
-			int marginRight = prefs.getInt("margin_right", 0) * 3;
-			int marginBottom = prefs.getInt("margin_bottom", 0) * 3;
+			int marginTop = (int) ((float) prefs.getInt("margin_top", 0) * postscale);
+			int marginLeft = (int) ((float) prefs.getInt("margin_left", 15) * postscale);
+			int marginRight = (int) ((float) prefs.getInt("margin_right", 15) * postscale);
+			int marginBottom = (int) ((float) prefs.getInt("margin_bottom", 0) * postscale);
 
 			switch (i) {
 				// Y
@@ -334,7 +347,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 						else if (prefs.getString("abposition", "sidebyside").equals("topbottom"))
 							buttons[i].setBounds(width - buttonsize - marginRight, bottomrowtop - marginBottom, width - marginRight, height - marginBottom);
 						else if (prefs.getString("abposition", "sidebyside").equals("diagonal"))
-							buttons[i].setBounds(width - (buttonsize * 2) - spacing - marginLeft, height - buttonsize - marginBottom, width - buttonsize - spacing - marginLeft, height - marginBottom);
+							buttons[i].setBounds(width - (buttonsize * 2) - spacing - marginRight, height - buttonsize - marginBottom, width - buttonsize - spacing - marginRight, height - marginBottom);
 					}
 					break;
 				case 9:
@@ -344,7 +357,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 						else if (prefs.getString("abposition", "sidebyside").equals("topbottom"))
 							buttons[i].setBounds(width - buttonsize - marginRight, bottomrowtop - marginBottom, width - marginRight, height - marginBottom);
 						else if (prefs.getString("abposition", "sidebyside").equals("diagonal"))
-							buttons[i].setBounds(width - (buttonsize * 2) - spacing - marginLeft, height - buttonsize - marginBottom, width - buttonsize - spacing - marginLeft, height - marginBottom);
+							buttons[i].setBounds(width - (buttonsize * 2) - spacing - marginRight, height - buttonsize - marginBottom, width - buttonsize - spacing - marginRight, height - marginBottom);
 					} else {
 						if (prefs.getString("abposition", "sidebyside").equals("sidebyside"))
 							buttons[i].setBounds(width - buttonsize - marginRight, bottomrowtop - marginBottom, width - marginRight, height - marginBottom);

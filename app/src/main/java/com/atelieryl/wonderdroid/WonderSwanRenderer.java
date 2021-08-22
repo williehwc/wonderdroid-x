@@ -6,8 +6,8 @@ import java.nio.ShortBuffer;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
+//import android.graphics.Canvas;
+//import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.media.AudioManager;
@@ -36,7 +36,7 @@ public class WonderSwanRenderer implements EmuThread.Renderer {
 
     private final Matrix scale = new Matrix();
 
-    private final Paint paint = new Paint();
+//    private final Paint paint = new Paint();
 
     private final Paint textPaint = new Paint();
     
@@ -59,7 +59,7 @@ public class WonderSwanRenderer implements EmuThread.Renderer {
         framebuffer = Bitmap.createBitmap(WonderSwan.SCREEN_WIDTH, WonderSwan.SCREEN_HEIGHT,
                 Bitmap.Config.RGB_565);
         
-        drawThread = new DrawThread(framebuffer, scale, paint);
+        drawThread = new DrawThread(framebuffer, scale);
         drawThread.start();
 
         audioRunnable = new AudioRunnable(audio);
@@ -90,13 +90,13 @@ public class WonderSwanRenderer implements EmuThread.Renderer {
         return scale;
     }
 
-    public Paint getPaint() {
-        return paint;
-    }
+//    public Paint getPaint() {
+//        return paint;
+//    }
     
-    public Bitmap getFrameBuffer() {
-    	return framebuffer;
-    }
+//    public Bitmap getFrameBuffer() {
+//    	return framebuffer;
+//    }
 
     @Override
     public void start() {
@@ -137,7 +137,7 @@ public class WonderSwanRenderer implements EmuThread.Renderer {
 
     public void restartDrawThread() {
         surfaceHolderIsSet = false;
-        drawThread = new DrawThread(framebuffer, scale, paint);
+        drawThread = new DrawThread(framebuffer, scale);
         drawThread.start();
         drawThread.setButtons(buttons);
         drawThread.setShowButtons(showButtons);

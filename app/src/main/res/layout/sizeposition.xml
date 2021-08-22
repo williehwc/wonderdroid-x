@@ -24,6 +24,26 @@
             android:icon="@drawable/ic_size_start"
             android:defaultValue="20"
             android:max="50" />
+        <SeekBarPreference
+            android:key="margin_left"
+            android:icon="@drawable/ic_margin_left"
+            android:defaultValue="15"
+            android:max="50" />
+        <SeekBarPreference
+            android:key="margin_right"
+            android:icon="@drawable/ic_margin_right"
+            android:defaultValue="15"
+            android:max="50" />
+        <SeekBarPreference
+            android:key="margin_top"
+            android:icon="@drawable/ic_margin_top"
+            android:defaultValue="0"
+            android:max="50" />
+        <SeekBarPreference
+            android:key="margin_bottom"
+            android:icon="@drawable/ic_margin_bottom"
+            android:defaultValue="0"
+            android:max="50" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="relocate"
@@ -38,26 +58,6 @@
             android:key="abposition"
             android:title="@string/abposition"
             android:defaultValue="sidebyside" />
-        <SeekBarPreference
-            android:key="margin_left"
-            android:icon="@drawable/ic_margin_left"
-            android:defaultValue="0"
-            android:max="50" />
-        <SeekBarPreference
-            android:key="margin_right"
-            android:icon="@drawable/ic_margin_right"
-            android:defaultValue="0"
-            android:max="50" />
-        <SeekBarPreference
-            android:key="margin_top"
-            android:icon="@drawable/ic_margin_top"
-            android:defaultValue="0"
-            android:max="50" />
-        <SeekBarPreference
-            android:key="margin_bottom"
-            android:icon="@drawable/ic_margin_bottom"
-            android:defaultValue="0"
-            android:max="50" />
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -112,6 +112,16 @@ public class Select extends BaseActivity {
 	        	});
             }
         }*/
+
+        // Set reversehorizontalorientation to false if just installed or upgraded
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean setreversehorizontalorientation = prefs.getBoolean("setreversehorizontalorientation", false);
+        if (!setreversehorizontalorientation) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("reversehorizontalorientation", false);
+            editor.putBoolean("setreversehorizontalorientation", true);
+            editor.commit();
+        }
     }
 
     @Override

@@ -5,8 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.util.Log;
+//import android.graphics.Paint;
+//import android.util.Log;
 import android.view.SurfaceHolder;
 import com.atelieryl.wonderdroid.Button;
 
@@ -15,7 +15,7 @@ public class DrawThread extends Thread {
 	private Canvas c;
 	private Bitmap framebuffer;
 	private Matrix scale;
-	private Paint paint;
+//	private Paint paint;
 	private SurfaceHolder mSurfaceHolder;
 	private Button[] buttons;
 	private boolean showButtons;
@@ -23,10 +23,10 @@ public class DrawThread extends Thread {
 	private boolean draw = false;
 	private boolean running = true;
 	
-	public DrawThread(Bitmap framebuffer, Matrix scale, Paint paint) {
+	public DrawThread(Bitmap framebuffer, Matrix scale) {
 		this.framebuffer = framebuffer;
 		this.scale = scale;
-		this.paint = paint;
+//		this.paint = paint;
 	}
 	
 	public void setSurfaceHolder(SurfaceHolder surfaceHolder) {
@@ -67,7 +67,7 @@ public class DrawThread extends Thread {
 					if (clearBeforeDraw) {
 						c.drawColor(Color.BLACK); // Make sure out-of-bounds areas remain black
 					}
-					c.drawBitmap(framebuffer, scale, paint);
+					c.drawBitmap(framebuffer, scale, null);
 					if (showButtons && buttons != null) {
 						for (Button button : buttons) {
 							c.drawBitmap(button.normal, button.drawrect, button.rect, null);

@@ -326,7 +326,7 @@ public class Main extends BaseActivity {
         view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        if (mRomHeader.isVertical || prefs.getBoolean("reversehorizontalorientation", false)) {
+        if (mRomHeader.isVertical || !prefs.getBoolean("reversehorizontalorientation", false)) {
         	this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
         } else {
         	this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);

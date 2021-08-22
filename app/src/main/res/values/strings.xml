@@ -3,7 +3,7 @@
 
     <string name="app_name">WonderDroid X</string>
     <string name="crash_string">WonderDroid X crashed!</string>
-    <string name="noroms">No ROMs found — Please exit, add ROMs to your ROM folder ???, and try again.</string>
+    <string name="noroms">No ROMs found — Please exit, add ROMs to your ROM folder ???, and try again. You can change your ROM path in Preferences.</string>
     <string name="nosdcard">Warning: main storage volume is unavailable.</string>
     <string name="colour">Color —\u00A0</string>
     <string name="mono">Monochrome —\u00A0</string>
