@@ -12,6 +12,11 @@ android {
         ndk {
             moduleName "wonderswan"
         }
+        externalNativeBuild {
+            ndkBuild {
+                cppFlags ''
+            }
+        }
     }
 
     buildTypes {
@@ -23,6 +28,11 @@ android {
 
     lintOptions {
         abortOnError false
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path file('src/main/jni/Android.mk')
+        }
     }
 }
 
