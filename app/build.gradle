@@ -10,11 +10,11 @@ android {
         targetSdkVersion 29
 
         ndk {
-            moduleName "mednafen"
             abiFilters 'arm64-v8a'
         }
         externalNativeBuild {
             ndkBuild {
+                targets 'mednafen'
                 cppFlags ''
             }
         }

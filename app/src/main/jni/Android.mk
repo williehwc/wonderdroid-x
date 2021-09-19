@@ -275,7 +275,8 @@ LOCAL_SRC_FILES := \
     mednafen/wswan/sound.cpp \
     mednafen/wswan/tcache.cpp \
     mednafen/wswan/v30mz.cpp \
-    stubs.cpp
+    stubs.cpp \
+    com_atelieryl_wonderdroid_WonderSwan.cpp
 
 LOCAL_C_INCLUDES := \
     libiconv \
@@ -324,7 +325,7 @@ LOCAL_CFLAGS := \
 LOCAL_CPPFLAGS := \
     -std=gnu++11
 
-LOCAL_LDLIBS := -lz
+LOCAL_LDLIBS := -lz -llog
 
 # LOCAL_DISABLE_FATAL_LINKER_WARNINGS := true
 ## LOCAL_LDFLAGS := -Wl,--no-fatal-warnings

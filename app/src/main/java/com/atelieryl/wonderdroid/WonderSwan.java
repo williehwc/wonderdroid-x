@@ -56,11 +56,7 @@ public class WonderSwan {
     }
 
     static {
-        if (CpuUtils.getArch() == CpuUtils.Arch.ARMv7 && CpuUtils.hasNeon()) {
-            System.loadLibrary("wonderswan-neon");
-        } else {
-            System.loadLibrary("wonderswan");
-        }
+        System.loadLibrary("mednafen");
     }
 
     static public native void load(String rompath, boolean wsc, String name, int year, int month,
