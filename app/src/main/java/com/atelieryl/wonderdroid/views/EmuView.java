@@ -2,16 +2,14 @@
 package com.atelieryl.wonderdroid.views;
 
 import com.atelieryl.wonderdroid.Button;
-import com.atelieryl.wonderdroid.R;
 import com.atelieryl.wonderdroid.TouchInputHandler;
 import com.atelieryl.wonderdroid.TouchInputHandler.Pointer;
 import com.atelieryl.wonderdroid.WonderSwan;
 import com.atelieryl.wonderdroid.WonderSwan.WonderSwanButton;
-import com.atelieryl.wonderdroid.WonderSwanRenderer;
+import com.atelieryl.wonderdroid.GameRenderer;
 import com.atelieryl.wonderdroid.utils.EmuThread;
 import com.atelieryl.wonderdroid.VibrateTask;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.ColorMatrixColorFilter;
@@ -42,7 +40,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 	private boolean mPaused = false;
 
 	private EmuThread mThread;
-	private final WonderSwanRenderer renderer;
+	private final GameRenderer renderer;
 	private boolean controlsVisible = false;
 	private GradientDrawable[] buttons;
 	private final TouchInputHandler inputHandler;
@@ -104,7 +102,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		SurfaceHolder holder = this.getHolder();
 		holder.addCallback(this);
 
-		renderer = new WonderSwanRenderer();
+		renderer = new GameRenderer();
 		mThread = new EmuThread(renderer);
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

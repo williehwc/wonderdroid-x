@@ -83,10 +83,10 @@ static unsigned PortDeviceType;
 
 static void Emulate(EmulateSpecStruct *espec)
 {
- espec->DisplayRect.x = 0;
- espec->DisplayRect.y = 0;
- espec->DisplayRect.w = 224;
- espec->DisplayRect.h = 144;
+ //espec->DisplayRect.x = 0;
+ //espec->DisplayRect.y = 0;
+ //espec->DisplayRect.w = 224;
+ //espec->DisplayRect.h = 144;
 
  if(espec->VideoFormatChanged)
   WSwan_SetPixelFormat(espec->surface->format);

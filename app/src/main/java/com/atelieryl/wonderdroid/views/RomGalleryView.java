@@ -20,7 +20,7 @@ public class RomGalleryView extends LinearLayout {
         LayoutInflater layoutInflater = (LayoutInflater)context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         LinearLayout mLayout = (LinearLayout)((LinearLayout)layoutInflater.inflate(
-                R.layout.romgalleyview, this)).getChildAt(0);
+                R.layout.view_rom_gallery, this)).getChildAt(0);
         iv = (ImageView)mLayout.getChildAt(1);
         title = ((TextView)mLayout.getChildAt(0));
     }

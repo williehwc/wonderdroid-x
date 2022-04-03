@@ -40,7 +40,7 @@
         <item name="windowActionBarOverlay">true</item>
     </style>
 
-    <style name="PrefsTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="PrefsTheme" parent="Theme.AppCompat">
         <!-- your app branding color for the app bar -->
         <item name="colorPrimary">#1e5292</item>
         <!-- theme UI controls like checkboxes and text fields -->

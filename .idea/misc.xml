@@ -4,6 +4,18 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.13697916666666668" />
+        <entry key="..\:/android-proj/wonderdroid-x/app/src/main/res/layout/activity_add_game.xml" value="0.20625" />
+        <entry key="..\:/android-proj/wonderdroid-x/app/src/main/res/layout/activity_main.xml" value="0.20572916666666666" />
+        <entry key="..\:/android-proj/wonderdroid-x/app/src/main/res/layout/activity_onboarding.xml" value="0.1984375" />
+        <entry key="..\:/android-proj/wonderdroid-x/app/src/main/res/layout/activity_select.xml" value="0.21302083333333333" />
+        <entry key="app/src/main/res/layout/activity_onboarding.xml" value="0.31023550724637683" />
+        <entry key="app/src/main/res/layout/hardwardbuttonpref.xml" value="0.31023550724637683" />
+        <entry key="app/src/main/res/layout/list_item_status.xml" value="0.31023550724637683" />
+        <entry key="app/src/main/res/layout/main.xml" value="0.31023550724637683" />
+        <entry key="app/src/main/res/layout/pref_date.xml" value="0.31023550724637683" />
+        <entry key="app/src/main/res/layout/pref_hardware_button.xml" value="0.30434782608695654" />
+        <entry key="app/src/main/res/layout/romgalleyview.xml" value="0.31023550724637683" />
+        <entry key="app/src/main/res/layout/select.xml" value="0.31023550724637683" />
         <entry key="app/src/main/res/layout/sizeposition.xml" value="0.11041666666666666" />
       </map>
     </option>

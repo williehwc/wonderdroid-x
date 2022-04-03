@@ -54,7 +54,7 @@ public class DatePreference extends Preference {
 	protected View onCreateView (ViewGroup parent) {
 
 		LayoutInflater layoutInflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		LinearLayout layout = (LinearLayout)layoutInflater.inflate(R.layout.datepref, null);
+		LinearLayout layout = (LinearLayout)layoutInflater.inflate(R.layout.pref_date, null);
 
 		TextView title = (TextView)layout.getChildAt(0);
 		title.setText(getTitle());

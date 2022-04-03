@@ -11,9 +11,13 @@ public class RomFilter implements FileFilter {
             String[] parts = pathname.getName().split("\\.");
             if (parts.length >= 2) {
                 String extension = parts[parts.length - 1];
-                if (extension.compareTo("wsc") == 0 || extension.compareTo("ws") == 0
-                        || extension.compareTo("zip") == 0) {
+                if (extension.compareTo("zip") == 0) {
                     return true;
+                }
+                for (String ext : RomAdapter.Rom.allRomExtensions) {
+                    if (extension.compareTo(ext) == 0) {
+                        return true;
+                    }
                 }
             }
         }

@@ -3,7 +3,7 @@
 
     <string name="app_name">WonderDroid X</string>
     <string name="crash_string">WonderDroid X 崩潰了!</string>
-    <string name="noroms">沒有找到 ROM – 請退出, 下載 ROM 放到 ROM 資料夾 ???, 然後再重試。</string>
+    <string name="noroms">沒有找到 ROM …… 請按 +。</string>
     <string name="nosdcard">注意: 硬碟不可用。</string>
     <string name="colour">彩色 —\u00A0</string>
     <string name="mono">黑白 —\u00A0</string>

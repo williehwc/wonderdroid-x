@@ -90,6 +90,8 @@ LOCAL_SRC_FILES := \
     mednafen/hw_cpu/z80-fuse/z80_ops.cpp \
     mednafen/hw_misc/arcade_card/arcade_card.cpp \
     mednafen/hw_sound/pce_psg/pce_psg.cpp \
+    mednafen/hw_sound/sms_apu/Sms_Apu.cpp \
+    mednafen/hw_sound/ym2413/emu2413.cpp \
     mednafen/hw_video/huc6270/vdc.cpp \
     mednafen/lynx/c65c02.cpp \
     mednafen/lynx/cart.cpp \
@@ -186,6 +188,16 @@ LOCAL_SRC_FILES := \
     mednafen/psx/timer.cpp \
     mednafen/quicklz/quicklz.c \
     mednafen/resampler/resample.c \
+    mednafen/sms/cart.cpp \
+    mednafen/sms/memz80.cpp \
+    mednafen/sms/pio.cpp \
+    mednafen/sms/render.cpp \
+    mednafen/sms/romdb.cpp \
+    mednafen/sms/sms.cpp \
+    mednafen/sms/sound.cpp \
+    mednafen/sms/system.cpp \
+    mednafen/sms/tms.cpp \
+    mednafen/sms/vdp.cpp \
     mednafen/sound/Blip_Buffer.cpp \
     mednafen/sound/DSPUtility.cpp \
     mednafen/sound/Fir_Resampler.cpp \
@@ -279,8 +291,8 @@ LOCAL_SRC_FILES := \
     com_atelieryl_wonderdroid_WonderSwan.cpp
 
 LOCAL_C_INCLUDES := \
-    libiconv \
     libsndfile \
+#     libiconv
 
 LOCAL_CFLAGS := \
     -fwrapv \
@@ -290,13 +302,9 @@ LOCAL_CFLAGS := \
     -DMEDNAFEN_VERSION_NUMERIC=0x00102601 \
     -DPSS_STYLE=1 \
     -DMPC_FIXED_POINT \
-    -DWANT_LYNX_EMU \
     -DWANT_NGP_EMU \
     -DWANT_PCE_EMU \
-    -DWANT_PCFX_EMU \
-    -DWANT_PSX_EMU \
-    -DWANT_SS_EMU \
-    -DWANT_VB_EMU \
+    -DWANT_SMS_EMU \
     -DWANT_WSWAN_EMU \
     -DSTDC_HEADERS \
     -DICONV_CONST= \
@@ -320,6 +328,7 @@ LOCAL_CFLAGS := \
     -frtti \
     -fsigned-char \
     -std=gnu99 \
+    -O0
 #     -DTRIO_PLATFORM_WINCE
 
 LOCAL_CPPFLAGS := \

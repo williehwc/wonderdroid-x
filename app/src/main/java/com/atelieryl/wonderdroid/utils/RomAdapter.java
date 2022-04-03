@@ -13,14 +13,25 @@ import java.util.zip.ZipFile;
 
 import com.atelieryl.wonderdroid.WonderSwanHeader;
 import com.atelieryl.wonderdroid.views.RomGalleryView;
+import com.downloader.Error;
+import com.downloader.OnDownloadListener;
+import com.downloader.PRDownloader;
+
 import android.annotation.SuppressLint;
+import android.app.DownloadManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.View;
@@ -33,8 +44,16 @@ public class RomAdapter extends BaseAdapter {
 
         private static final long serialVersionUID = 1L;
 
-        public static String[] romExtension = new String[] {
+        public static String[] allRomExtensions = new String[] {
+                "ws", "wsc", "gg", "sms", "pce", "ngp", "ngc"
+        };
+
+        public static String[] wsRomExtensions = new String[] {
                 "ws", "wsc"
+        };
+
+        public static String[] boxArtExtensions = new String[] {
+                "jpg", "png"
         };
 
         public enum Type {
@@ -63,7 +82,7 @@ public class RomAdapter extends BaseAdapter {
                 case ZIP:
                     try {
                         return ZipCache.getFile(context, new ZipFile(rom.sourcefile), rom.fileName,
-                                romExtension);
+                                allRomExtensions);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         return null;
@@ -110,10 +129,7 @@ public class RomAdapter extends BaseAdapter {
         @SuppressLint("NewApi")
         @Override
         protected int sizeOf(String key, Bitmap value) {
-            if (Build.VERSION.SDK_INT >= 12)
-                return value.getByteCount();
-            else
-                return value.getRowBytes() * value.getHeight();
+            return value.getByteCount();
         }
 
     };
@@ -126,33 +142,33 @@ public class RomAdapter extends BaseAdapter {
 
     private final Rom[] mRoms;
 
-    public RomAdapter(Context context, String romdir, AssetManager assetManager) {
+    private final OnDownloadListener mOnDownloadListener;
+
+    public RomAdapter(Context context, String romdir, AssetManager assetManager, OnDownloadListener onDownloadListener) {
         mAssetManager = assetManager;
         mRomDir = new File(romdir);
         mContext = context;
         mRoms = findRoms();
+        mOnDownloadListener = onDownloadListener;
     }
 
     private Rom[] findRoms() {
         File[] sourceFiles = mRomDir.listFiles(new RomFilter());
-        ArrayList<Rom> roms = new ArrayList<Rom>();
+        ArrayList<Rom> roms = new ArrayList<>();
         if (sourceFiles != null) {
-            for (int i = 0; i < sourceFiles.length; i++) {
+            for (File sourceFile : sourceFiles) {
 
-                if (sourceFiles[i].getName().endsWith("zip")) {
+                if (sourceFile.getName().endsWith("zip")) {
                     try {
-                        for (String entry : ZipUtils.getValidEntries(new ZipFile(sourceFiles[i]),
-                                Rom.romExtension)) {
-                            roms.add(new Rom(Rom.Type.ZIP, sourceFiles[i], entry, sourceFiles[i]
-                                    .getName().replaceFirst("\\.zip", "")));
+                        for (String entry : ZipUtils.getValidEntries(new ZipFile(sourceFile), Rom.allRomExtensions)) {
+                            roms.add(new Rom(Rom.Type.ZIP, sourceFile, entry, entry + " (ZIP)"));
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         break;
                     }
                 } else {
-                    roms.add(new Rom(Rom.Type.RAW, sourceFiles[i], null, sourceFiles[i].getName()
-                            .replaceFirst("\\.wsc", "").replaceFirst("\\.ws", "")));
+                    roms.add(new Rom(Rom.Type.RAW, sourceFile, sourceFile.getName(), sourceFile.getName()));
                 }
 
             }
@@ -165,19 +181,119 @@ public class RomAdapter extends BaseAdapter {
             }
         });
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        if (!prefs.getBoolean("no_box_art", false))
+            new BoxArtTask().execute(allRoms);
+
         return allRoms;
+    }
+
+    public class BoxArtTask extends AsyncTask<Rom, Void, Void> {
+
+        SQLiteDatabase openVGDB = null;
+
+        private boolean openDB() { // Also gets the download manager
+            try {
+                openVGDB = SQLiteDatabase.openDatabase(mRomDir + "/openvgdb.sqlite", null, SQLiteDatabase.OPEN_READONLY);
+                return true;
+            } catch (Exception e) {
+                Log.e("WonderDroid", e.toString());
+                return false;
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Rom... roms) {
+
+            for (Rom rom : roms) {
+                // Look for box art
+                boolean boxArtExists = false;
+                for (String boxArtExtension : Rom.boxArtExtensions) {
+                    File boxArtFile = new File(mRomDir + "/" + rom.fileName + "." + boxArtExtension);
+                    if (boxArtFile.exists()) {
+                        boxArtExists = true;
+                        break;
+                    }
+                }
+                if (!boxArtExists) {
+                    if (openVGDB == null && !openDB()) return null;
+                    File romFile = Rom.getRomFile(mContext, rom);
+                    String md5 = MD5.calculateMD5(romFile).toUpperCase();
+                    Cursor cursor = openVGDB.rawQuery("SELECT * FROM ROMs WHERE romHashMD5 = \"" + md5 + "\"", null);
+                    String url = null;
+                    if (cursor.moveToFirst()) {
+                        String romID = cursor.getString(0);
+                        cursor = openVGDB.rawQuery("SELECT * FROM RELEASES WHERE romID = \"" + romID + "\"", null);
+                        if (cursor.moveToFirst()) {
+                            url = cursor.getString(7);
+                        }
+                    }
+                    if (url != null) {
+                        // Get extension
+                        String extension = null;
+                        for (String boxArtExtension : Rom.boxArtExtensions) {
+                            if (url.endsWith("." + boxArtExtension)) {
+                                extension = boxArtExtension;
+                                break;
+                            }
+                        }
+                        if (extension == null) continue;
+                        // Queue download
+                        PRDownloader.download(url, mRomDir.getPath(), rom.fileName + "." + extension)
+                                    .build()
+                                    .start(mOnDownloadListener);
+                    } else {
+                        File emptyFile = new File(rom.fileName + "." + Rom.boxArtExtensions[0]);
+                        try {
+                            emptyFile.createNewFile();
+                        } catch (IOException e) {
+                            Log.e("WonderDroid", e.toString());
+                        }
+                    }
+                }
+            }
+            if (openVGDB != null) openVGDB.close();
+            return null;
+        }
+
     }
 
     public Bitmap getBitmap(int index) {
         try {
-            WonderSwanHeader header = getHeader(index);
-            String internalname = header.internalname;
-            Bitmap splash = splashCache.get(internalname);
+            Rom rom = (Rom)(this.getItem(index));
+            String filename = rom.fileName;
+
+            // Cache
+            Bitmap splash = splashCache.get(filename);
             if (splash != null)
                 return splash;
 
-            splash = BitmapFactory.decodeStream(mAssetManager
-                    .open("snaps/" + internalname + ".png"));
+            // Box art
+            for (String extension : Rom.boxArtExtensions) {
+                String boxArtFilePath = mRomDir + "/" + rom.fileName + "." + extension;
+                File boxArtFile = new File(boxArtFilePath);
+                if (boxArtFile.exists()) {
+                    splash = BitmapFactory.decodeFile(boxArtFilePath);
+                    if (splash != null)
+                        splashCache.put(filename, splash);
+                    return splash;
+                }
+            }
+
+            // Check if WS game before proceeding
+            boolean isWsGame = false;
+            for (String extension : Rom.wsRomExtensions) {
+                if (filename.endsWith("." + extension)) {
+                    isWsGame = true;
+                    break;
+                }
+            }
+            if (!isWsGame) return null;
+
+            // WS games: screenshot
+            WonderSwanHeader header = getHeader(index);
+            String internalname = header.internalname;
+            splash = BitmapFactory.decodeStream(mAssetManager.open("snaps/" + internalname + ".png"));
             if (header.isVertical) {
                 Matrix rotationmatrix = new Matrix();
                 rotationmatrix.setRotate(270, splash.getWidth() / 2, splash.getHeight() / 2);
@@ -185,11 +301,11 @@ public class RomAdapter extends BaseAdapter {
                         rotationmatrix, false);
             }
             if (splash != null)
-                splashCache.put(internalname, splash);
+                splashCache.put(filename, splash);
             return splash;
         } catch (Exception e) {
             // e.printStackTrace();
-            Log.d(TAG, "No shot for ROM at index" + index);
+            Log.d(TAG, "No box art for ROM at index " + index + " because " + e.getMessage());
             return null;
         }
 

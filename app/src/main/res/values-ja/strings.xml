@@ -3,7 +3,7 @@
 
     <string name="app_name">ワンダドロイド X</string>
     <string name="nosdcard">注意: 携帯のディスクがないか、または使用できません</string>
-    <string name="noroms">ロムのファイルを見つけられませんでした (ロムのディレクトリ: ???)</string>
+    <string name="noroms">ロムのファイルを見つけられませんでした</string>
     <string name="colour">カラー –\u00A0</string>
     <string name="mono">モノクロ –\u00A0</string>
     <string name="vertical">横</string>

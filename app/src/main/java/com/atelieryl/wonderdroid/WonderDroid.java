@@ -2,6 +2,7 @@
 package com.atelieryl.wonderdroid;
 
 import com.atelieryl.wonderdroid.utils.ZipCache;
+import com.downloader.PRDownloader;
 
 import android.app.Application;
 import android.os.Environment;
@@ -23,6 +24,7 @@ public class WonderDroid extends Application {
         WonderSwan.outputDebugShizzle();
         ZipCache.dumpInfo(this.getBaseContext());
         ZipCache.clean(this.getBaseContext());
+        PRDownloader.initialize(getApplicationContext());
     }
 
     public File getRomDir() {

@@ -1,7 +1,7 @@
 
 package com.atelieryl.wonderdroid;
 
-import java.nio.ShortBuffer;
+import java.nio.IntBuffer;
 
 import com.atelieryl.wonderdroid.utils.CpuUtils;
 
@@ -17,7 +17,7 @@ public class WonderSwan {
 
     static public final int SCREEN_HEIGHT = 144;
 
-    static public final int FRAMEBUFFERSIZE = (SCREEN_WIDTH * SCREEN_HEIGHT) * 2;
+    static public final int FRAMEBUFFERSIZE = (SCREEN_WIDTH * SCREEN_HEIGHT) * 4;
 
     static public boolean audioEnabled = true;
 
@@ -25,7 +25,7 @@ public class WonderSwan {
     
     static public int prevSamples;
 
-    static final int audiobufferlen = 2000;
+    static final int audiobufferlen = 65536; // 0x10000
 
     static public short[] audiobuffer = new short[audiobufferlen];
     
@@ -59,10 +59,11 @@ public class WonderSwan {
         System.loadLibrary("mednafen");
     }
 
-    static public native void load(String rompath, boolean wsc, String name, int year, int month,
-            int day, int blood, int sex);
+    static public native int load(String rom_path, String dir_path);
 
     static public native void reset();
+
+    static public native void exit();
 
     /*static public void execute_frame(ShortBuffer framebuffer, boolean skipframe) {
         if (buttonsDirty) {
@@ -94,7 +95,7 @@ public class WonderSwan {
         }
     }*/
 
-    static public void execute_frame(ShortBuffer framebuffer, boolean skipframe) {
+    static public void execute_frame(IntBuffer framebuffer, boolean skipframe) {
         if (buttonsDirty) {
             WonderSwan.updatebuttons(WonderSwanButton.Y1.down, WonderSwanButton.Y2.down,
                     WonderSwanButton.Y3.down, WonderSwanButton.Y4.down, WonderSwanButton.X1.down,
@@ -111,7 +112,7 @@ public class WonderSwan {
     }
 
     static private native int _execute_frame(boolean skipframe, boolean audio,
-            ShortBuffer framebuffer, short[] audiobuffer);
+            IntBuffer framebuffer, short[] audiobuffer);
 
     static public native void updatebuttons(boolean y1, boolean y2, boolean y3, boolean y4,
             boolean x1, boolean x2, boolean x3, boolean x4, boolean a, boolean b, boolean start);

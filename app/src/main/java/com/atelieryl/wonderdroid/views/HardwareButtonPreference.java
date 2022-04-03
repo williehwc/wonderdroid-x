@@ -36,7 +36,7 @@ public class HardwareButtonPreference extends Preference {
 	protected View onCreateView (ViewGroup parent) {
 
 		LayoutInflater layoutInflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		LinearLayout layout = (LinearLayout)layoutInflater.inflate(R.layout.hardwardbuttonpref, null);
+		LinearLayout layout = (LinearLayout)layoutInflater.inflate(R.layout.pref_hardware_button, null);
 
 		TextView controltext = (TextView)layout.getChildAt(0);
 		controltext.setText(getTitle());

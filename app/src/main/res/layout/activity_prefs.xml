@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <PreferenceCategory android:title="@string/emulatorsettings" >
+
+        <SeekBarPreference
+            android:key="volume"
+            android:icon="@drawable/ic_volume"
+            android:defaultValue="100"
+            android:max="100" />
+
+        <!--
+       <CheckBoxPreference
+                android:key="emufpscounter"
+                android:title="Enable FPS counter"
+                android:defaultValue="false"
+                android:summary="Show an FPS counter on the screen" />
+        -->
+
+
+        <!--
+             <CheckBoxPreference
+                android:key="emuframeskip"
+                android:title="Enable Frameskip"
+                android:defaultValue="true"
+                android:summary="Enable frameskipping to help the emulator catch up if it gets behind." />
+        -->
+        <!--
+    	<CheckBoxPreference
+                android:key="emuforcemono"
+                android:title="Force Mono"
+                android:defaultValue="false"
+                android:summary="Force the emulator to emulate an original mono Wonder Swan." />
+        -->
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="reversehorizontalorientation"
+            android:title="@string/reversehorizontalorientation" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="showbackground"
+            android:title="@string/showbackground" />
+        
+        <EditTextPreference
+            android:key="emu_rompath"
+            android:maxLength="256"
+            android:defaultValue="wonderdroid"
+            android:title="@string/overriderompath" />
+        
+        <EditTextPreference
+            android:key="emu_mempath"
+            android:maxLength="256"
+            android:defaultValue="wonderdroid/cartmem"
+            android:title="@string/overridemempath" />
+        <Preference android:title="@string/sdcardinfo">
+		    <intent android:action="android.intent.action.VIEW"
+		            android:data="http://yearbooklabs.com/sd/" />
+		</Preference>
+        
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings_cat_controls" >
+
+        <Preference
+            android:key="mapcontrols"
+            android:title="@string/mapcontrols"
+            android:summary="@string/mapcontrolsdescription" />
+
+    </PreferenceCategory>
+     
+    <PreferenceCategory android:title="@string/onscreencontrolsettings">
+        <Preference
+            android:key="sizeposition"
+            android:title="@string/sizeposition" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="showcontrols"
+            android:title="@string/showcontrols"
+            android:summary="@string/showcontrolsdescription" />
+        <ListPreference
+            android:entries="@array/vibration"
+            android:entryValues="@array/vibrationvalues"
+            android:key="vibratedown"
+            android:title="@string/vibratedown"
+            android:defaultValue="5"
+            android:summary="@string/vibratedowndescription" />
+        <ListPreference
+            android:entries="@array/vibration"
+            android:entryValues="@array/vibrationvalues"
+            android:key="vibrateup"
+            android:title="@string/vibrateup"
+            android:defaultValue="1"
+            android:summary="@string/vibrateupdescription" />
+        <ListPreference
+            android:entries="@array/opacity"
+            android:entryValues="@array/opacityvalues"
+            android:key="opacity"
+            android:title="@string/opacity"
+            android:defaultValue="4" />
+        <ListPreference
+            android:entries="@array/buttoncolor"
+            android:entryValues="@array/buttoncolorvalues"
+            android:key="buttoncolor"
+            android:title="@string/buttoncolor"
+            android:defaultValue="black" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="showbuttonlabels"
+            android:title="@string/showbuttonlabels" />
+    </PreferenceCategory>
+    
+    <PreferenceCategory android:title="@string/graphicssettings" >
+
+        <SeekBarPreference
+            android:key="scaling"
+            android:icon="@drawable/ic_scaling"
+            android:defaultValue="95"
+            android:max="95" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="stretchtofill"
+            android:title="@string/stretchtofill"
+            android:summary="@string/stretchtofilldescription" />
+        <ListPreference
+            android:entries="@array/sharpness"
+            android:entryValues="@array/bloodtypevalues"
+            android:key="sharpness"
+            android:title="@string/sharpness"
+            android:defaultValue="3"
+            android:summary="@string/sharpnessdescription" />
+        <ListPreference
+            android:entries="@array/frameskip"
+            android:entryValues="@array/frameskipvalues"
+            android:key="frameskip"
+            android:title="@string/frameskip"
+            android:defaultValue="0"
+            android:summary="@string/frameskipdescription" />
+        
+        
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings_cat_ws" >
+
+        <EditTextPreference
+            android:key="ws_name"
+            android:maxLength="16"
+            android:title="@string/name" />
+
+        <com.atelieryl.wonderdroid.views.DatePreference
+            android:key="ws_birthday"
+            android:title="@string/birthday" />
+
+        <ListPreference
+            android:entries="@array/sexes"
+            android:entryValues="@array/sexvalues"
+            android:key="ws_sex"
+            android:title="@string/sex" />
+
+        <ListPreference
+            android:entries="@array/bloodtypes"
+            android:entryValues="@array/bloodtypevalues"
+            android:key="ws_blood"
+            android:title="@string/bloodtype" />
+    </PreferenceCategory>
+
+    <!--<PreferenceCategory android:title="Support Settings" >
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="adsupported"
+            android:summary="This allows adverts to be displayed on the game selection screen. In the future this will unlock extra features like save states."
+            android:title="Allow adverts" />
+    </PreferenceCategory>-->
+
+</PreferenceScreen>
