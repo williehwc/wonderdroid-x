@@ -17,9 +17,9 @@ extern "C" {
 /*
 * Class:     com_atelieryl_wonderdroid_WonderSwan
 * Method:    load
-* Signature: (Ljava/lang/String;Ljava/lang/String;)V
+* Signature: (Ljava/lang/String;Ljava/lang/String;)[S
 */
-JNIEXPORT jint JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_load
+JNIEXPORT jshortArray JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_load
 (JNIEnv *, jclass, jstring, jstring);
 
 /*
@@ -41,9 +41,9 @@ JNIEXPORT void JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_exit
 /*
  * Class:     com_atelieryl_wonderdroid_WonderSwan
  * Method:    _execute_frame
- * Signature: (ZLjava/nio/ShortBuffer;[S)I
+ * Signature: (ZZLjava/nio/ShortBuffer;[S)[S
  */
-JNIEXPORT jint JNICALL Java_com_atelieryl_wonderdroid_WonderSwan__1execute_1frame
+JNIEXPORT jshortArray JNICALL Java_com_atelieryl_wonderdroid_WonderSwan__1execute_1frame
         (JNIEnv *, jclass, jboolean, jboolean, jobject, jshortArray);
 
 /*

@@ -112,6 +112,14 @@ public class SelectActivity extends BaseActivity {
         }*/
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Onboarding
+        String storageVolume = prefs.getString("storage_path", null);
+        if (storageVolume == null) {
+            Intent intent = new Intent(this, OnboardingActivity.class);
+            startActivity(intent);
+            return;
+        }
     }
 
     @Override
@@ -214,14 +222,6 @@ public class SelectActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        // Onboarding
-        String storageVolume = prefs.getString("storage_path", null);
-        if (storageVolume == null) {
-            Intent intent = new Intent(this, OnboardingActivity.class);
-            startActivity(intent);
-            return;
-        }
 
         // Get destination path and check if it's available
         String storagePath = prefs.getString("storage_path", "");

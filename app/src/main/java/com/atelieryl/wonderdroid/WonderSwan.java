@@ -23,9 +23,9 @@ public class WonderSwan {
 
     static public int samples;
     
-    static public int prevSamples;
+    static public short[] prevSamples;
 
-    static final int audiobufferlen = 65536; // 0x10000
+    static final int audiobufferlen = 4096;
 
     static public short[] audiobuffer = new short[audiobufferlen];
     
@@ -49,7 +49,7 @@ public class WonderSwan {
 
     public static final int encoding = AudioFormat.ENCODING_PCM_16BIT;
 
-    public static final int audiofreq = 22050;
+    public static final int audiofreq = 24000;
 
     public WonderSwan() {
         throw new UnsupportedOperationException();
@@ -59,7 +59,7 @@ public class WonderSwan {
         System.loadLibrary("mednafen");
     }
 
-    static public native int load(String rom_path, String dir_path);
+    static public native short[] load(String rom_path, String dir_path);
 
     static public native void reset();
 
@@ -95,7 +95,7 @@ public class WonderSwan {
         }
     }*/
 
-    static public void execute_frame(IntBuffer framebuffer, boolean skipframe) {
+    static public short[] execute_frame(IntBuffer framebuffer, boolean skipframe) {
         if (buttonsDirty) {
             WonderSwan.updatebuttons(WonderSwanButton.Y1.down, WonderSwanButton.Y2.down,
                     WonderSwanButton.Y3.down, WonderSwanButton.Y4.down, WonderSwanButton.X1.down,
@@ -104,14 +104,15 @@ public class WonderSwan {
             buttonsDirty = false;
         }
 
-        samples = _execute_frame(skipframe, audioEnabled, framebuffer, audioEnabled ? audiobuffer
-                : null);
+        short[] frameInfo = _execute_frame(skipframe, audioEnabled, framebuffer, audioEnabled ? audiobuffer : null);
+        samples = frameInfo[0];
         synchronized (audiobuffer) {
             audiobuffer.notify();
         }
+        return frameInfo;
     }
 
-    static private native int _execute_frame(boolean skipframe, boolean audio,
+    static private native short[] _execute_frame(boolean skipframe, boolean audio,
             IntBuffer framebuffer, short[] audiobuffer);
 
     static public native void updatebuttons(boolean y1, boolean y2, boolean y3, boolean y4,

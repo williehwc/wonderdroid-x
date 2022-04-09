@@ -92,10 +92,10 @@ public class MainActivity extends BaseActivity {
         showStateWarning = !prefs.getBoolean("hidestatewarning", false);
     }
 
-    public class GameLoader extends AsyncTask<Void, Void, Integer> {
+    public class GameLoader extends AsyncTask<Void, Void, short[]> {
 
         @Override
-        protected Integer doInBackground(Void... params) {
+        protected short[] doInBackground(Void... params) {
 //                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 //                String name = prefs.getString("ws_name", "");
 //                String sex = prefs.getString("ws_sex", "1");
@@ -107,12 +107,12 @@ public class MainActivity extends BaseActivity {
         }
 
         @Override
-        protected void onPostExecute(Integer errorCode) {
+        protected void onPostExecute(short[] gameInfo) {
             if (mPB != null) {
                 mPB.setVisibility(ProgressBar.GONE);
             }
 
-            if (errorCode != 0) {
+            if (gameInfo == null) {
                 Toast.makeText(mContext, R.string.cannotloadrom, Toast.LENGTH_SHORT).show();
                 WonderSwan.exit();
                 finish();
