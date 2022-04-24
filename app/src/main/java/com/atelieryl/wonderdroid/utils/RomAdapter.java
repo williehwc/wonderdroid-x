@@ -45,7 +45,7 @@ public class RomAdapter extends BaseAdapter {
         private static final long serialVersionUID = 1L;
 
         public static String[] allRomExtensions = new String[] {
-                "ws", "wsc", "gg", "sms", "pce", "ngp", "ngc"
+                "ws", "wsc", "gg", "pce", "ngp", "ngc"
         };
 
         public static String[] wsRomExtensions = new String[] {

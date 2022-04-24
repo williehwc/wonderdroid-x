@@ -70,7 +70,8 @@ public class DrawThread extends Thread {
 					c.drawBitmap(framebuffer, scale, null);
 					if (showButtons && buttons != null) {
 						for (Button button : buttons) {
-							c.drawBitmap(button.normal, button.drawrect, button.rect, null);
+							if (button != null)
+								c.drawBitmap(button.normal, button.drawrect, button.rect, null);
 						}
 					}
 				} catch (Exception e) {

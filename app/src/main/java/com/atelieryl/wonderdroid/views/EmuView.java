@@ -61,6 +61,11 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 	private int width = 0;
 	private int height = 0;
 
+	private int mNominalWidth = 0;
+	private int mNominalHeight = 0;
+	private int mFps;
+	private char mSystem;
+
 	private float postscale;
 
 	private static final float[] NEGATIVE = {
@@ -86,15 +91,16 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		WonderSwanButton.Y4.keyCode = y4;
 	}
 
-	public EmuView (Context context) {
-		this(context, null);
-	}
+	public EmuView (Context context, int[] gameInfo) {
+		super(context);
 
-	public EmuView (Context context, AttributeSet attrs) {
-		super(context, attrs);
+		mFps = gameInfo[0];
+		mNominalWidth = gameInfo[1];
+		mNominalHeight = gameInfo[2];
+		mSystem = (char) gameInfo[7];
 
 		this.mContext = context;
-		
+
 		inputHandler = new TouchInputHandler(context);
 
 		setZOrderOnTop(true); // FIXME any advantage to this?
@@ -102,16 +108,18 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		SurfaceHolder holder = this.getHolder();
 		holder.addCallback(this);
 
-		renderer = new GameRenderer();
-		mThread = new EmuThread(renderer);
-		
+		renderer = new GameRenderer(gameInfo, sharpness);
+		renderer.setScaling(scaling);
+		mThread = new EmuThread(renderer, mFps);
+
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		sharpness = Integer.parseInt(prefs.getString("sharpness", "3"));
 		mThread.setFrameskip(Integer.parseInt(prefs.getString("frameskip", "0")));
 		stretchToFill = prefs.getBoolean("stretchtofill", false);
 		scaling = (prefs.getInt("scaling", 95) + 5) / 100.;
+
 		renderer.setClearBeforeDraw(!stretchToFill);
-		
+
 		vibratedown = Integer.parseInt(prefs.getString("vibratedown", "5"));
 		vibrateup = Integer.parseInt(prefs.getString("vibrateup", "1"));
 	}
@@ -121,26 +129,34 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		if (actualHeightToDrawnHeightRatio == 0 || actualHeightToDrawnHeightRatio == 1) {
 			if (widthToHeightRatio == 0)
 				widthToHeightRatio = (float) this.getWidth() / (float) this.getHeight();
-			int newWidth = WonderSwan.SCREEN_WIDTH * sharpness;
-			int newHeight = WonderSwan.SCREEN_HEIGHT * sharpness;
-			if (!stretchToFill) {
-				while ((float) newWidth / (float) newHeight < widthToHeightRatio) newWidth++;
+			int newWidth = mNominalWidth * sharpness;
+			int newHeight = mNominalHeight * sharpness;
+			if (this.getWidth() > this.getHeight()) {
+				// Device in landscape
+				newWidth = (int) (newHeight * widthToHeightRatio);
+			} else {
+				// Device in portrait
+				newHeight = (int) (newWidth / widthToHeightRatio);
 			}
+//			if (!stretchToFill) {
+//				while ((float) newWidth / (float) newHeight < widthToHeightRatio) newWidth++;
+//			}
 			actualWidthToDrawnWidthRatio = (float) w / (float) newWidth;
 			actualHeightToDrawnHeightRatio = (float) h / (float) newHeight;
 			width = newWidth;
 			height = newHeight;
+			renderer.updateSurfaceDimens(width, height);
 			
 			makeButtons(PreferenceManager.getDefaultSharedPreferences(mContext));
 
-			postscale = (float)width / (float)WonderSwan.SCREEN_WIDTH;
+			postscale = (float)width / (float)mNominalWidth;
 
-			if (WonderSwan.SCREEN_HEIGHT * postscale > height) {
-				postscale = (float)height / (float)WonderSwan.SCREEN_HEIGHT;
+			if (mNominalHeight * postscale > height) {
+				postscale = (float)height / (float)mNominalHeight;
 
 			}
 
-			rescale();
+//			rescale();
 		}
 		mHolder = holder;
 	}
@@ -150,11 +166,18 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		holder.setFormat(PixelFormat.RGB_565);
 		if (widthToHeightRatio == 0)
 			widthToHeightRatio = (float) this.getWidth() / (float) this.getHeight();
-		int holderWidth = WonderSwan.SCREEN_WIDTH * sharpness;
-		int holderHeight = WonderSwan.SCREEN_HEIGHT * sharpness;
-		if (!stretchToFill) {
-			while ((float) holderWidth / (float) holderHeight < widthToHeightRatio) holderWidth++;
+		int holderWidth = mNominalWidth * sharpness;
+		int holderHeight = mNominalHeight * sharpness;
+		if (this.getWidth() > this.getHeight()) {
+			// Device in landscape
+			holderWidth = (int) (holderHeight * widthToHeightRatio);
+		} else {
+			// Device in portrait
+			holderHeight = (int) (holderWidth / widthToHeightRatio);
 		}
+//		if (!stretchToFill) {
+//			while ((float) holderWidth / (float) holderHeight < widthToHeightRatio) holderWidth++;
+//		}
 		holder.setFixedSize(holderWidth, holderHeight);
 		mHolder = holder;
 		mThread.setSurfaceHolder(holder);
@@ -166,14 +189,14 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		//mThread.clearRunning();
 	}
 
-	public void rescale () {
-		Matrix scale = renderer.getMatrix();
-
-		scale.reset();
-		scale.postScale(sharpness * (float) scaling, sharpness * (float) scaling);
-		scale.postTranslate((width - WonderSwan.SCREEN_WIDTH * sharpness * (float) scaling) / 2,
-				(height - WonderSwan.SCREEN_HEIGHT * sharpness * (float) scaling) / 2);
-	}
+//	public void rescale () {
+//		Matrix scale = renderer.getMatrix();
+//
+//		scale.reset();
+//		scale.postScale(sharpness * (float) scaling, sharpness * (float) scaling);
+//		scale.postTranslate((width - mNominalWidth * sharpness * (float) scaling) / 2,
+//				(height - mNominalHeight * sharpness * (float) scaling) / 2);
+//	}
 
 	public void start () {
 		Log.d(TAG, "emulation started");
@@ -205,7 +228,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 	public void onResume () {
 		if (started) {
 			renderer.restartDrawThread();
-			mThread = new EmuThread(renderer);
+			mThread = new EmuThread(renderer, mFps);
 			start();
 		}
 		mThread.setSurfaceHolder(mHolder);
@@ -217,8 +240,9 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		if (width > 0 && height > 0) {
 			makeButtons(prefs);
 		}
+		renderer.setScaling(scaling);
 		renderer.setVolume(prefs.getInt("volume", 100));
-		rescale();
+//		rescale();
 	}
 
 	public void stop () {
@@ -397,7 +421,47 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 
 
 			for (int i = 0; i < buttons.length; i++) {
-				buts[i] = new Button(buttons[i], textPaint, WonderSwanButton.values()[i].name());
+				// Skip button if system lacks it
+				if (mSystem != 'w' && i <= 3) {
+					// Y buttons are only on WonderSwan
+					buttons[i] = null;
+					continue;
+				}
+				String buttonLabel = WonderSwanButton.values()[i].name();
+				if (i == 8) {
+					if (mSystem == 'g') {
+						buttonLabel = "2";
+					} else if (mSystem == 'n') {
+						buttonLabel = "B";
+					} else if (mSystem == 'p') {
+						buttonLabel = "I";
+					}
+				} else if (i == 9) {
+					if (mSystem == 'g') {
+						buttonLabel = "1";
+					} else if (mSystem == 'n') {
+						buttonLabel = "A";
+					} else if (mSystem == 'p') {
+						buttonLabel = "II";
+					}
+				} else if (i == 4) {
+					if (mSystem != 'w') {
+						buttonLabel = "▽";
+					}
+				} else if (i == 5) {
+					if (mSystem != 'w') {
+						buttonLabel = "◁";
+					}
+				} else if (i == 6) {
+					if (mSystem != 'w') {
+						buttonLabel = "▷";
+					}
+				} else if (i == 7) {
+					if (mSystem != 'w') {
+						buttonLabel = "△";
+					}
+				}
+				buts[i] = new Button(buttons[i], textPaint, buttonLabel);
 			}
 		}
 
@@ -405,19 +469,23 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	public static void changeButton (WonderSwanButton button, boolean newState, boolean touch) {
-		if (newState && !button.touchDown && touch && vibratedown > 0) {
-			new VibrateTask(mContext).execute(vibratedown);
-		}
-		if (!newState && button.touchDown && touch && vibrateup > 0) {
-			new VibrateTask(mContext).execute(vibrateup);
-		}
 		if (touch) {
-			button.touchDown = newState;
+			if (newState && !button.touchDown) {
+				if (vibratedown > 0) new VibrateTask(mContext).execute(vibratedown);
+				button.touchDown = newState;
+				WonderSwan.buttonsDirty = true;
+			}
+			if (!newState && button.touchDown) {
+				if (vibrateup > 0) new VibrateTask(mContext).execute(vibrateup);
+				button.touchDown = newState;
+				WonderSwan.buttonsDirty = true;
+			}
 		} else {
+			// This function is called only when any key state has changed, so no need to check
 			button.hardwareKeyDown = newState;
+			WonderSwan.buttonsDirty = true;
 		}
 		button.down = (button.touchDown || button.hardwareKeyDown);
-		WonderSwan.buttonsDirty = true;
 	}
 
 	public EmuThread getThread () {
@@ -440,8 +508,10 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		boolean[] buttonStates = new boolean[buttons.length];
 		for (Pointer pointer : inputHandler.pointers) {
 			for (int i = 0; i < buttons.length; i++) {
+				if (buttons[i] == null) continue;
 				Rect bounds = buttons[i].getBounds();
-				bounds = new Rect((int) (bounds.left * actualWidthToDrawnWidthRatio), (int) (bounds.top * actualHeightToDrawnHeightRatio), (int) (bounds.right * actualWidthToDrawnWidthRatio), (int) (bounds.bottom * actualHeightToDrawnHeightRatio));
+				float length = bounds.top - bounds.bottom;
+				bounds = new Rect((int) ((bounds.left + length / 5) * actualWidthToDrawnWidthRatio), (int) ((bounds.top + length / 5) * actualHeightToDrawnHeightRatio), (int) ((bounds.right - length / 5) * actualWidthToDrawnWidthRatio), (int) ((bounds.bottom - length / 5) * actualHeightToDrawnHeightRatio));
 				if (bounds.contains((int)pointer.x, (int)pointer.y) && pointer.down) {
 					buttonStates[i] = true;
 				} else if (!buttonStates[i] && (bounds.contains((int)pointer.x, (int)pointer.y) || pointer.down)) {
@@ -450,6 +520,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		}
 		for (int i = 0; i < buttons.length; i++) {
+			if (buttons[i] == null) continue;
 			if (buttonStates[i]) {
 				changeButton(WonderSwanButton.values()[i], true, true);
 			} else {

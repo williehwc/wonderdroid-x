@@ -2,10 +2,10 @@
 package com.atelieryl.wonderdroid.utils;
 
 import com.atelieryl.wonderdroid.Button;
+
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 public class EmuThread extends Thread {
@@ -27,8 +27,7 @@ public class EmuThread extends Thread {
 
     private Renderer renderer;
 
-    private static final long[] TARGETFRAMETIME = {12, 13};
-    private static int frameTimeIndex = 0;
+    private static long targetFrameTime;
 
     private boolean mIsRunning = false;
     private boolean isPaused = false;
@@ -48,8 +47,9 @@ public class EmuThread extends Thread {
 
     private int frameskip = 0;
 
-    public EmuThread (Renderer renderer) {
+    public EmuThread (Renderer renderer, int fps) {
         this.renderer = renderer;
+        targetFrameTime = (long) (1000000000. / (fps / 65536. / 256.));
     }
 
     public void setSurfaceHolder (SurfaceHolder sh) {
@@ -83,29 +83,26 @@ public class EmuThread extends Thread {
 
             if (isPaused) {
                 //Log.d(TAG, "Paused!!!");
-                SystemClock.sleep(TARGETFRAMETIME[0]);
+                SystemClock.sleep(targetFrameTime);
             } else {
 
-                frameStart = System.currentTimeMillis();
+                frameStart = System.nanoTime();
 
-                renderer.update(frame % 2 != 0);
+                renderer.update(false/*frame % 2 != 0*/);
 
                 if (frameskip == 0 || frame % frameskip != 0) {
                     renderer.render(mSurfaceHolder);
                 }
 
-                frameEnd = System.currentTimeMillis();
-                frametime = (int)(frameEnd - frameStart);
+                frametime = 0;
 
-                if (frametime < TARGETFRAMETIME[frameTimeIndex]) {
-                    SystemClock.sleep(TARGETFRAMETIME[frameTimeIndex] - frametime);
-                } else if (frametime > TARGETFRAMETIME[frameTimeIndex]) {
-                    //Log.d(TAG, "Overtime " + frametime);
-                }
+                //targetFrameTime = 1000000000 * WonderSwan.samples / WonderSwan.audiofreq;
 
-                frameTimeIndex++;
-                if (frameTimeIndex >= TARGETFRAMETIME.length) {
-                    frameTimeIndex = 0;
+                while (frametime < targetFrameTime) {
+                    frametime = (int)(System.nanoTime() - frameStart);
+//                    if (frametime > targetFrameTime) {
+//                        Log.d(TAG, "Overtime " + frametime + " -- " + targetFrameTime);
+//                    }
                 }
 
                 frame++;

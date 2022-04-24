@@ -17,9 +17,9 @@ extern "C" {
 /*
 * Class:     com_atelieryl_wonderdroid_WonderSwan
 * Method:    load
-* Signature: (Ljava/lang/String;Ljava/lang/String;)[S
+* Signature: (Ljava/lang/String;Ljava/lang/String;)[I
 */
-JNIEXPORT jshortArray JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_load
+JNIEXPORT jintArray JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_load
 (JNIEnv *, jclass, jstring, jstring);
 
 /*

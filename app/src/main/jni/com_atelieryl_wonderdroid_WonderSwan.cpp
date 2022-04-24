@@ -9,10 +9,12 @@
 
 #include "com_atelieryl_wonderdroid_WonderSwan.h"
 
+#define setBit(dest, bit, idx) (dest ^ ((-bit ^ dest) & (1 << idx)));
+
 using namespace Mednafen;
 
-const int GAME_INFO_ARRAY_SIZE = 7;
-const int FRAME_INFO_ARRAY_SIZE = 3;
+const int GAME_INFO_ARRAY_SIZE = 8;
+const int FRAME_INFO_ARRAY_SIZE = 5;
 const int SOUND_BUF_SIZE = 4096;
 
 bool _initialized = false;
@@ -38,7 +40,7 @@ extern "C" {
         MDFNI_Reset();
     }
 
-    JNIEXPORT jshortArray JNICALL
+    JNIEXPORT jintArray JNICALL
     Java_com_atelieryl_wonderdroid_WonderSwan_load(JNIEnv *env, jclass obj, jstring rom_path,
                                                    jstring dir_path) {
         LOGD("Called load!");
@@ -56,6 +58,12 @@ extern "C" {
         _game = MDFNI_LoadGame(NULL, &::Mednafen::NVFS, env->GetStringUTFChars(rom_path, NULL));
         if (!_game) return NULL;
 
+        // Prevent Master System games from running
+        if (strcmp(_game->shortname, "sms") == 0) {
+            MDFNI_CloseGame();
+            return env->NewIntArray(GAME_INFO_ARRAY_SIZE);
+        }
+
         // Set up input
         for (unsigned i = 0; i < 13; i++)
             _inputBuffer[i] = (uint32_t *) calloc(9, sizeof(uint32_t));
@@ -67,7 +75,7 @@ extern "C" {
 
         _runGame = true;
 
-        jshort gameInfo[GAME_INFO_ARRAY_SIZE];
+        jint gameInfo[GAME_INFO_ARRAY_SIZE];
         gameInfo[0] = _game->fps;
         gameInfo[1] = _game->nominal_width;
         gameInfo[2] = _game->nominal_height;
@@ -75,9 +83,10 @@ extern "C" {
         gameInfo[4] = _game->fb_height;
         gameInfo[5] = _game->soundchan;
         gameInfo[6] = _game->rotated;
+        gameInfo[7] = _game->shortname[0];
 
-        jshortArray gameInfoArray = env->NewShortArray(GAME_INFO_ARRAY_SIZE);
-        env->SetShortArrayRegion(gameInfoArray, 0, GAME_INFO_ARRAY_SIZE, gameInfo);
+        jintArray gameInfoArray = env->NewIntArray(GAME_INFO_ARRAY_SIZE);
+        env->SetIntArrayRegion(gameInfoArray, 0, GAME_INFO_ARRAY_SIZE, gameInfo);
         return gameInfoArray;
     }
 
@@ -117,6 +126,12 @@ extern "C" {
         frameInfo[0] = spec.SoundBufSize;
         frameInfo[1] = spec.DisplayRect.x;
         frameInfo[2] = spec.DisplayRect.y;
+        if (_game->multires || !spec.DisplayRect.w) {
+            frameInfo[3] = spec.LineWidths[spec.DisplayRect.y];
+        } else {
+            frameInfo[3] = spec.DisplayRect.w;
+        }
+        frameInfo[4] = spec.DisplayRect.h;
 
         jshortArray frameInfoArray = env->NewShortArray(FRAME_INFO_ARRAY_SIZE);
         env->SetShortArrayRegion(frameInfoArray, 0, FRAME_INFO_ARRAY_SIZE, frameInfo);
@@ -128,7 +143,39 @@ extern "C" {
                                                             jboolean y2, jboolean y3, jboolean y4,
                                                             jboolean x1, jboolean x2, jboolean x3,
                                                             jboolean x4, jboolean a, jboolean b,
-                                                            jboolean start) {}
+                                                            jboolean start) {
+        if (_game->shortname[0] == 'w') {
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x1, 0);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x2, 1);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x3, 2);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x4, 3);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], y1, 4);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], y2, 5);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], y3, 6);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], y4, 7);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], a, 9);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], b, 10);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], start, 8);
+        } else if (_game->shortname[0] == 'g') {
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x1, 0);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x2, 3);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x3, 1);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x4, 2);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], a, 4);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], b, 5);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], start, 6);
+        } else if (_game->shortname[0] == 'n') {
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x1, 0);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x2, 3);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x3, 1);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x4, 2);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], a, 5);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], b, 4);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], start, 6);
+        } else if (_game->shortname[0] == 'p') {
+
+        }
+    }
 
     JNIEXPORT void JNICALL
     Java_com_atelieryl_wonderdroid_WonderSwan_loadbackup(JNIEnv *env, jclass obj, jstring filename) {}

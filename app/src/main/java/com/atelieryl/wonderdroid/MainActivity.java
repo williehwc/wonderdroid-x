@@ -41,7 +41,7 @@ public class MainActivity extends BaseActivity {
 
     private ProgressBar mPB;
 
-    private EmuView view;
+    private EmuView view = null;
 
     private Rom mRom;
 
@@ -61,6 +61,8 @@ public class MainActivity extends BaseActivity {
 
     private final int maxBackupNo = 4;
 
+    SharedPreferences prefs;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,17 +73,11 @@ public class MainActivity extends BaseActivity {
             throw new IllegalArgumentException();
         }
 
-        view = new EmuView(this);
-        setContentView(view);
-        view.setFocusable(true);
-        view.setFocusableInTouchMode(true);
-
         mContext = this.getBaseContext();
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         parseEmuOptions(prefs);
-        parseKeys(prefs);
-        
+
         dirPath = prefs.getString("storage_path", "");
 
         mPB = (ProgressBar)this.findViewById(R.id.romloadprogressbar);
@@ -92,10 +88,10 @@ public class MainActivity extends BaseActivity {
         showStateWarning = !prefs.getBoolean("hidestatewarning", false);
     }
 
-    public class GameLoader extends AsyncTask<Void, Void, short[]> {
+    public class GameLoader extends AsyncTask<Void, Void, int[]> {
 
         @Override
-        protected short[] doInBackground(Void... params) {
+        protected int[] doInBackground(Void... params) {
 //                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 //                String name = prefs.getString("ws_name", "");
 //                String sex = prefs.getString("ws_sex", "1");
@@ -107,7 +103,7 @@ public class MainActivity extends BaseActivity {
         }
 
         @Override
-        protected void onPostExecute(short[] gameInfo) {
+        protected void onPostExecute(int[] gameInfo) {
             if (mPB != null) {
                 mPB.setVisibility(ProgressBar.GONE);
             }
@@ -117,12 +113,25 @@ public class MainActivity extends BaseActivity {
                 WonderSwan.exit();
                 finish();
                 return;
+            } else if (gameInfo[0] == 0) {
+                Toast.makeText(mContext, R.string.no_sms, Toast.LENGTH_SHORT).show();
+                WonderSwan.exit();
+                finish();
+                return;
             }
 
             WonderSwan.reset();
             //WonderSwan.loadbackup(mCartMem.getAbsolutePath());
 
+            view = new EmuView(mContext, gameInfo);
+            setContentView(view);
+            view.setFocusable(true);
+            view.setFocusableInTouchMode(true);
             view.start();
+            view.onResume();
+            parseKeys(prefs);
+            view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+
             // Show controls automatically
             if (showControls) {
                 mControlsVisible = true;
@@ -293,11 +302,12 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
     	// Called second when switching/waking to emulator
         super.onResume();
-        view.onResume();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         parseEmuOptions(prefs);
-        parseKeys(prefs);
-        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        if (view != null) {
+            view.onResume();
+            parseKeys(prefs);
+            view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        }
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        if (mRomHeader.isVertical || !prefs.getBoolean("reversehorizontalorientation", false)) {
@@ -311,8 +321,10 @@ public class MainActivity extends BaseActivity {
     public void onPause() {
     	// Called first when switching away or sleeping
         super.onPause();
-        view.stop();
-        saveState(-1);
+        if (view != null) {
+            view.stop();
+            saveState(-1);
+        }
         //WonderSwan.savebackup(mCartMem.getAbsolutePath());
     }
     

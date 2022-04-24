@@ -146,6 +146,7 @@
     <string name="unrecognized_extension">Unrecognized extension</string>
     <string name="already_in_zip">File already exists in a ZIP, which can only be overwritten by another ZIP.</string>
     <string name="no_corresponding_game">No corresponding game exists</string>
+    <string name="no_sms">Master System games are not supported, but Game Gear games are.</string>
     <string-array name="sexes">
         <item>Male</item>
         <item>Female</item>

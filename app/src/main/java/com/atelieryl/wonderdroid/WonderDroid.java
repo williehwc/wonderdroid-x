@@ -21,7 +21,7 @@ public class WonderDroid extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        WonderSwan.outputDebugShizzle();
+        //WonderSwan.outputDebugShizzle();
         ZipCache.dumpInfo(this.getBaseContext());
         ZipCache.clean(this.getBaseContext());
         PRDownloader.initialize(getApplicationContext());

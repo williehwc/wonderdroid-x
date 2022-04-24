@@ -13,12 +13,6 @@ public class WonderSwan {
 
     private static final String TAG = WonderSwan.class.getSimpleName();
 
-    static public final int SCREEN_WIDTH = 224;
-
-    static public final int SCREEN_HEIGHT = 144;
-
-    static public final int FRAMEBUFFERSIZE = (SCREEN_WIDTH * SCREEN_HEIGHT) * 4;
-
     static public boolean audioEnabled = true;
 
     static public int samples;
@@ -32,8 +26,15 @@ public class WonderSwan {
     static public short[] workingaudiobuffer = new short[audiobufferlen];
 
     public static enum WonderSwanButton {
-        Y1, Y4, Y2, Y3, X3, X4, X2, X1, A, B, START; // FIXME the is screen
-                                                     // rendering order
+        Y1, Y4, Y2, Y3, X3, X4, X2, X1, A, B, START;
+
+        // 1 up
+        // 2 right
+        // 3 down
+        // 4 left
+        // B refers to the left action button, regardless of system
+        // A refers to the right action button, regardless of system
+
         public boolean hardwareKeyDown = false;
         
         public boolean touchDown = false;
@@ -44,8 +45,6 @@ public class WonderSwan {
     };
 
     public static boolean buttonsDirty = false;
-
-    public static final int channelconf = AudioFormat.CHANNEL_CONFIGURATION_STEREO;
 
     public static final int encoding = AudioFormat.ENCODING_PCM_16BIT;
 
@@ -59,7 +58,7 @@ public class WonderSwan {
         System.loadLibrary("mednafen");
     }
 
-    static public native short[] load(String rom_path, String dir_path);
+    static public native int[] load(String rom_path, String dir_path);
 
     static public native void reset();
 
@@ -106,9 +105,9 @@ public class WonderSwan {
 
         short[] frameInfo = _execute_frame(skipframe, audioEnabled, framebuffer, audioEnabled ? audiobuffer : null);
         samples = frameInfo[0];
-        synchronized (audiobuffer) {
-            audiobuffer.notify();
-        }
+//        synchronized (audiobuffer) {
+//            audiobuffer.notify();
+//        }
         return frameInfo;
     }
 
@@ -118,10 +117,10 @@ public class WonderSwan {
     static public native void updatebuttons(boolean y1, boolean y2, boolean y3, boolean y4,
             boolean x1, boolean x2, boolean x3, boolean x4, boolean a, boolean b, boolean start);
 
-    static public void outputDebugShizzle() {
-        Log.d(TAG,
-                "Audio buffer min " + AudioTrack.getMinBufferSize(audiofreq, channelconf, encoding));
-    }
+//    static public void outputDebugShizzle() {
+//        Log.d(TAG,
+//                "Audio buffer min " + AudioTrack.getMinBufferSize(audiofreq, channelconf, encoding));
+//    }
 
     public static native void savebackup(String filename);
 

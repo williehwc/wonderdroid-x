@@ -3,6 +3,7 @@ package com.atelieryl.wonderdroid;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.concurrent.ExecutorService;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
@@ -10,21 +11,18 @@ import android.graphics.Bitmap;
 //import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.view.SurfaceHolder;
 
 import com.atelieryl.wonderdroid.utils.DrawThread;
 import com.atelieryl.wonderdroid.utils.EmuThread;
-import com.atelieryl.wonderdroid.utils.AudioRunnable;
 
 @SuppressLint("NewApi")
 public class GameRenderer implements EmuThread.Renderer {
 
-    private AudioTrack audio = new AudioTrack(AudioManager.STREAM_MUSIC, WonderSwan.audiofreq,
-            WonderSwan.channelconf, WonderSwan.encoding, AudioTrack.getMinBufferSize(
-                    WonderSwan.audiofreq, WonderSwan.channelconf, WonderSwan.encoding) * 4,
-            AudioTrack.MODE_STREAM);
+    private AudioTrack audio;
 
     private Button[] buttons;
 
@@ -41,28 +39,59 @@ public class GameRenderer implements EmuThread.Renderer {
     private final Paint textPaint = new Paint();
     
     private DrawThread drawThread;
-    
-    private AudioRunnable audioRunnable;
-    
+
     private boolean surfaceHolderIsSet = false;
 
     private boolean clearBeforeDraw = true;
 
-    public GameRenderer() {
+    private static final int BYTES_PER_PX = 4;
+
+    private int mSoundChan;
+
+    private boolean scaleGenerated;
+
+    private int mNominalWidth;
+    private int mNominalHeight;
+
+    private double mScaling;
+    private int mSharpness;
+
+    private int mSurfaceWidth;
+    private int mSurfaceHeight;
+
+    public GameRenderer(int[] gameInfo, int sharpness) {
+
+        mNominalWidth = gameInfo[1];
+        mNominalHeight = gameInfo[2];
+
+        int fbWidth = gameInfo[3];
+        int fbHeight = gameInfo[4];
+
+        int soundChan = gameInfo[5];
+
+        mSharpness = sharpness;
 
         textPaint.setColor(0xFFFFFFFF);
         textPaint.setTextSize(35);
         textPaint.setShadowLayer(3, 1, 1, 0x99000000);
         textPaint.setAntiAlias(true);
 
-        frameone = ByteBuffer.allocateDirect(WonderSwan.FRAMEBUFFERSIZE).asIntBuffer();
-        framebuffer = Bitmap.createBitmap(WonderSwan.SCREEN_WIDTH, WonderSwan.SCREEN_HEIGHT,
-                Bitmap.Config.ARGB_8888);
+        frameone = ByteBuffer.allocateDirect(fbWidth * fbHeight * BYTES_PER_PX).asIntBuffer();
+        framebuffer = Bitmap.createBitmap(fbWidth, fbHeight, Bitmap.Config.ARGB_8888);
         
         drawThread = new DrawThread(framebuffer, scale);
         drawThread.start();
 
-        audioRunnable = new AudioRunnable(audio);
+        int channelConf = AudioFormat.CHANNEL_CONFIGURATION_STEREO;
+        if (soundChan == 1) {
+            channelConf = AudioFormat.CHANNEL_CONFIGURATION_MONO;
+        }
+        mSoundChan = soundChan;
+
+        audio = new AudioTrack(AudioManager.STREAM_MUSIC, WonderSwan.audiofreq,
+                channelConf, WonderSwan.encoding, AudioTrack.getMinBufferSize(
+                WonderSwan.audiofreq, channelConf, WonderSwan.encoding) * 4,
+                AudioTrack.MODE_STREAM);
 
     }
 
@@ -109,9 +138,19 @@ public class GameRenderer implements EmuThread.Renderer {
 
     @Override
     public void update(boolean skip) {
-        WonderSwan.execute_frame(frameone, skip);
-        audioRunnable.run();
-
+        short[] frameInfo = WonderSwan.execute_frame(frameone, skip);
+        audio.write(WonderSwan.audiobuffer, 0, WonderSwan.samples * mSoundChan);
+        if (!scaleGenerated) {
+            scale.reset();
+            if (frameInfo[4] > 0) {
+                scale.postScale((float) mNominalWidth / frameInfo[3], (float) mNominalHeight / frameInfo[4]);
+            }
+            scale.postTranslate(-frameInfo[1], -frameInfo[2]);
+            scale.postScale(mSharpness * (float) mScaling, mSharpness * (float) mScaling);
+            scale.postTranslate((mSurfaceWidth - mNominalWidth * mSharpness * (float) mScaling) / 2,
+                    (mSurfaceHeight - mNominalHeight * mSharpness * (float) mScaling) / 2);
+            scaleGenerated = true;
+        }
         if (!skip) {
             frameone.rewind();
             framebuffer.copyPixelsFromBuffer(frameone);
@@ -146,6 +185,16 @@ public class GameRenderer implements EmuThread.Renderer {
 
     public void stopDrawThread() {
         drawThread.clearRunning();
+    }
+
+    public void setScaling(double scaling) {
+        mScaling = scaling;
+        scaleGenerated = false;
+    }
+
+    public void updateSurfaceDimens(int surfaceWidth, int surfaceHeight) {
+        mSurfaceWidth = surfaceWidth;
+        mSurfaceHeight = surfaceHeight;
     }
 
     public void setVolume(int volume) {
