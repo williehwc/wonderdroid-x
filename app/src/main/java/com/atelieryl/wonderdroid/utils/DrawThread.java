@@ -19,7 +19,6 @@ public class DrawThread extends Thread {
 	private SurfaceHolder mSurfaceHolder;
 	private Button[] buttons;
 	private boolean showButtons;
-	private boolean clearBeforeDraw;
 	private boolean draw = false;
 	private boolean running = true;
 	
@@ -39,10 +38,6 @@ public class DrawThread extends Thread {
 	
 	public void setShowButtons(boolean showButtons) {
 		this.showButtons = showButtons;
-	}
-	
-	public void setClearBeforeDraw(boolean clearBeforeDraw) {
-		this.clearBeforeDraw = clearBeforeDraw;
 	}
 
 	public void setDraw() {
@@ -64,9 +59,7 @@ public class DrawThread extends Thread {
 						c = mSurfaceHolder.lockCanvas();
 					}
 					//boolean x = c.isHardwareAccelerated();
-					if (clearBeforeDraw) {
-						c.drawColor(Color.BLACK); // Make sure out-of-bounds areas remain black
-					}
+					c.drawColor(Color.BLACK); // Make sure out-of-bounds areas remain black
 					c.drawBitmap(framebuffer, scale, null);
 					if (showButtons && buttons != null) {
 						for (Button button : buttons) {

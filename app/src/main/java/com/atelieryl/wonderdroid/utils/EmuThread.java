@@ -41,15 +41,25 @@ public class EmuThread extends Thread {
     private long frameEnd;
     private long nextUpdateTime;
     private int frametime;
+    private long sleepTimeMillis;
 
     boolean skip = false;
     boolean behind = false;
 
     private int frameskip = 0;
 
-    public EmuThread (Renderer renderer, int fps) {
+    public EmuThread (Renderer renderer, int fps, char mSystem) {
         this.renderer = renderer;
         targetFrameTime = (long) (1000000000. / (fps / 65536. / 256.));
+        double sleepTimeMillisFactor = 0.66;
+        switch (mSystem) {
+            case 'w':
+            case 'n':
+            case 'g':
+                sleepTimeMillisFactor = 0.75;
+                break;
+        }
+        sleepTimeMillis = (long) (targetFrameTime / 1000000. * sleepTimeMillisFactor);
     }
 
     public void setSurfaceHolder (SurfaceHolder sh) {
@@ -97,6 +107,8 @@ public class EmuThread extends Thread {
                 frametime = 0;
 
                 //targetFrameTime = 1000000000 * WonderSwan.samples / WonderSwan.audiofreq;
+
+                SystemClock.sleep(sleepTimeMillis);
 
                 while (frametime < targetFrameTime) {
                     frametime = (int)(System.nanoTime() - frameStart);

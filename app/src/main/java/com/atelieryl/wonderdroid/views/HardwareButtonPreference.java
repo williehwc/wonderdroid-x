@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -41,12 +42,23 @@ public class HardwareButtonPreference extends Preference {
 		TextView controltext = (TextView)layout.getChildAt(0);
 		controltext.setText(getTitle());
 
-		final TextView current = (TextView)layout.getChildAt(1);
-		if (getSharedPreferences().contains(getKey())) {
-			current.setText(keycodeDecode(getSharedPreferences().getInt(getKey(), 0)));
+		ImageView imageView = (ImageView)layout.getChildAt(1);
+		if (getTitle().equals("B")) {
+			imageView.setImageDrawable(parent.getResources().getDrawable(R.drawable.left_action_button));
+			imageView.setVisibility(View.VISIBLE);
+			controltext.setVisibility(View.GONE);
+		} else if (getTitle().equals("A")) {
+			imageView.setImageDrawable(parent.getResources().getDrawable(R.drawable.right_action_button));
+			imageView.setVisibility(View.VISIBLE);
+			controltext.setVisibility(View.GONE);
 		}
 
-		Button set = (Button)layout.getChildAt(2);
+		final TextView current = (TextView)layout.getChildAt(2);
+		if (getSharedPreferences().contains(getKey())) {
+			current.setText("Set");
+		}
+
+		Button set = (Button)layout.getChildAt(3);
 		set.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -58,7 +70,7 @@ public class HardwareButtonPreference extends Preference {
 			}
 		});
 
-		Button clear = (Button)layout.getChildAt(3);
+		Button clear = (Button)layout.getChildAt(4);
 		clear.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -93,7 +105,7 @@ public class HardwareButtonPreference extends Preference {
 			SharedPreferences.Editor editor = getEditor();
 			editor.putInt(getKey(), keyCode);
 			editor.commit();
-			current.setText(keycodeDecode(keyCode));
+			current.setText("Set");
 			this.dismiss();
 			return true;
 

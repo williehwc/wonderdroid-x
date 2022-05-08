@@ -46,10 +46,11 @@
     <string name="frameskip">Frame skip</string>
     <string name="frameskipdescription">Skip one out of every how many frames?</string>
     <string name="sharpness">Screen sharpness</string>
-    <string name="sharpnessdescription">May cause display lag; requires emulator restart</string>
+    <string name="sharpnessdescription">Requires emulator restart</string>
+    <string name="orientationdescription">May require emulator restart; not for vertical WS games</string>
     <string name="reversehorizontalorientation">Reverse horizontal orientation</string>
     <string name="stretchtofill">Stretch to fill screen</string>
-    <string name="stretchtofilldescription">May improve performance; requires emulator restart</string>
+    <string name="stretchtofilldescription">Does not apply to portrait orientation</string>
     <string name="showbackground">Show game select background</string>
     <string name="showbackgrounddescription">Disable for smoother scrolling</string>
     <string name="about">About</string>
@@ -147,9 +148,7 @@
     <string name="already_in_zip">File already exists in a ZIP, which can only be overwritten by another ZIP.</string>
     <string name="no_corresponding_game">No corresponding game exists</string>
     <string name="no_sms">Master System games are not supported, but Game Gear games are.</string>
-    <string-array name="sexes">
-        <item>Male</item>
-        <item>Female</item>
-    </string-array>
+    <string name="orientation">Orientation</string>
+    <string name="language">Digimon Battle Spirit &amp; NGP language</string>
 
 </resources>

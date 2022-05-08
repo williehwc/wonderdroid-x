@@ -44,6 +44,11 @@
             android:icon="@drawable/ic_margin_bottom"
             android:defaultValue="0"
             android:max="50" />
+        <SeekBarPreference
+            android:key="margin_middle_portrait"
+            android:icon="@drawable/ic_margin_middle_portrait"
+            android:defaultValue="15"
+            android:max="50" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="relocate"

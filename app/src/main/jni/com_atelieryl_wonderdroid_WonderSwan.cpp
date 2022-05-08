@@ -29,28 +29,35 @@ uint32_t *_inputBuffer[13];
 extern "C" {
 
     JNIEXPORT void JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_exit(JNIEnv *env, jclass obj) {
-        LOGD("Called exit!");
         _runGame = false;
         MDFNI_CloseGame();
         delete _surf;
     }
 
     JNIEXPORT void JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_reset(JNIEnv *env, jclass obj) {
-        LOGD("Called reset!");
         MDFNI_Reset();
     }
 
     JNIEXPORT jintArray JNICALL
     Java_com_atelieryl_wonderdroid_WonderSwan_load(JNIEnv *env, jclass obj, jstring rom_path,
-                                                   jstring dir_path) {
-        LOGD("Called load!");
-
+                                                   jstring dir_path, jstring name, jint year, jint month, jint day,
+                                                   jstring blood, jstring sex, jstring language) {
         // Initialize Mednafen
         if (!_initialized) {
             MDFNI_InitializeModules();
             std::vector<MDFNSetting> settings;
             MDFNI_Initialize(env->GetStringUTFChars(dir_path, NULL), settings);
             MDFNI_SetSetting("filesys.path_sav", env->GetStringUTFChars(dir_path, NULL));
+            MDFNI_SetSetting("filesys.path_state", env->GetStringUTFChars(dir_path, NULL));
+            MDFNI_SetSetting("filesys.fname_sav", "%f%e.%x");
+            MDFNI_SetSetting("wswan.name", env->GetStringUTFChars(name, NULL));
+            MDFNI_SetSetting("wswan.byear", std::to_string(year).c_str());
+            MDFNI_SetSetting("wswan.bmonth", std::to_string(month).c_str());
+            MDFNI_SetSetting("wswan.bday", std::to_string(day).c_str());
+            MDFNI_SetSetting("wswan.blood", env->GetStringUTFChars(blood, NULL));
+            MDFNI_SetSetting("wswan.sex", env->GetStringUTFChars(sex, NULL));
+            MDFNI_SetSetting("wswan.language", env->GetStringUTFChars(language, NULL));
+            MDFNI_SetSetting("ngp.language", env->GetStringUTFChars(language, NULL));
             _initialized = true;
         }
 
@@ -94,8 +101,6 @@ extern "C" {
     Java_com_atelieryl_wonderdroid_WonderSwan__1execute_1frame(JNIEnv *env, jclass obj, jboolean skip,
                                                                jboolean audio, jobject framebuffer,
                                                                jshortArray audiobuffer) {
-        LOGD("Called execute frame!");
-
         if (!_runGame) return 0;
 
         // Mednafen emulate
@@ -143,7 +148,7 @@ extern "C" {
                                                             jboolean y2, jboolean y3, jboolean y4,
                                                             jboolean x1, jboolean x2, jboolean x3,
                                                             jboolean x4, jboolean a, jboolean b,
-                                                            jboolean start) {
+                                                            jboolean start, jboolean select) {
         if (_game->shortname[0] == 'w') {
             *_inputBuffer[0] = setBit(*_inputBuffer[0], x1, 0);
             *_inputBuffer[0] = setBit(*_inputBuffer[0], x2, 1);
@@ -173,7 +178,14 @@ extern "C" {
             *_inputBuffer[0] = setBit(*_inputBuffer[0], b, 4);
             *_inputBuffer[0] = setBit(*_inputBuffer[0], start, 6);
         } else if (_game->shortname[0] == 'p') {
-
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x1, 4);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x2, 5);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x3, 6);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], x4, 7);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], a, 0);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], b, 1);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], start, 3);
+            *_inputBuffer[0] = setBit(*_inputBuffer[0], select, 2);
         }
     }
 

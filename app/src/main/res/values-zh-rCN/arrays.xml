@@ -17,5 +17,18 @@
         <item>黑</item>
         <item>白</item>
     </string-array>
+    <string-array name="orientation">
+        <item>水平</item>
+        <item>反水平</item>
+        <item>垂直</item>
+    </string-array>
+    <string-array name="sexes">
+        <item>男</item>
+        <item>女</item>
+    </string-array>
+    <string-array name="language">
+        <item>日文</item>
+        <item>英文</item>
+    </string-array>
 
 </resources>

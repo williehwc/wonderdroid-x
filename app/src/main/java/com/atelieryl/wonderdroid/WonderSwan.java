@@ -26,7 +26,7 @@ public class WonderSwan {
     static public short[] workingaudiobuffer = new short[audiobufferlen];
 
     public static enum WonderSwanButton {
-        Y1, Y4, Y2, Y3, X3, X4, X2, X1, A, B, START;
+        Y1, Y4, Y2, Y3, X3, X4, X2, X1, A, B, START, SEL;
 
         // 1 up
         // 2 right
@@ -58,7 +58,8 @@ public class WonderSwan {
         System.loadLibrary("mednafen");
     }
 
-    static public native int[] load(String rom_path, String dir_path);
+    static public native int[] load(String rom_path, String dir_path, String name, int year, int month,
+                                    int day, String blood, String sex, String language);
 
     static public native void reset();
 
@@ -99,7 +100,7 @@ public class WonderSwan {
             WonderSwan.updatebuttons(WonderSwanButton.Y1.down, WonderSwanButton.Y2.down,
                     WonderSwanButton.Y3.down, WonderSwanButton.Y4.down, WonderSwanButton.X1.down,
                     WonderSwanButton.X2.down, WonderSwanButton.X3.down, WonderSwanButton.X4.down,
-                    WonderSwanButton.A.down, WonderSwanButton.B.down, WonderSwanButton.START.down);
+                    WonderSwanButton.A.down, WonderSwanButton.B.down, WonderSwanButton.START.down, WonderSwanButton.SEL.down);
             buttonsDirty = false;
         }
 
@@ -115,7 +116,7 @@ public class WonderSwan {
             IntBuffer framebuffer, short[] audiobuffer);
 
     static public native void updatebuttons(boolean y1, boolean y2, boolean y3, boolean y4,
-            boolean x1, boolean x2, boolean x3, boolean x4, boolean a, boolean b, boolean start);
+            boolean x1, boolean x2, boolean x3, boolean x4, boolean a, boolean b, boolean start, boolean select);
 
 //    static public void outputDebugShizzle() {
 //        Log.d(TAG,

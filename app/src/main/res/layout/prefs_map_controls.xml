@@ -47,7 +47,11 @@
 
         <com.atelieryl.wonderdroid.views.HardwareButtonPreference
             android:key="hwcontrolStart"
-            android:title="Start" />
+            android:title="Start/Run" />
+
+        <com.atelieryl.wonderdroid.views.HardwareButtonPreference
+            android:key="hwcontrolSelect"
+            android:title="Select" />
     
     </PreferenceCategory>
     

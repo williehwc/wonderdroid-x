@@ -34,11 +34,14 @@
                 android:defaultValue="false"
                 android:summary="Force the emulator to emulate an original mono Wonder Swan." />
         -->
-        
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="reversehorizontalorientation"
-            android:title="@string/reversehorizontalorientation" />
+
+        <ListPreference
+            android:entries="@array/orientation"
+            android:entryValues="@array/orientationvalues"
+            android:key="orientation"
+            android:defaultValue="landscape"
+            android:title="@string/orientation"
+            android:summary="@string/orientationdescription" />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="showbackground"
@@ -126,7 +129,7 @@
             android:summary="@string/stretchtofilldescription" />
         <ListPreference
             android:entries="@array/sharpness"
-            android:entryValues="@array/bloodtypevalues"
+            android:entryValues="@array/sharpnessvalues"
             android:key="sharpness"
             android:title="@string/sharpness"
             android:defaultValue="3"
@@ -156,14 +159,23 @@
         <ListPreference
             android:entries="@array/sexes"
             android:entryValues="@array/sexvalues"
+            android:defaultValue="male"
             android:key="ws_sex"
             android:title="@string/sex" />
 
         <ListPreference
             android:entries="@array/bloodtypes"
             android:entryValues="@array/bloodtypevalues"
+            android:defaultValue="o"
             android:key="ws_blood"
             android:title="@string/bloodtype" />
+
+        <ListPreference
+            android:entries="@array/language"
+            android:entryValues="@array/languagevalues"
+            android:defaultValue="english"
+            android:key="ws_language"
+            android:title="@string/language" />
     </PreferenceCategory>
 
     <!--<PreferenceCategory android:title="Support Settings" >

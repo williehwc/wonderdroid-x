@@ -8,14 +8,24 @@
         <item>AB</item>
     </string-array>
     <string-array name="bloodtypevalues">
+        <item>a</item>
+        <item>b</item>
+        <item>o</item>
+        <item>ab</item>
+    </string-array>
+    <string-array name="sharpnessvalues">
         <item>1</item>
         <item>2</item>
         <item>3</item>
         <item>4</item>
     </string-array>
+    <string-array name="sexes">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
     <string-array name="sexvalues">
-        <item>1</item>
-        <item>2</item>
+        <item>male</item>
+        <item>female</item>
     </string-array>
     <string-array name="frameskipvalues">
         <item>2</item>
@@ -88,6 +98,24 @@
     <string-array name="buttoncolorvalues">
         <item>black</item>
         <item>white</item>
+    </string-array>
+    <string-array name="orientation">
+        <item>Landscape</item>
+        <item>Reverse landscape</item>
+        <item>Portrait</item>
+    </string-array>
+    <string-array name="orientationvalues">
+        <item>landscape</item>
+        <item>reverselandscape</item>
+        <item>portrait</item>
+    </string-array>
+    <string-array name="language">
+        <item>Japanese</item>
+        <item>English</item>
+    </string-array>
+    <string-array name="languagevalues">
+        <item>japanese</item>
+        <item>english</item>
     </string-array>
 
 </resources>

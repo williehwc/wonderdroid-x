@@ -46,7 +46,7 @@
     <string name="frameskip">跳幀</string>
     <string name="frameskipdescription">每多少幀跳過一個?</string>
     <string name="sharpness">銳利度</string>
-    <string name="sharpnessdescription">可能導致畫面不順; 需要重新開始模擬器</string>
+    <string name="sharpnessdescription">需要重新開始模擬器</string>
     <string name="reversehorizontalorientation">水平時，轉動180度</string>
     <string name="stretchtofill">畫面自動調整到螢幕的形狀</string>
     <string name="stretchtofilldescription">可改善性能; 需要重新開始模擬器</string>
@@ -83,11 +83,6 @@
     <string name="understand">我瞭解</string>
     <string name="mapcontrols">選擇按鈕…</string>
     <string name="mapcontrolsdescription">鍵盤和其他輸入設備</string>
-
-    <string-array name="sexes">
-        <item>男</item>
-        <item>女</item>
-    </string-array>
     <string name="swapab">交換 A + B 按鈕</string>
     <string name="sizeposition">大小和位置…</string>
     <string name="abposition">A + B 按鈕位置</string>

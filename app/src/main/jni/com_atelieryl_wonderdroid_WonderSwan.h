@@ -17,10 +17,10 @@ extern "C" {
 /*
 * Class:     com_atelieryl_wonderdroid_WonderSwan
 * Method:    load
-* Signature: (Ljava/lang/String;Ljava/lang/String;)[I
+* Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)[I
 */
 JNIEXPORT jintArray JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_load
-(JNIEnv *, jclass, jstring, jstring);
+(JNIEnv *, jclass, jstring, jstring, jstring, jint, jint, jint, jstring, jstring, jstring);
 
 /*
  * Class:     com_atelieryl_wonderdroid_WonderSwan
@@ -49,10 +49,10 @@ JNIEXPORT jshortArray JNICALL Java_com_atelieryl_wonderdroid_WonderSwan__1execut
 /*
  * Class:     com_atelieryl_wonderdroid_WonderSwan
  * Method:    updatebuttons
- * Signature: (ZZZZZZZZZZZ)V
+ * Signature: (ZZZZZZZZZZZZ)V
  */
 JNIEXPORT void JNICALL Java_com_atelieryl_wonderdroid_WonderSwan_updatebuttons
-(JNIEnv *, jclass, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean);
+(JNIEnv *, jclass, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean);
 
 /*
  * Class:     com_atelieryl_wonderdroid_WonderSwan

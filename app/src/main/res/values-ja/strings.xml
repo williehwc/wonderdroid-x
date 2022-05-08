@@ -41,11 +41,6 @@
     <string name="loadstate">読み込み</string>
     <string name="understand">分かりました</string>
     <string name="visit">当社のウェブサイトを訪問する</string>
-
-    <string-array name="sexes">
-        <item>男性</item>
-        <item>女性</item>
-    </string-array>
     <string name="report">問題を報告する</string>
     <string name="reportdescription">パフォーマンスに問題がある場合は、まずフレームスキップとシャープネスの設定を変更してみて下さい。それでも解決しない場合や他に問題がある場合は、GitHubにてご報告下さい。ご協力をお待ちしております！</string>
     <string name="issues">GitHubへ移動する</string>
@@ -70,7 +65,7 @@
     <string name="cannotloadrom">ROMをロードできませんでした。再度お試し下さい。</string>
     <string name="frameskipdescription">1回につき何フレームスキップしますか?</string>
     <string name="mapcontrolsdescription">キーボード及びその他の入力周辺機器用</string>
-    <string name="sharpnessdescription">表示遅れの原因となる可能性があります; エミュレーターの再起動が必要です</string>
+    <string name="sharpnessdescription">エミュレーターの再起動が必要です</string>
     <string name="sdcardinfo">SDカードの使用に関するヘルプ</string>
     <string name="rompatherror">ROMフォルダーエラー</string>
     <string name="moreapps">他のYLアプリ一覧</string>

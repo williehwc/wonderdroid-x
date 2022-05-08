@@ -42,7 +42,7 @@ public class GameRenderer implements EmuThread.Renderer {
 
     private boolean surfaceHolderIsSet = false;
 
-    private boolean clearBeforeDraw = true;
+    private boolean stretchToFill = false;
 
     private static final int BYTES_PER_PX = 4;
 
@@ -59,7 +59,9 @@ public class GameRenderer implements EmuThread.Renderer {
     private int mSurfaceWidth;
     private int mSurfaceHeight;
 
-    public GameRenderer(int[] gameInfo, int sharpness) {
+    private boolean mPortrait;
+
+    public GameRenderer(int[] gameInfo, int sharpness, boolean portrait) {
 
         mNominalWidth = gameInfo[1];
         mNominalHeight = gameInfo[2];
@@ -93,6 +95,7 @@ public class GameRenderer implements EmuThread.Renderer {
                 WonderSwan.audiofreq, channelConf, WonderSwan.encoding) * 4,
                 AudioTrack.MODE_STREAM);
 
+        mPortrait = portrait;
     }
 
     @Override
@@ -146,9 +149,18 @@ public class GameRenderer implements EmuThread.Renderer {
                 scale.postScale((float) mNominalWidth / frameInfo[3], (float) mNominalHeight / frameInfo[4]);
             }
             scale.postTranslate(-frameInfo[1], -frameInfo[2]);
-            scale.postScale(mSharpness * (float) mScaling, mSharpness * (float) mScaling);
-            scale.postTranslate((mSurfaceWidth - mNominalWidth * mSharpness * (float) mScaling) / 2,
-                    (mSurfaceHeight - mNominalHeight * mSharpness * (float) mScaling) / 2);
+            if (mPortrait) {
+                scale.postScale((float) mScaling * mSurfaceWidth / mNominalWidth, mSharpness * (float) mScaling);
+                scale.postTranslate((mSurfaceWidth - mSurfaceWidth * (float) mScaling) / 2, 10 * mSharpness);
+            } else if (stretchToFill) {
+                scale.postScale((float) mScaling * mSurfaceWidth / mNominalWidth, mSharpness * (float) mScaling);
+                scale.postTranslate((mSurfaceWidth - mSurfaceWidth * (float) mScaling) / 2,
+                        (mSurfaceHeight - mNominalHeight * mSharpness * (float) mScaling) / 2);
+            } else {
+                scale.postScale(mSharpness * (float) mScaling, mSharpness * (float) mScaling);
+                scale.postTranslate((mSurfaceWidth - mNominalWidth * mSharpness * (float) mScaling) / 2,
+                        (mSurfaceHeight - mNominalHeight * mSharpness * (float) mScaling) / 2);
+            }
             scaleGenerated = true;
         }
         if (!skip) {
@@ -169,9 +181,9 @@ public class GameRenderer implements EmuThread.Renderer {
         drawThread.setShowButtons(show);
     }
     
-    public void setClearBeforeDraw(boolean clearBeforeDraw) {
-        this.clearBeforeDraw = clearBeforeDraw;
-        drawThread.setClearBeforeDraw(clearBeforeDraw);
+    public void setStretchToFill(boolean stretchToFill) {
+        this.stretchToFill = stretchToFill;
+        this.scaleGenerated = false;
     }
 
     public void restartDrawThread() {
@@ -180,7 +192,6 @@ public class GameRenderer implements EmuThread.Renderer {
         drawThread.start();
         drawThread.setButtons(buttons);
         drawThread.setShowButtons(showButtons);
-        drawThread.setClearBeforeDraw(clearBeforeDraw);
     }
 
     public void stopDrawThread() {

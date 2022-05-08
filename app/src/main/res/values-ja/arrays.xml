@@ -17,5 +17,18 @@
         <item>黒</item>
         <item>白</item>
     </string-array>
+    <string-array name="orientation">
+        <item>縦</item>
+        <item>縦 (逆向き)</item>
+        <item>横</item>
+    </string-array>
+    <string-array name="sexes">
+        <item>男性</item>
+        <item>女性</item>
+    </string-array>
+    <string-array name="language">
+        <item>日本語</item>
+        <item>英語</item>
+    </string-array>
 
 </resources>

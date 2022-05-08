@@ -1,2 +1,0 @@
-set solib-search-path C:/android-proj/wonderdroid-x/app/src/main/obj/local/arm64-v8a
-directory C:/android-sdk/ndk/23.0.7599858/build//../toolchains/llvm/prebuilt/windows-x86_64/sysroot C:/android-sdk/ndk/23.0.7599858/build//../sources/cxx-stl/llvm-libc++ C:/android-sdk/ndk/23.0.7599858/build//../sources/cxx-stl/llvm-libc++abi/include libsndfile C:/android-sdk/ndk/23.0.7599858/build//../sources/cxx-stl/llvm-libc++/include C:/android-proj/wonderdroid-x/app/src/main/jni C:/android-proj/wonderdroid-x/app/src/main/jni/libsndfile

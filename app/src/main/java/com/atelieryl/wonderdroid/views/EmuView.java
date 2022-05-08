@@ -77,7 +77,12 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 
 	SurfaceHolder mHolder = null;
 
-	public void setKeyCodes (int start, int a, int b, int x1, int x2, int x3, int x4, int y1, int y2, int y3, int y4) {
+	private boolean mPortrait;
+
+	private int mSurfaceWidth = 0;
+	private int mSurfaceHeight = 0;
+
+	public void setKeyCodes (int start, int a, int b, int x1, int x2, int x3, int x4, int y1, int y2, int y3, int y4, int select) {
 		WonderSwanButton.START.keyCode = start;
 		WonderSwanButton.A.keyCode = a;
 		WonderSwanButton.B.keyCode = b;
@@ -89,9 +94,10 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		WonderSwanButton.Y2.keyCode = y2;
 		WonderSwanButton.Y3.keyCode = y3;
 		WonderSwanButton.Y4.keyCode = y4;
+		WonderSwanButton.SEL.keyCode = select;
 	}
 
-	public EmuView (Context context, int[] gameInfo) {
+	public EmuView (Context context, int[] gameInfo, boolean portrait) {
 		super(context);
 
 		mFps = gameInfo[0];
@@ -108,17 +114,16 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		SurfaceHolder holder = this.getHolder();
 		holder.addCallback(this);
 
-		renderer = new GameRenderer(gameInfo, sharpness);
-		renderer.setScaling(scaling);
-		mThread = new EmuThread(renderer, mFps);
+		mPortrait = portrait;
+
+		renderer = new GameRenderer(gameInfo, sharpness, mPortrait);
+		mThread = new EmuThread(renderer, mFps, mSystem);
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		sharpness = Integer.parseInt(prefs.getString("sharpness", "3"));
 		mThread.setFrameskip(Integer.parseInt(prefs.getString("frameskip", "0")));
 		stretchToFill = prefs.getBoolean("stretchtofill", false);
 		scaling = (prefs.getInt("scaling", 95) + 5) / 100.;
-
-		renderer.setClearBeforeDraw(!stretchToFill);
 
 		vibratedown = Integer.parseInt(prefs.getString("vibratedown", "5"));
 		vibrateup = Integer.parseInt(prefs.getString("vibrateup", "1"));
@@ -159,6 +164,9 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 //			rescale();
 		}
 		mHolder = holder;
+
+		mSurfaceWidth = w;
+		mSurfaceHeight = h;
 	}
 
 	@Override
@@ -228,7 +236,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 	public void onResume () {
 		if (started) {
 			renderer.restartDrawThread();
-			mThread = new EmuThread(renderer, mFps);
+			mThread = new EmuThread(renderer, mFps, mSystem);
 			start();
 		}
 		mThread.setSurfaceHolder(mHolder);
@@ -240,7 +248,9 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		if (width > 0 && height > 0) {
 			makeButtons(prefs);
 		}
+		stretchToFill = prefs.getBoolean("stretchtofill", false);
 		renderer.setScaling(scaling);
+		renderer.setStretchToFill(stretchToFill);
 		renderer.setVolume(prefs.getInt("volume", 100));
 //		rescale();
 	}
@@ -282,8 +292,11 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 			this.setSystemGestureExclusionRects(exclusionRects);
 		}
 
-		int defaultSpacing = -1 * height / 50;
-		int defaultButtonsize = (int)(height / 6.7);
+		double multiplier = 1;
+		if (mPortrait) multiplier = 0.5;
+
+		int defaultSpacing = (int) (-1 * multiplier * height / 50);
+		int defaultButtonsize = (int) (multiplier * height / 6.7);
 		for (int i = 0; i < buttons.length; i++) {
 			int spacing = 0;
 			int buttonsize = 0;
@@ -308,6 +321,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 					buttonsize = (int) ((prefs.getInt("size_ab", 20) + 5) / 25. * defaultButtonsize);
 					break;
 				case 10:
+				case 11:
 					spacing = (int) ((prefs.getInt("size_start", 20) + 5) / 25. * defaultSpacing);
 					buttonsize = (int) ((prefs.getInt("size_start", 20) + 5) / 25. * defaultButtonsize);
 					break;
@@ -319,25 +333,50 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 			int updownright = buttonsize + buttonsize + spacing;
 			int bottomrowtop = height - buttonsize;
 
+			if (mPortrait) multiplier = 1.5;
+
 			int marginTop = (int) ((float) prefs.getInt("margin_top", 0) * postscale);
 			int marginLeft = (int) ((float) prefs.getInt("margin_left", 15) * postscale);
 			int marginRight = (int) ((float) prefs.getInt("margin_right", 15) * postscale);
-			int marginBottom = (int) ((float) prefs.getInt("margin_bottom", 0) * postscale);
+			int marginBottom = (int) ((float) prefs.getInt("margin_bottom", 0) * postscale * multiplier);
+			int marginMiddlePortrait = (int) ((float) prefs.getInt("margin_middle_portrait", 15) * postscale);
+
+			int dPadSize = (buttonsize * 3) + (spacing * 2);
 
 			switch (i) {
 				// Y
 				case 0: //up
-					buttons[i].setBounds(marginLeft + updownleft, marginTop, marginLeft + updownright, marginTop + buttonsize);
+					if (mPortrait) {
+						buttons[i].setBounds(marginLeft + updownleft, height - dPadSize - marginBottom - dPadSize - marginMiddlePortrait, marginLeft + updownright,
+								(height - (buttonsize * 2)) - (2 * spacing) - marginBottom - dPadSize - marginMiddlePortrait);
+					} else {
+						buttons[i].setBounds(marginLeft + updownleft, marginTop, marginLeft + updownright, marginTop + buttonsize);
+					}
 					break;
 				case 1: //left
-					buttons[i].setBounds(marginLeft, marginTop + buttonsize + spacing, marginLeft + buttonsize, marginTop + (buttonsize * 2) + spacing);
+					if (mPortrait) {
+						buttons[i].setBounds(marginLeft, height - (buttonsize * 2) - spacing - marginBottom - dPadSize - marginMiddlePortrait, marginLeft + buttonsize,
+								height - buttonsize - spacing - marginBottom - dPadSize - marginMiddlePortrait);
+					} else {
+						buttons[i].setBounds(marginLeft, marginTop + buttonsize + spacing, marginLeft + buttonsize, marginTop + (buttonsize * 2) + spacing);
+					}
 					break;
 				case 2: //right
-					buttons[i].setBounds(marginLeft + 2 * (buttonsize + spacing), marginTop + buttonsize + spacing, marginLeft + buttonsize + 2 * (buttonsize + spacing), marginTop + (buttonsize * 2)
-							+ spacing);
+					if (mPortrait) {
+						buttons[i].setBounds(marginLeft + 2 * (buttonsize + spacing), height - (buttonsize * 2) - spacing - marginBottom - dPadSize - marginMiddlePortrait, marginLeft + dPadSize,
+								height - buttonsize - spacing - marginBottom - dPadSize - marginMiddlePortrait);
+					} else {
+						buttons[i].setBounds(marginLeft + 2 * (buttonsize + spacing), marginTop + buttonsize + spacing, marginLeft + dPadSize, marginTop + (buttonsize * 2)
+								+ spacing);
+					}
 					break;
 				case 3: //down
-					buttons[i].setBounds(marginLeft + updownleft, marginTop + (buttonsize * 2) + (spacing * 2), marginLeft + updownright, marginTop + (buttonsize * 3) + (spacing * 2));
+					if (mPortrait) {
+						buttons[i].setBounds(marginLeft + updownleft, height - buttonsize - marginBottom - dPadSize - marginMiddlePortrait, marginLeft + updownright,
+								height - marginBottom - dPadSize - marginMiddlePortrait);
+					} else {
+						buttons[i].setBounds(marginLeft + updownleft, marginTop + (buttonsize * 2) + (spacing * 2), marginLeft + updownright, marginTop + dPadSize);
+					}
 					break;
 				// X
 				case 4:
@@ -347,11 +386,11 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 					buttons[i].setBounds(marginLeft, height - (buttonsize * 2) - spacing - marginBottom, marginLeft + buttonsize, height - buttonsize - spacing - marginBottom);
 					break;
 				case 6:
-					buttons[i].setBounds(marginLeft + 2 * (buttonsize + spacing), height - (buttonsize * 2) - spacing - marginBottom, marginLeft + buttonsize + 2 * (buttonsize + spacing), height
+					buttons[i].setBounds(marginLeft + 2 * (buttonsize + spacing), height - (buttonsize * 2) - spacing - marginBottom, marginLeft + dPadSize, height
 							- buttonsize - spacing - marginBottom);
 					break;
 				case 7:
-					buttons[i].setBounds(marginLeft + updownleft, (height - (buttonsize * 3)) - (2 * spacing) - marginBottom, marginLeft + updownright,
+					buttons[i].setBounds(marginLeft + updownleft, height - dPadSize - marginBottom, marginLeft + updownright,
 							(height - (buttonsize * 2)) - (2 * spacing) - marginBottom);
 					break;
 				// A,B
@@ -391,11 +430,39 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 					break;
 				// Start
 				case 10:
-					buttons[i].setSize(buttonsize * 2, buttonsize);
-					if (prefs.getBoolean("relocate", false)) {
-						buttons[i].setBounds(width - buttonsize * 2 - marginRight, marginTop, width - marginRight, marginTop + buttonsize);
+					if (mSystem == 'p') {
+						buttons[i].setSize(buttonsize, buttonsize);
+						if (mPortrait) {
+							buttons[i].setBounds(width - buttonsize - marginRight, height - (int) (1.5 * dPadSize) - marginBottom - marginMiddlePortrait, width - marginRight,
+									height - (int) (1.5 * dPadSize) - marginBottom - marginMiddlePortrait + buttonsize);
+						} else if (prefs.getBoolean("relocate", false)) {
+							buttons[i].setBounds(width - buttonsize - marginRight, marginTop, width - marginRight, marginTop + buttonsize);
+						} else {
+							buttons[i].setBounds((width / 2) - spacing, bottomrowtop - marginBottom, (width / 2) - spacing + buttonsize, height - marginBottom);
+						}
 					} else {
-						buttons[i].setBounds((width / 2) - buttonsize, bottomrowtop - marginBottom, (width / 2) + buttonsize, height - marginBottom);
+						buttons[i].setSize(buttonsize * 2, buttonsize);
+						if (mPortrait) {
+							buttons[i].setBounds(width - buttonsize * 2 - marginRight, height - (int) (1.5 * dPadSize) - marginBottom - marginMiddlePortrait, width - marginRight,
+									height - (int) (1.5 * dPadSize) - marginBottom - marginMiddlePortrait + buttonsize);
+						} else if (prefs.getBoolean("relocate", false)) {
+							buttons[i].setBounds(width - buttonsize * 2 - marginRight, marginTop, width - marginRight, marginTop + buttonsize);
+						} else {
+							buttons[i].setBounds((width / 2) - buttonsize, bottomrowtop - marginBottom, (width / 2) + buttonsize, height - marginBottom);
+						}
+					}
+					break;
+				// Select
+				case 11:
+					buttons[i].setSize(buttonsize, buttonsize);
+					if (mPortrait) {
+
+						buttons[i].setBounds(width - (buttonsize * 2) + spacing * 2 - marginRight, height - (int) (1.5 * dPadSize) - marginBottom - marginMiddlePortrait, (width - buttonsize) + spacing * 2 - marginRight,
+								height - (int) (1.5 * dPadSize) - marginBottom - marginMiddlePortrait + buttonsize);
+					} else if (prefs.getBoolean("relocate", false)) {
+						buttons[i].setBounds(width - buttonsize * 2 - marginRight + spacing * 2, marginTop, width - buttonsize - marginRight + spacing * 2, marginTop + buttonsize);
+					} else {
+						buttons[i].setBounds((width / 2) + spacing - buttonsize, bottomrowtop - marginBottom, (width / 2) + spacing, height - marginBottom);
 					}
 					break;
 			}
@@ -422,8 +489,9 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 
 			for (int i = 0; i < buttons.length; i++) {
 				// Skip button if system lacks it
-				if (mSystem != 'w' && i <= 3) {
+				if ((mSystem != 'w' && i <= 3) || (mSystem != 'p' && i == 11)) {
 					// Y buttons are only on WonderSwan
+					// Select button is only on PCE
 					buttons[i] = null;
 					continue;
 				}
@@ -459,6 +527,10 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 				} else if (i == 7) {
 					if (mSystem != 'w') {
 						buttonLabel = "△";
+					}
+				} else if (i == 10) {
+					if (mSystem == 'p') {
+						buttonLabel = "RUN";
 					}
 				}
 				buts[i] = new Button(buttons[i], textPaint, buttonLabel);

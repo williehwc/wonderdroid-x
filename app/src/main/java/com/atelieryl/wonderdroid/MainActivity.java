@@ -1,6 +1,9 @@
 
 package com.atelieryl.wonderdroid;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.support.v7.widget.Toolbar;
@@ -61,6 +64,12 @@ public class MainActivity extends BaseActivity {
 
     private final int maxBackupNo = 4;
 
+    private boolean vertical = false;
+
+    private boolean portrait;
+
+    private Activity mActivity = this;
+
     SharedPreferences prefs;
 
     @Override
@@ -86,20 +95,26 @@ public class MainActivity extends BaseActivity {
 
         packageName = getPackageName();
         showStateWarning = !prefs.getBoolean("hidestatewarning", false);
+
+        portrait = prefs.getString("orientation", "landscape").equals("portrait");
     }
 
     public class GameLoader extends AsyncTask<Void, Void, int[]> {
 
         @Override
         protected int[] doInBackground(Void... params) {
-//                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-//                String name = prefs.getString("ws_name", "");
-//                String sex = prefs.getString("ws_sex", "1");
-//                String blood = prefs.getString("ws_blood", "1");
-//                GregorianCalendar cal = new GregorianCalendar();
-//                cal.setTimeInMillis(prefs.getLong("ws_birthday", 0));
+            String name = prefs.getString("ws_name", "");
+            GregorianCalendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(prefs.getLong("ws_birthday", 0));
+            String blood = prefs.getString("ws_blood", "o");
+            String sex = prefs.getString("ws_sex", "male");
+            String language = prefs.getString("ws_language", "english");
 
-            return WonderSwan.load(Rom.getRomFile(mContext, mRom).getAbsolutePath(), dirPath);
+            return WonderSwan.load(Rom.getRomFile(mContext, mRom).getAbsolutePath(), dirPath,
+                    name, cal.get(GregorianCalendar.YEAR),
+                    cal.get(GregorianCalendar.MONTH),
+                    cal.get(GregorianCalendar.DAY_OF_MONTH),
+                    blood, sex, language);
         }
 
         @Override
@@ -123,7 +138,12 @@ public class MainActivity extends BaseActivity {
             WonderSwan.reset();
             //WonderSwan.loadbackup(mCartMem.getAbsolutePath());
 
-            view = new EmuView(mContext, gameInfo);
+            if (gameInfo[6] == 1) {
+                vertical = true;
+                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+            }
+
+            view = new EmuView(mContext, gameInfo, portrait && !vertical);
             setContentView(view);
             view.setFocusable(true);
             view.setFocusableInTouchMode(true);
@@ -147,7 +167,10 @@ public class MainActivity extends BaseActivity {
             case R.id.main_exitmi:
                 view.stop();
                 WonderSwan.exit();
-                this.finish();
+                Intent intent = new Intent(mContext, SelectActivity.class);
+                intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(intent);
+                Runtime.getRuntime().exit(0);
                 return true;
 
             case R.id.main_pausemi:
@@ -160,8 +183,7 @@ public class MainActivity extends BaseActivity {
                 return true;
 
             case R.id.main_prefsmi:
-                Intent intent = new Intent(this, PrefsActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(this, PrefsActivity.class));
                 return true;
 
             case R.id.main_togcntrlmi:
@@ -288,7 +310,7 @@ public class MainActivity extends BaseActivity {
                 prefs.getInt("hwcontrolX2", 0), prefs.getInt("hwcontrolX3", 0),
                 prefs.getInt("hwcontrolX4", 0), prefs.getInt("hwcontrolY1", 0),
                 prefs.getInt("hwcontrolY2", 0), prefs.getInt("hwcontrolY3", 0),
-                prefs.getInt("hwcontrolY4", 0));
+                prefs.getInt("hwcontrolY4", 0), prefs.getInt("hwcontrolSelect", 0));
 
     }
 
@@ -310,11 +332,14 @@ public class MainActivity extends BaseActivity {
         }
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        if (mRomHeader.isVertical || !prefs.getBoolean("reversehorizontalorientation", false)) {
-//        	this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-//        } else {
-        	this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-//        }
+        String orientation = prefs.getString("orientation", "landscape");
+        if (vertical || (orientation.equals("reverselandscape") && !portrait)) {
+        	this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+        } else if (portrait) {
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
     }
     
     @Override
