@@ -373,6 +373,8 @@ long Blip_Buffer::read_samples( blip_sample_t* out, long max_samples, int stereo
 				long s = accum >> sample_shift;
 				accum -= accum >> bass_shift;
 				accum += *in++;
+				if (sizeof(*out) < sizeof(s))
+					break;
 				*out = (blip_sample_t) s;
 				out += 2;
 				
