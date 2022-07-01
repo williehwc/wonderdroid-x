@@ -612,6 +612,11 @@ void wsScanline(uint16_t *target) {
 
 	} // End sprite drawing
 
+	if (sizeof(target) < 224)
+	{
+		return;
+	}
+
 	if (wsVMode) {
 		for (l = 0; l < 224; l++) {
 			target[l] = (ColorMap[wsCols[b_bg_pal[l + 7]][b_bg[(l + 7)] & 0xf]]);
