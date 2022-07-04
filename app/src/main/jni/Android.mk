@@ -328,7 +328,7 @@ LOCAL_CFLAGS := \
     -frtti \
     -fsigned-char \
     -std=gnu99 \
-    -O2
+    -O3
 #    -O0
 #    -DTRIO_PLATFORM_WINCE
 

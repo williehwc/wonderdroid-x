@@ -50,6 +50,32 @@
                 android:visibility="gone" />
 
         </LinearLayout>
+        
+        <LinearLayout
+            android:id="@+id/migrateView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone" >
+            
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/please_wait" />
+
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                style="?android:attr/progressBarStyleHorizontal" />
+
+            <TextView
+                android:id="@+id/currentFile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            
+        </LinearLayout>
 
         <Button
             android:id="@+id/onboardingNextButton"
@@ -69,6 +95,17 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:text="@string/refresh"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/onboardingCancelButton"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="@string/cancel"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:visibility="gone" />

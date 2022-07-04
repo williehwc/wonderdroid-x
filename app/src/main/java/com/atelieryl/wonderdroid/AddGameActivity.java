@@ -2,14 +2,17 @@ package com.atelieryl.wonderdroid;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
+import android.support.annotation.NonNull;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -30,13 +33,22 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.atelieryl.wonderdroid.utils.RomAdapter;
+import com.atelieryl.wonderdroid.utils.RomFilter;
+import com.atelieryl.wonderdroid.utils.ZipUtils;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 public class AddGameActivity extends AppCompatActivity {
 
@@ -71,6 +83,12 @@ public class AddGameActivity extends AppCompatActivity {
     private AsyncTask fileOpTask;
     private boolean upgrade;
     private boolean noBoxArt;
+    private boolean noMatchingExt;
+    private String storagePath;
+    private String precheckError;
+    private boolean openvgdbOnly;
+    
+    private Context mContext;
 
     final int BUFFER_SIZE = 1000;
     final String OPENVGDB_FILENAME = "openvgdb.sqlite";
@@ -106,7 +124,8 @@ public class AddGameActivity extends AppCompatActivity {
             uri = Uri.parse(lastFolderUri);
             lastFolderPath = uri.getPath().split(":")[1];
         }
-        noBoxArt = prefs.getBoolean("no_box_art", false);
+        noBoxArt = !prefs.getBoolean("downloadboxart", true);
+        storagePath = prefs.getString("storage_path", "");
 
         // Set views
         includeSubfoldersCheckBox.setChecked(includeSubfolders);
@@ -178,9 +197,13 @@ public class AddGameActivity extends AppCompatActivity {
             }
         });
 
+        // Context
+        mContext = getApplicationContext();
+
         // Intent extras (upgrading from WonderDroid X)
         Intent intent = getIntent();
         upgrade = intent.getBooleanExtra("upgrade", false);
+        openvgdbOnly = intent.getBooleanExtra("openvgdb", false);
         if (upgrade) {
             String romPath = null;
             File romdirx = ((WonderDroid)getApplication()).getRomDir();
@@ -192,12 +215,14 @@ public class AddGameActivity extends AppCompatActivity {
                 }
             }
             selectFolder(romPath);
+        } else if (openvgdbOnly) {
+            startFileOpTask();
         }
 
         // Set up ListView
         fileQueueDisplay = new ArrayList<>();
         fileQueueDisplayUpdated = new ArrayList<>();
-        adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_2, android.R.id.text1, fileQueueDisplayUpdated) {
+        adapter = new ArrayAdapter(mContext, android.R.layout.simple_list_item_2, android.R.id.text1, fileQueueDisplayUpdated) {
             @Override
             public View getView(int position, View view, ViewGroup parent) {
                 if (view == null) {
@@ -252,7 +277,7 @@ public class AddGameActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String[] displayTextSplit = fileQueueDisplayUpdated.get(position).split("\0");
                 if (!displayTextSplit[0].equals("f")) return;
-                Toast.makeText(getApplicationContext(), displayTextSplit[2], Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, displayTextSplit[2], Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -278,11 +303,16 @@ public class AddGameActivity extends AppCompatActivity {
             editor.commit();
             getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
         }
+        startFileOpTask();
+    }
+
+    private void startFileOpTask() {
         addGameChoices.setVisibility(View.GONE);
         addGamePrefs.setVisibility(View.GONE);
         listView.setVisibility(View.VISIBLE);
         fileOpTask = new FileOpTask().execute();
-        addGameCancelButton.setVisibility(View.VISIBLE);
+        if (!openvgdbOnly)
+            addGameCancelButton.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -307,106 +337,128 @@ public class AddGameActivity extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             // Scan for files
             scanning = true;
-            publishProgress();
             fileQueue = new ArrayList<>();
-            if (scanFolder) {
-                // Scan folder
-                DocumentFile documentFile = DocumentFile.fromTreeUri(getApplicationContext(), uri);
-                ArrayList<DocumentFile> dirQueue = new ArrayList<>();
-                dirQueue.add(documentFile);
-                if (includeSubfolders) {
-                    for (DocumentFile file : documentFile.listFiles()) {
-                        if (isCancelled()) return setCanceled();
-                        if (file.isDirectory())
-                            dirQueue.add(file);
-                    }
-                }
-                for (DocumentFile dir : dirQueue) {
-                    for (DocumentFile file : dir.listFiles()) {
-                        if (isCancelled()) return setCanceled();
-                        if (!file.isDirectory()) {
-                            fileQueue.add(file);
-                            fileQueueDisplay.add("p\0" + file.getName());
+            if (!openvgdbOnly) {
+                if (scanFolder) {
+                    // Scan folder
+                    DocumentFile documentFile = DocumentFile.fromTreeUri(mContext, uri);
+                    ArrayList<DocumentFile> dirQueue = new ArrayList<>();
+                    dirQueue.add(documentFile);
+                    if (includeSubfolders) {
+                        for (DocumentFile file : documentFile.listFiles()) {
+                            if (isCancelled()) return setCanceled();
+                            if (file.isDirectory())
+                                dirQueue.add(file);
                         }
                     }
+                    for (DocumentFile dir : dirQueue) {
+                        for (DocumentFile file : dir.listFiles()) {
+                            if (isCancelled()) return setCanceled();
+                            if (!file.isDirectory()) {
+                                if (precheckDocumentFile(file)) {
+                                    fileQueue.add(file);
+                                    fileQueueDisplay.add("p\0" + file.getName());
+                                }
+                            }
+                        }
+                    }
+                    if (fileQueue.size() == 0) {
+                        noMatchingExt = true;
+                    }
+                } else {
+                    // Single file
+                    DocumentFile documentFile = DocumentFile.fromSingleUri(mContext, uri);
+                    if (precheckDocumentFile(documentFile)) {
+                        fileQueue.add(documentFile);
+                        fileQueueDisplay.add("p\0" + documentFile.getName());
+                    } else {
+                        noMatchingExt = true;
+                    }
                 }
-            } else {
-                // Single file
-                DocumentFile documentFile = DocumentFile.fromSingleUri(getApplicationContext(), uri);
-                fileQueue.add(documentFile);
-                fileQueueDisplay.add("p\0" + documentFile.getName());
             }
             scanning = false;
             publishProgress();
-            // Get destination path
-            String storagePath = prefs.getString("storage_path", "");
             // Check for OpenVGDB
             if (!noBoxArt) {
                 File openVGDBFile = new File(storagePath + "/" + OPENVGDB_FILENAME);
-                if (!openVGDBFile.exists()) {
+                if (!openVGDBFile.isFile()) {
                     fileQueue.add(0, null);
                     fileQueueDisplay.add(0, "p\0" + OPENVGDB_FILENAME);
                 }
             }
+            // Sort files
+            for (int i = 0; i < fileQueue.size(); i++) {
+                DocumentFile documentFile = fileQueue.get(i);
+                if (documentFile != null) {
+                    String filename = documentFile.getName();
+                    if (filename.endsWith(".sav") || filename.endsWith(".mem")) {
+                        fileQueue.remove(i);
+                        fileQueueDisplay.remove(i);
+                        fileQueue.add(documentFile);
+                        fileQueueDisplay.add("p\0" + filename);
+                    }
+                }
+            }
             // Perform file operations
             for (int i = 0; i < fileQueue.size(); i++) {
+                publishProgress();
                 if (isCancelled()) return setCanceled();
                 DocumentFile srcFile = fileQueue.get(i);
                 String filename;
                 if (srcFile != null) {
                     filename = srcFile.getName();
+                    // Check file
+                    char check = checkDocumentFile(srcFile);
+                    if (check != 'v') {
+                        fileQueueDisplay.set(i, check + "\0" + filename);
+                        continue;
+                    }
                 } else {
                     filename = OPENVGDB_FILENAME;
                 }
                 // Ref: https://stackoverflow.com/questions/36023334
                 try {
                     File outFile = new File(storagePath + "/" + filename);
-                    // check if file exists
-                    if (!overwrite && outFile.exists()) {
-                        fileQueueDisplay.set(i, "e\0" + filename);
+                    // copy output file
+                    OutputStream out = getApplication().getContentResolver().openOutputStream(Uri.fromFile(outFile));
+                    InputStream in;
+                    long fileSize;
+                    if (srcFile != null) {
+                        in = getApplication().getContentResolver().openInputStream(srcFile.getUri());
+                        fileSize = srcFile.length();
                     } else {
-                        // copy output file
-                        OutputStream out = getApplication().getContentResolver().openOutputStream(Uri.fromFile(outFile));
-                        InputStream in;
-                        long fileSize;
-                        if (srcFile != null) {
-                            in = getApplication().getContentResolver().openInputStream(srcFile.getUri());
-                            fileSize = srcFile.length();
-                        } else {
-                            in = getApplicationContext().getAssets().open(OPENVGDB_FILENAME);
-                            fileSize = OPENVGDB_FILE_SIZE;
-                        }
-                        long transferred = 0;
-                        byte[] buffer = new byte[BUFFER_SIZE];
-                        int read;
-                        while ((read = in.read(buffer)) != -1) {
-                            if (isCancelled()) {
-                                out.flush();
-                                out.close();
-                                outFile.delete();
-                                return setCanceled();
-                            }
-                            out.write(buffer, 0, read);
-                            transferred += BUFFER_SIZE;
-                            fileQueueDisplay.set(i, "i\0" + filename + "\0" + (int) (((double) transferred / fileSize) * 100) + "%");
-                            publishProgress();
-                        }
-                        in.close();
-                        // write output file
-                        out.flush();
-                        out.close();
-                        fileQueue.remove(i);
-                        fileQueueDisplay.remove(i);
-                        // delete original file
-                        if (!copyMode && srcFile != null) {
-                            srcFile.delete();
-                        }
-                        i--;
+                        in = mContext.getAssets().open(OPENVGDB_FILENAME);
+                        fileSize = OPENVGDB_FILE_SIZE;
                     }
+                    long transferred = 0;
+                    byte[] buffer = new byte[BUFFER_SIZE];
+                    int read;
+                    while ((read = in.read(buffer)) != -1) {
+                        if (isCancelled() && srcFile != null) {
+                            out.flush();
+                            out.close();
+                            outFile.delete();
+                            return setCanceled();
+                        }
+                        out.write(buffer, 0, read);
+                        transferred += BUFFER_SIZE;
+                        fileQueueDisplay.set(i, "i\0" + filename + "\0" + (int) (((double) transferred / fileSize) * 100) + "%");
+                        publishProgress();
+                    }
+                    in.close();
+                    // write output file
+                    out.flush();
+                    out.close();
+                    fileQueue.remove(i);
+                    fileQueueDisplay.remove(i);
+                    // delete original file
+                    if (!copyMode && srcFile != null) {
+                        srcFile.delete();
+                    }
+                    i--;
                 } catch (Exception e) {
                     fileQueueDisplay.set(i, "f\0" + filename + "\0" + e.getMessage());
                 }
-                publishProgress();
             }
             return null;
         }
@@ -423,6 +475,13 @@ public class AddGameActivity extends AppCompatActivity {
         }
         @Override
         protected void onPostExecute(Void result) {
+            if (noMatchingExt) {
+                if (precheckError != null) {
+                    Toast.makeText(mContext, precheckError, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(mContext, R.string.no_matching_ext, Toast.LENGTH_SHORT).show();
+                }
+            }
             if (fileQueue.size() > 0) {
                 actionBar.setTitle(R.string.errors);
                 addGameCancelButton.setVisibility(View.GONE);
@@ -432,7 +491,7 @@ public class AddGameActivity extends AppCompatActivity {
                     String romPath = prefs.getString("emu_rompath", "wonderdroid");
                     String memPath = prefs.getString("emu_mempath", "wonderdroid/cartmem");
                     if (!memPath.equals(romPath + "/cartmem")) {
-                        Toast.makeText(getApplicationContext(), R.string.upgrade_save_warning, Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, R.string.upgrade_save_warning, Toast.LENGTH_LONG).show();
                     }
                 }
                 finish();
@@ -456,6 +515,117 @@ public class AddGameActivity extends AppCompatActivity {
                 actionBar.setTitle(title + " (" + fileQueueDisplay.size() + " " + getString(R.string.remaining) + ")");
             }
         }
+    }
+
+    public boolean precheckDocumentFile(@NonNull DocumentFile documentFile) {
+        String filename = documentFile.getName();
+        if (filename.endsWith(".zip")) {
+            // https://stackoverflow.com/questions/23869228
+            try {
+                InputStream inputStream = getContentResolver().openInputStream(documentFile.getUri());
+                ZipInputStream zipInputStream = new ZipInputStream(inputStream);
+                ZipEntry entry;
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    String entryName = entry.getName();
+                    for (String extension : RomAdapter.Rom.allRomExtensions) {
+                        if (entryName.endsWith(extension)) return true;
+                    }
+                }
+            } catch (Exception e) {
+                precheckError = e.getMessage();
+                return false;
+            }
+        }
+        for (String extension : RomAdapter.Rom.allRomExtensions) {
+            if (filename.endsWith(extension)) return true;
+        }
+        for (String extension : RomAdapter.Rom.stateExtensions) {
+            if (filename.endsWith(extension)) return true;
+        }
+        if (filename.endsWith(".sav") || filename.endsWith(".mem")) {
+            return true;
+        }
+        return false;
+    }
+
+    public char fileExists(String filename, String currentZipName) {
+        // v: file does not already exist
+        // e: file exists
+        // z: file exists in ZIP
+        // Check if the file itself exists
+        if (!overwrite) {
+            File outFile = new File(storagePath + "/" + filename);
+            if (outFile.exists()) {
+                return 'e';
+            }
+        }
+        // If filename is not a ZIP, check all ZIPs except currentZipName
+        if (!filename.endsWith(".zip")) {
+            File mRomDir = new File(storagePath);
+            File[] sourceFiles = mRomDir.listFiles(new RomFilter(false, false, false));
+            if (sourceFiles != null) {
+                for (File sourceFile : sourceFiles) {
+                    if (currentZipName == null || !sourceFile.getName().equals(currentZipName)) {
+                        try {
+                            for (String entry : ZipUtils.getValidEntries(new ZipFile(sourceFile), RomAdapter.Rom.allRomExtensions)) {
+                                if (entry.equals(filename)) {
+                                    return 'z';
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            break;
+                        }
+                    }
+
+                }
+            }
+        }
+        return 'v';
+    }
+
+    public char checkDocumentFile(@NonNull DocumentFile documentFile) {
+        // v: okay
+        // e: file exists
+        // z: file exists in ZIP
+        // n: no corresponding game
+        String filename = documentFile.getName();
+        // Check if file exists
+        char exists = fileExists(filename, null);
+        if (exists != 'v') return exists;
+        if (filename.endsWith(".zip")) {
+            try {
+                InputStream inputStream = getContentResolver().openInputStream(documentFile.getUri());
+                ZipInputStream zipInputStream = new ZipInputStream(inputStream);
+                ZipEntry entry;
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    String entryName = entry.getName();
+                    exists = fileExists(entryName, filename);
+                    if (exists != 'v') return exists;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (filename.endsWith(".sav")) {
+            // Mednafen backup save or WonderDroid X state
+            Pattern pattern = Pattern.compile("\\d+-\\d+-\\d+_a?\\d_\\d.sav");
+            if (!pattern.matcher(filename).matches() || fileExists(filename.substring(0, filename.length() - 4), null) == 'v') {
+                return 'n';
+            }
+        } else if (filename.endsWith(".mem")) {
+            // WonderDroid X backup save
+            Pattern pattern = Pattern.compile("\\d+-\\d+-\\d+.mem");
+            if (!pattern.matcher(filename).matches()) {
+                return 'n';
+            }
+        } else {
+            for (String extension : RomAdapter.Rom.stateExtensions) {
+                if (filename.endsWith(extension) && fileExists(filename.substring(0, filename.length() - 4), null) == 'v') {
+                    return 'n';
+                }
+            }
+        }
+        return 'v';
     }
 
     // Syntax is status\0filename\0extra

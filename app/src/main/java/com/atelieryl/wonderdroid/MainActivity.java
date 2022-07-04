@@ -38,7 +38,9 @@ public class MainActivity extends BaseActivity {
 
     public static final String ROM = "rom";
 
-    public static final String ROMHEADER = "romheader";
+    public static final String PLAYING = "playing";
+
+    public static final String HEADER = "header";
 
     private Context mContext;
 
@@ -52,13 +54,11 @@ public class MainActivity extends BaseActivity {
 
     private boolean showControls = true;
     
-    private String dirPath = "wonderdroid/cartmem";
+    private String dirPath;
 
     private Menu menu;
 
     private String packageName = "com.atelieryl.wonderdroid"; // Will be checked and replaced automatically if different
-
-    private boolean showStateWarning = true;
 
     private int currentBackupNo = 0;
 
@@ -72,11 +72,16 @@ public class MainActivity extends BaseActivity {
 
     SharedPreferences prefs;
 
+    private WonderSwanHeader mHeader;
+
+    private boolean isWSC;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mRom = (Rom) this.getIntent().getExtras().getSerializable(ROM);
+        mHeader = (WonderSwanHeader) this.getIntent().getExtras().getSerializable(HEADER);
 
         if (mRom == null) {
             throw new IllegalArgumentException();
@@ -94,15 +99,28 @@ public class MainActivity extends BaseActivity {
         new GameLoader().execute((Void[])null);
 
         packageName = getPackageName();
-        showStateWarning = !prefs.getBoolean("hidestatewarning", false);
 
         portrait = prefs.getString("orientation", "landscape").equals("portrait");
     }
 
-    public class GameLoader extends AsyncTask<Void, Void, int[]> {
+    public class GameLoader extends AsyncTask<Void, Void, long[]> {
 
         @Override
-        protected int[] doInBackground(Void... params) {
+        protected long[] doInBackground(Void... params) {
+            File romFile = Rom.getRomFile(mContext, mRom);
+            // Check legacy save file
+            for (String extension : Rom.wsRomExtensions) {
+                if (romFile.getName().endsWith(extension)) {
+                    File saveFile = new File(romFile.getAbsolutePath() + ".sav");
+                    if (!saveFile.exists()) {
+                        File legacySaveFile = new File(dirPath + "/" + mHeader.internalname + ".mem");
+                        if (legacySaveFile.exists()) {
+                            legacySaveFile.renameTo(saveFile);
+                        }
+                    }
+                }
+            }
+            // Initialize Mednafen
             String name = prefs.getString("ws_name", "");
             GregorianCalendar cal = new GregorianCalendar();
             cal.setTimeInMillis(prefs.getLong("ws_birthday", 0));
@@ -110,7 +128,7 @@ public class MainActivity extends BaseActivity {
             String sex = prefs.getString("ws_sex", "male");
             String language = prefs.getString("ws_language", "english");
 
-            return WonderSwan.load(Rom.getRomFile(mContext, mRom).getAbsolutePath(), dirPath,
+            return WonderSwan.load(romFile.getAbsolutePath(), dirPath + "/",
                     name, cal.get(GregorianCalendar.YEAR),
                     cal.get(GregorianCalendar.MONTH),
                     cal.get(GregorianCalendar.DAY_OF_MONTH),
@@ -118,7 +136,7 @@ public class MainActivity extends BaseActivity {
         }
 
         @Override
-        protected void onPostExecute(int[] gameInfo) {
+        protected void onPostExecute(long[] gameInfo) {
             if (mPB != null) {
                 mPB.setVisibility(ProgressBar.GONE);
             }
@@ -143,12 +161,16 @@ public class MainActivity extends BaseActivity {
                 mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
             }
 
+            if (gameInfo[7] == 'w') {
+                isWSC = true;
+            }
+
             view = new EmuView(mContext, gameInfo, portrait && !vertical);
             setContentView(view);
             view.setFocusable(true);
             view.setFocusableInTouchMode(true);
-            view.start();
             view.onResume();
+            view.start();
             parseKeys(prefs);
             view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 
@@ -163,11 +185,12 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+        Intent intent;
         switch (item.getItemId()) {
             case R.id.main_exitmi:
                 view.stop();
                 WonderSwan.exit();
-                Intent intent = new Intent(mContext, SelectActivity.class);
+                intent = new Intent(mContext, SelectActivity.class);
                 intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                 mContext.startActivity(intent);
                 Runtime.getRuntime().exit(0);
@@ -183,7 +206,9 @@ public class MainActivity extends BaseActivity {
                 return true;
 
             case R.id.main_prefsmi:
-                startActivity(new Intent(this, PrefsActivity.class));
+                intent = new Intent(this, PrefsActivity.class);
+                intent.putExtra(MainActivity.PLAYING, true);
+                startActivity(intent);
                 return true;
 
             case R.id.main_togcntrlmi:
@@ -193,21 +218,6 @@ public class MainActivity extends BaseActivity {
             case R.id.main_savestate:
             case R.id.main_loadstate:
                 updateStateMenuTitles();
-                if (showStateWarning) {
-                    AlertDialog.Builder builder;
-                    builder = new AlertDialog.Builder(this);
-                    builder.setMessage(getResources().getString(R.string.statewarning))
-                            .setPositiveButton(R.string.understand, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    showStateWarning = false;
-                                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-                                    SharedPreferences.Editor editor = prefs.edit();
-                                    editor.putBoolean("hidestatewarning", true);
-                                    editor.commit();
-                                }
-                            })
-                            .show();
-                }
                 return true;
             case R.id.load_a1:
                 loadState(-1);
@@ -260,32 +270,46 @@ public class MainActivity extends BaseActivity {
     }
 
     public void updateStateMenuTitles() {
-//        for (int i = -1; i <= 5; i++) {
-//            String statePath = dirPath + mRomHeader.internalname + "_" + Integer.toString(i).replace("-", "a") + "_0.sav";
-//            String menuTitle = getResources().getString(R.string.slot) + " " + Integer.toString(i).replace("-", "a");
-//            if (i < 0) {
-//                menuTitle = getResources().getString(R.string.auto);
-//            } else if (i == 0) {
-//                menuTitle = getResources().getString(R.string.undo);
-//            }
-//            menuTitle += ": ";
-//            File stateFile = new File(statePath);
-//            int loadStateMenuItemId = getResources().getIdentifier("load_" + Integer.toString(i).replace("-", "a"), "id", packageName);
-//            MenuItem loadStateMenuItem = menu.findItem(loadStateMenuItemId);
-//            if (checkFileAccess(stateFile, false, true)) {
-//                menuTitle += formatDate(stateFile.lastModified());
-//                loadStateMenuItem.setEnabled(true);
-//            } else {
-//                menuTitle += getResources().getString(R.string.empty);
-//                loadStateMenuItem.setEnabled(false);
-//            }
-//            loadStateMenuItem.setTitle(menuTitle);
-//            if (i > 0) {
-//                int saveStateMenuItemId = getResources().getIdentifier("save_" + Integer.toString(i), "id", packageName);
-//                MenuItem saveStateMenuItem = menu.findItem(saveStateMenuItemId);
-//                saveStateMenuItem.setTitle(menuTitle);
-//            }
-//        }
+        boolean fileAccessible;
+        boolean wscLegacyState = false;
+        for (int i = -1; i <= 5; i++) {
+            String statePath;
+            if (wscLegacyState) {
+                statePath = dirPath + "/" + mHeader.internalname + "_" + Integer.toString(i).replace("-", "a") + "_0.sav";
+            } else {
+                statePath = dirPath + "/" + mRom.fileName + ".mc" + Integer.toString(i).replace("-1", "9");
+            }
+            String menuTitle = getResources().getString(R.string.slot) + " " + Integer.toString(i).replace("-", "a");
+            if (i < 0) {
+                menuTitle = getResources().getString(R.string.auto);
+            } else if (i == 0) {
+                menuTitle = getResources().getString(R.string.undo);
+            }
+            menuTitle += ": ";
+            File stateFile = new File(statePath);
+            int loadStateMenuItemId = getResources().getIdentifier("load_" + Integer.toString(i).replace("-", "a"), "id", packageName);
+            MenuItem loadStateMenuItem = menu.findItem(loadStateMenuItemId);
+            fileAccessible = checkFileAccess(stateFile, false, true);
+            if (fileAccessible) {
+                menuTitle += formatDate(stateFile.lastModified());
+                loadStateMenuItem.setEnabled(true);
+            } else {
+                menuTitle += getResources().getString(R.string.empty);
+                loadStateMenuItem.setEnabled(false);
+            }
+            loadStateMenuItem.setTitle(menuTitle);
+            if (i > 0) {
+                int saveStateMenuItemId = getResources().getIdentifier("save_" + Integer.toString(i), "id", packageName);
+                MenuItem saveStateMenuItem = menu.findItem(saveStateMenuItemId);
+                saveStateMenuItem.setTitle(menuTitle);
+            }
+            if (wscLegacyState) {
+                wscLegacyState = false;
+            } else if (isWSC && !fileAccessible) {
+                wscLegacyState = true;
+                i--;
+            }
+        }
     }
 
     @Override
@@ -360,47 +384,78 @@ public class MainActivity extends BaseActivity {
     }
 
     public void saveState(int stateNo) {
-//        for (int backupNo = 0; backupNo <= maxBackupNo; backupNo++) {
-//            String statePath = dirPath + mRomHeader.internalname + "_" + Integer.toString(stateNo).replace("-", "a") + "_" + Integer.toString(backupNo) + ".sav";
-//            File stateFile = new File(statePath);
-//            try {
-//                stateFile.createNewFile();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                //throw new RuntimeException();
-//            }
-//            if (checkFileAccess(stateFile, true, false)) {
-//                for (int i = 0; i < 2; i++) {
-//                    WonderSwan.savestate(stateFile.getAbsolutePath());
-//                }
-//            } else {
-//                break;
-//            }
-//        }
+        String statePath = dirPath + "/" + mRom.fileName + ".mc" + Integer.toString(stateNo).replace("-1", "9");
+        File stateFile = new File(statePath);
+        try {
+            stateFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            //throw new RuntimeException();
+        }
+        if (checkFileAccess(stateFile, true, false)) {
+            WonderSwan.savestate(stateFile.getAbsolutePath());
+        }
     }
 
     public void loadState(int stateNo) {
-//        String statePath;
-//        File stateFile;
-//        int startingBackupNo = currentBackupNo;
-//        while (true) {
-//            statePath = dirPath + mRomHeader.internalname + "_" + Integer.toString(stateNo).replace("-", "a") + "_" + Integer.toString(currentBackupNo) + ".sav";
-//            currentBackupNo++;
-//            if (currentBackupNo > maxBackupNo) {
-//                currentBackupNo = 0;
-//            }
-//            stateFile = new File(statePath);
-//            if (checkFileAccess(stateFile, false, true)) {
-//                break;
-//            } else if (startingBackupNo == currentBackupNo) {
-//                Toast.makeText(this, R.string.readmemfileerror, Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-//        }
-//        if (stateNo != 0) {
-//            saveState(0);
-//        }
-//        WonderSwan.loadstate(stateFile.getAbsolutePath());
+        String statePath;
+        File stateFile;
+        int startingBackupNo = currentBackupNo;
+        boolean wscLegacyState = false;
+        while (true) {
+            if (wscLegacyState) {
+                statePath = dirPath + "/" + mHeader.internalname + "_" + Integer.toString(stateNo).replace("-", "a") + "_" + Integer.toString(currentBackupNo) + ".sav";
+                currentBackupNo++;
+                if (currentBackupNo > maxBackupNo) {
+                    currentBackupNo = 0;
+                }
+            } else {
+                statePath = dirPath + "/" + mRom.fileName + ".mc" + Integer.toString(stateNo).replace("-1", "9");
+            }
+            stateFile = new File(statePath);
+            if (checkFileAccess(stateFile, false, true)) {
+                if (wscLegacyState) Toast.makeText(this, R.string.legacystate, Toast.LENGTH_SHORT).show();
+                break;
+            } else if (isWSC && !wscLegacyState) {
+                wscLegacyState = true;
+            } else if (startingBackupNo == currentBackupNo) {
+                Toast.makeText(this, R.string.readmemfileerror, Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+        if (stateNo != 0) {
+            saveState(0);
+        }
+        // Wait until the undo state has finished saving
+        for (int i = 0; i < 1000; i++) {
+            if (WonderSwan.running) {
+                break;
+            }
+        }
+        if (wscLegacyState) {
+            WonderSwan.loadstate(stateFile.getName());
+        } else {
+            WonderSwan.loadstate(stateFile.getAbsolutePath());
+        }
+    }
+
+    public boolean checkFileAccess(File file, boolean write, boolean suppressToasts) {
+        boolean accessOK = false;
+        try {
+            if (file.isFile() && (!write || file.canWrite()) && (write || file.canRead())) {
+                accessOK = true;
+            }
+        } catch (Exception e) {
+
+        }
+        if (!accessOK && !suppressToasts) {
+            if (write) {
+                Toast.makeText(this, R.string.writememfileerror, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, R.string.readmemfileerror, Toast.LENGTH_SHORT).show();
+            }
+        }
+        return accessOK;
     }
 
     private String formatDate(long milliseconds) {

@@ -63,6 +63,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 
 	private int mNominalWidth = 0;
 	private int mNominalHeight = 0;
+	private long mMasterClock;
 	private int mFps;
 	private char mSystem;
 
@@ -97,13 +98,14 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		WonderSwanButton.SEL.keyCode = select;
 	}
 
-	public EmuView (Context context, int[] gameInfo, boolean portrait) {
+	public EmuView (Context context, long[] gameInfo, boolean portrait) {
 		super(context);
 
-		mFps = gameInfo[0];
-		mNominalWidth = gameInfo[1];
-		mNominalHeight = gameInfo[2];
+		mFps = (int) gameInfo[0];
+		mNominalWidth = (int) gameInfo[1];
+		mNominalHeight = (int) gameInfo[2];
 		mSystem = (char) gameInfo[7];
+		mMasterClock = gameInfo[8];
 
 		this.mContext = context;
 
@@ -117,7 +119,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		mPortrait = portrait;
 
 		renderer = new GameRenderer(gameInfo, sharpness, mPortrait);
-		mThread = new EmuThread(renderer, mFps, mSystem);
+		mThread = new EmuThread(renderer, mMasterClock, mFps);
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		sharpness = Integer.parseInt(prefs.getString("sharpness", "3"));
@@ -236,7 +238,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 	public void onResume () {
 		if (started) {
 			renderer.restartDrawThread();
-			mThread = new EmuThread(renderer, mFps, mSystem);
+			mThread = new EmuThread(renderer, mMasterClock, mFps);
 			start();
 		}
 		mThread.setSurfaceHolder(mHolder);
@@ -251,6 +253,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		stretchToFill = prefs.getBoolean("stretchtofill", false);
 		renderer.setScaling(scaling);
 		renderer.setStretchToFill(stretchToFill);
+		renderer.setMask(prefs.getBoolean("mask", false));
 		renderer.setVolume(prefs.getInt("volume", 100));
 //		rescale();
 	}

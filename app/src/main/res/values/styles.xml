@@ -14,9 +14,9 @@
 
     <style name="AppTheme" parent="Theme.AppCompat">
         <!-- your app branding color for the app bar -->
-        <item name="colorPrimary">#1e5292</item>
+        <item name="colorPrimary">#ef6c00</item>
         <!-- theme UI controls like checkboxes and text fields -->
-        <item name="colorAccent">#5B82B1</item>
+        <item name="colorAccent">#ef6c00</item>
     </style>
 
     <style name="Overflow" parent="@android:style/Widget.Holo.ActionButton.Overflow">
@@ -31,7 +31,7 @@
     </style>
 
     <style name="MainTheme" parent="Theme.AppCompat">
-        <item name="colorAccent">#5B82B1</item>
+        <item name="colorAccent">#ef6c00</item>
         <item name="android:actionBarStyle">@style/ActionBar</item>
         <item name="actionBarStyle">@style/ActionBar</item>
         <item name="android:actionOverflowButtonStyle">@style/Overflow</item>
@@ -42,9 +42,9 @@
 
     <style name="PrefsTheme" parent="Theme.AppCompat">
         <!-- your app branding color for the app bar -->
-        <item name="colorPrimary">#1e5292</item>
+        <item name="colorPrimary">#ef6c00</item>
         <!-- theme UI controls like checkboxes and text fields -->
-        <item name="colorAccent">#1e5292</item>
+        <item name="colorAccent">#ef6c00</item>
     </style>
 
 </resources>

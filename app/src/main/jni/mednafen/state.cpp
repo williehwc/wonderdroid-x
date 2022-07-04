@@ -808,6 +808,22 @@ bool MDFNI_LoadState(const char *fname, const char *suffix) noexcept
 {
  bool ret = true;
 
+ const char *dot_ext = &fname[strlen(fname) - 4];
+ if (strcmp(dot_ext, ".sav") == 0) {
+  int wscPublisher;
+  int wscGameId;
+  int wscCksum;
+  int wscSlotNo;
+  int wscCopyNo;
+  sscanf(fname, "%d-%d-%d_%d_%d.sav", &wscPublisher, &wscGameId, &wscCksum, &wscSlotNo, &wscCopyNo);
+  MDFNGameInfo->DoSimpleCommand(9);
+  MDFNGameInfo->DoSimpleCommand(wscPublisher);
+  MDFNGameInfo->DoSimpleCommand(wscGameId);
+  MDFNGameInfo->DoSimpleCommand(wscCksum);
+  MDFNGameInfo->DoSimpleCommand(wscSlotNo);
+  MDFNGameInfo->DoSimpleCommand(wscCopyNo);
+ }
+
  try
  {
   /* For network play and movies, be load the state locally, and then save the state to a temporary buffer,

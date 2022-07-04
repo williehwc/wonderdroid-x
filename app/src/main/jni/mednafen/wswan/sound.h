@@ -25,6 +25,32 @@
 namespace MDFN_IEN_WSWAN
 {
 
+extern uint16 period[4]; ///
+extern uint8 volume[4]; ///
+extern uint8 voice_volume; ///
+
+extern uint8 sweep_step, sweep_value; ///
+extern uint8 noise_control; ///
+extern uint8 control; ///
+extern uint8 output_control; ///
+
+extern int32 sweep_8192_divider; ///
+extern uint8 sweep_counter; ///
+extern uint8 SampleRAMPos; ///
+
+extern int32 sample_cache[4][2]; ///
+
+extern int32 last_v_val; ///
+
+extern uint8 HyperVoice; ///
+extern int32 last_hv_val[2]; ///
+
+extern int32 period_counter[4]; ///
+extern int32 last_val[4][2]; ///
+extern uint8 sample_pos[4]; ///
+extern uint16 nreg; ///
+extern uint32 last_ts; ///
+
 int32 WSwan_SoundFlush(int16 *SoundBuf, const int32 MaxSoundFrames);
 
 void WSwan_SoundInit(void) MDFN_COLD;

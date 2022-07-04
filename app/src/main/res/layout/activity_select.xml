@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+	android:background="#000000">
 
     <RelativeLayout
         android:id="@+id/helptranslate"
@@ -33,14 +34,14 @@
 			android:layout_alignParentRight="true" />
     
     </RelativeLayout>
-    
-    <ImageView
-        android:id="@+id/select_bg1"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:contentDescription="background"
-        android:scaleType="centerCrop"
-        android:tint="#BB111111" />
+
+	<ImageView
+		android:id="@+id/select_bg1"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:contentDescription="background"
+		android:scaleType="centerCrop"
+		android:tint="#BB111111" />
 
     <Gallery
         android:id="@+id/select_gallery"

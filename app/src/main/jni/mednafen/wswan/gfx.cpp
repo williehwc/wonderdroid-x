@@ -31,40 +31,40 @@
 namespace MDFN_IEN_WSWAN
 {
 
-static uint32 wsMonoPal[16][4];
-static uint32 wsColors[8];
-static uint32 wsCols[16][16];
+uint32 wsMonoPal[16][4];
+uint32 wsColors[8];
+uint32 wsCols[16][16];
 
-static uint32 ColorMapG[16];
-static uint32 ColorMap[16*16*16];
+uint32 ColorMapG[16];
+uint32 ColorMap[16*16*16];
 static uint32 LayerEnabled;
 
-static uint8 wsLine;                 /*current scanline*/
+uint8 wsLine;                 /*current scanline*/
 static uint8 weppy;
 
-static uint8 SpriteTable[2][0x80][4];
-static uint32 SpriteCountCache[2];
-static bool FrameWhichActive;
-static uint8 DispControl;
-static uint8 BGColor;
-static uint8 LineCompare;
-static uint8 SPRBase;
-static uint8 SpriteStart, SpriteCount;
-static uint8 FGBGLoc;
-static uint8 FGx0, FGy0, FGx1, FGy1;
-static uint8 SPRx0, SPRy0, SPRx1, SPRy1;
+uint8 SpriteTable[2][0x80][4];
+uint32 SpriteCountCache[2];
+bool FrameWhichActive;
+uint8 DispControl;
+uint8 BGColor;
+uint8 LineCompare;
+uint8 SPRBase;
+uint8 SpriteStart, SpriteCount;
+uint8 FGBGLoc;
+uint8 FGx0, FGy0, FGx1, FGy1;
+uint8 SPRx0, SPRy0, SPRx1, SPRy1;
 
-static uint8 BGXScroll, BGYScroll;
-static uint8 FGXScroll, FGYScroll;
-static uint8 LCDControl, LCDIcons;
+uint8 BGXScroll, BGYScroll;
+uint8 FGXScroll, FGYScroll;
+uint8 LCDControl, LCDIcons;
 static uint8 LCDVtotal;
 
-static uint8 BTimerControl;
-static uint16 HBTimerPeriod;
-static uint16 VBTimerPeriod;
+uint8 BTimerControl;
+uint16 HBTimerPeriod;
+uint16 VBTimerPeriod;
 
-static uint16 HBCounter, VBCounter;
-static uint8 VideoMode;
+uint16 HBCounter, VBCounter;
+uint8 VideoMode;
 
 #ifdef WANT_DEBUGGER
 

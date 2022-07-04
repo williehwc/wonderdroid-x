@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +23,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.atelieryl.wonderdroid.utils.RomFilter;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -32,18 +36,22 @@ public class OnboardingActivity extends AppCompatActivity {
     private Button refreshButton;
     private ImageView heroImageView;
     private CheckBox noBoxArtCheckBox;
+    private View migrateView;
 
     private SharedPreferences prefs;
     private String storagePath;
+    private String oldStoragePath;
 
     private boolean upgrade;
+    private boolean changeDrive;
 
     private enum Steps {
         START,
         UPGRADE_WELCOME,
         PRIVACY,
         CHOOSE_DRIVE,
-        UPGRADE_PROMPT
+        UPGRADE_PROMPT,
+        MIGRATE
     }
 
     private Steps currentStep = Steps.START;
@@ -60,6 +68,7 @@ public class OnboardingActivity extends AppCompatActivity {
         refreshButton = findViewById(R.id.onboardingRefreshButton);
         heroImageView = findViewById(R.id.heroImageView);
         noBoxArtCheckBox = findViewById(R.id.noBoxArtCheckBox);
+        migrateView = findViewById(R.id.migrateView);
 
         // Prefs
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -82,10 +91,15 @@ public class OnboardingActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean("no_box_art", isChecked);
+                editor.putBoolean("downloadboxart", !isChecked);
                 editor.commit();
             }
         });
+
+        // Intent extras (upgrading from WonderDroid X)
+        Intent intent = getIntent();
+        changeDrive = intent.getBooleanExtra("changedrive", false);
+        if (changeDrive) currentStep = Steps.PRIVACY;
 
         // Check if user is upgrading from WonderDroid X.
         // Either storage permission is enabled or "setreversehorizontalorientation" is set, while storagePath is null
@@ -117,7 +131,9 @@ public class OnboardingActivity extends AppCompatActivity {
                 currentStep = Steps.CHOOSE_DRIVE;
                 break;
             case CHOOSE_DRIVE:
-                if (upgrade)
+                if (changeDrive)
+                    currentStep = Steps.MIGRATE;
+                else if (upgrade)
                     currentStep = Steps.UPGRADE_PROMPT;
                 else
                     finish();
@@ -139,7 +155,10 @@ public class OnboardingActivity extends AppCompatActivity {
                     currentStep = Steps.UPGRADE_WELCOME;
                 break;
             case CHOOSE_DRIVE:
-                currentStep = Steps.PRIVACY;
+                if (!changeDrive)
+                    currentStep = Steps.PRIVACY;
+                else
+                    finish();
                 break;
             case UPGRADE_PROMPT:
                 currentStep = Steps.CHOOSE_DRIVE;
@@ -161,6 +180,9 @@ public class OnboardingActivity extends AppCompatActivity {
                 break;
             case UPGRADE_PROMPT:
                 load_upgrade_prompt_screen();
+                break;
+            case MIGRATE:
+                load_migrate_screen();
                 break;
         }
     }
@@ -232,6 +254,7 @@ public class OnboardingActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
+                oldStoragePath = storagePath;
                 storagePath = driveStoragePaths.get(position);
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putString("storage_path", storagePath);
@@ -248,5 +271,17 @@ public class OnboardingActivity extends AppCompatActivity {
         textView.setText(getString(R.string.upgrade_prompt_1) + "\n\n" + getString(R.string.upgrade_prompt_2));
         heroImageView.setImageDrawable(getResources().getDrawable(R.drawable.onboarding_prompt));
         noBoxArtCheckBox.setVisibility(View.GONE);
+    }
+
+    private void load_migrate_screen() {
+        listView.setVisibility(View.GONE);
+        nextButton.setVisibility(View.GONE);
+        refreshButton.setVisibility(View.GONE);
+        migrateView.setVisibility(View.VISIBLE);
+        if (!oldStoragePath.equals("") && !storagePath.equals("") && oldStoragePath.equals(storagePath)) {
+            //File[] sourceFiles = mRomDir.listFiles(new RomFilter(false, false));
+        } else {
+            finish();
+        }
     }
 }

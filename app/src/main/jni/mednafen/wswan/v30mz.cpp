@@ -51,23 +51,23 @@ static uint16 old_CS, old_IP;
  #define SETOLDCSIP() {  }
 #endif
 
-typedef union
-{                   /* eight general registers */
-    uint16 w[8];    /* viewed as 16 bits registers */
-    uint8  b[16];   /* or as 8 bit registers */
-} v30mz_basicregs_t;
+//typedef union
+//{                   /* eight general registers */
+//    uint16 w[8];    /* viewed as 16 bits registers */
+//    uint8  b[16];   /* or as 8 bit registers */
+//} v30mz_basicregs_t;
 
-typedef struct
-{
-	v30mz_basicregs_t regs;
- 	uint16	sregs[4];
+//typedef struct
+//{
+//	v30mz_basicregs_t regs;
+// 	uint16	sregs[4];
 
-	uint16	pc;
+//	uint16	pc;
 
-	int32	SignVal;
-	uint32  AuxVal, OverVal, ZeroVal, CarryVal, ParityVal; /* 0 or non-0 valued flags */
-	uint8 TF, IF, DF;
-} v30mz_regs_t;
+//	int32	SignVal;
+//	uint32  AuxVal, OverVal, ZeroVal, CarryVal, ParityVal; /* 0 or non-0 valued flags */
+//	uint8 TF, IF, DF;
+//} v30mz_regs_t;
 
 static void (MDFN_FASTCALL *cpu_writemem20)(uint32,uint8) = NULL;
 static uint8 (MDFN_FASTCALL *cpu_readport)(uint32) = NULL;
@@ -96,11 +96,11 @@ static INLINE uint16 PhysRead16(uint32 addr)
 uint32 v30mz_timestamp;
 int32 v30mz_ICount;
 
-static v30mz_regs_t I;
-static bool InHLT;
+v30mz_regs_t I;
+bool InHLT;
 
-static uint32 prefix_base;	/* base address of the latest prefix segment */
-static int8 seg_prefix;		/* prefix segment indicator */
+uint32 prefix_base;	/* base address of the latest prefix segment */
+int8 seg_prefix;		/* prefix segment indicator */
 
 #ifdef WANT_DEBUGGER
 static void (*cpu_hook)(uint32) = NULL;
@@ -115,7 +115,7 @@ static void (*branch_trace_hook)(uint16 from_CS, uint16 from_IP, uint16 to_CS, u
 #include "v30mz-ea.inc"
 #include "v30mz-modrm.inc"
 
-static uint8 parity_table[256];
+uint8 parity_table[256];
 
 static INLINE void i_real_pushf(void)
 {

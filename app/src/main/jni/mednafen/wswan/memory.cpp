@@ -37,25 +37,25 @@ namespace MDFN_IEN_WSWAN
 
 uint32 wsRAMSize;
 uint8 wsRAM[65536];
-static uint8 *wsSRAM = NULL;
+uint8 *wsSRAM = NULL;
 
 uint8 *wsCartROM;
 static uint32 sram_size;
 uint32 eeprom_size;
 
-static uint8 ButtonWhich, ButtonReadLatch;
+uint8 ButtonWhich, ButtonReadLatch;
 
-static uint32 DMASource;
-static uint16 DMADest;
-static uint16 DMALength;
-static uint8 DMAControl;
+uint32 DMASource;
+uint16 DMADest;
+uint16 DMALength;
+uint8 DMAControl;
 
-static uint32 SoundDMASource, SoundDMASourceSaved;
-static uint32 SoundDMALength, SoundDMALengthSaved;
-static uint8 SoundDMAControl;
+uint32 SoundDMASource, SoundDMASourceSaved;
+uint32 SoundDMALength, SoundDMALengthSaved;
+uint8 SoundDMAControl;
 static uint8 SoundDMATimer;
 
-static uint8 BankSelector[4];
+uint8 BankSelector[4];
 
 static bool language;
 

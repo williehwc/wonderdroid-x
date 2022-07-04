@@ -56,6 +56,10 @@ public class RomAdapter extends BaseAdapter {
                 "jpg", "png"
         };
 
+        public static String[] stateExtensions = new String[] {
+                "mc0", "mc1", "mc2", "mc3", "mc4", "mc5", "mc9"
+        };
+
         public enum Type {
             ZIP, RAW
         }
@@ -153,7 +157,7 @@ public class RomAdapter extends BaseAdapter {
     }
 
     private Rom[] findRoms() {
-        File[] sourceFiles = mRomDir.listFiles(new RomFilter());
+        File[] sourceFiles = mRomDir.listFiles(new RomFilter(false, false, false));
         ArrayList<Rom> roms = new ArrayList<>();
         if (sourceFiles != null) {
             for (File sourceFile : sourceFiles) {
@@ -182,7 +186,7 @@ public class RomAdapter extends BaseAdapter {
         });
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        if (!prefs.getBoolean("no_box_art", false))
+        if (prefs.getBoolean("downloadboxart", true))
             new BoxArtTask().execute(allRoms);
 
         return allRoms;
@@ -259,6 +263,9 @@ public class RomAdapter extends BaseAdapter {
     }
 
     public Bitmap getBitmap(int index) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        if (!prefs.getBoolean("downloadboxart", true)) return null;
+
         try {
             Rom rom = (Rom)(this.getItem(index));
             String filename = rom.fileName;

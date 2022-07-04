@@ -2,11 +2,14 @@
 package com.atelieryl.wonderdroid.utils;
 
 import com.atelieryl.wonderdroid.Button;
+import com.atelieryl.wonderdroid.R;
 
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.SurfaceHolder;
+import android.widget.Toast;
 
 public class EmuThread extends Thread {
 
@@ -20,7 +23,7 @@ public class EmuThread extends Thread {
 
         public void showButtons (boolean show);
 
-        public void update (boolean skip);
+        public int update (boolean skip);
 
         public void render (SurfaceHolder surfaceHolder);
     }
@@ -38,28 +41,30 @@ public class EmuThread extends Thread {
 
     private int frame;
     private long frameStart;
-    private long frameEnd;
+    private long frameRenderTime;
     private long nextUpdateTime;
-    private int frametime;
     private long sleepTimeMillis;
 
     boolean skip = false;
     boolean behind = false;
 
     private int frameskip = 0;
+    private final double mMasterClockNano;
+    private int expectedCyclesPerFrameLowerBound;
+    private int expectedCyclesPerFrameUpperBound;
+    private short numConsecFramesWithUnexpectedCycles;
 
-    public EmuThread (Renderer renderer, int fps, char mSystem) {
+    private final short numConsecFramesWithUnexpectedCyclesThreshold = 10;
+    private final double sleepTimeMillisFactor = 0.66;
+
+    public EmuThread (Renderer renderer, long masterClock, int fps) {
         this.renderer = renderer;
-        targetFrameTime = (long) (1000000000. / (fps / 65536. / 256.));
-        double sleepTimeMillisFactor = 0.66;
-        switch (mSystem) {
-            case 'w':
-            case 'n':
-            case 'g':
-                sleepTimeMillisFactor = 0.75;
-                break;
-        }
-        sleepTimeMillis = (long) (targetFrameTime / 1000000. * sleepTimeMillisFactor);
+        mMasterClockNano = masterClock / 1000000000.;
+        double expectedCyclesPerFrame = masterClock / (fps / 65536. / 256.);
+        expectedCyclesPerFrameLowerBound = (int) (expectedCyclesPerFrame * 0.95);
+        expectedCyclesPerFrameUpperBound = (int) (expectedCyclesPerFrame * 1.05);
+        targetFrameTime = (long) (1000000000. / (fps / 65536. / 256.)); // in nanoseconds
+        calculateSleepTimeMillis();
     }
 
     public void setSurfaceHolder (SurfaceHolder sh) {
@@ -92,29 +97,39 @@ public class EmuThread extends Thread {
         while (mIsRunning) {
 
             if (isPaused) {
-                //Log.d(TAG, "Paused!!!");
-                SystemClock.sleep(targetFrameTime);
+                SystemClock.sleep(100);
             } else {
 
                 frameStart = System.nanoTime();
 
-                renderer.update(false/*frame % 2 != 0*/);
+                int cycles = renderer.update(false/*frame % 2 != 0*/);
 
                 if (frameskip == 0 || frame % frameskip != 0) {
                     renderer.render(mSurfaceHolder);
                 }
 
-                frametime = 0;
+                frameRenderTime = System.nanoTime() - frameStart;
 
-                //targetFrameTime = 1000000000 * WonderSwan.samples / WonderSwan.audiofreq;
+                targetFrameTime = (long) (cycles / mMasterClockNano);
 
-                SystemClock.sleep(sleepTimeMillis);
+                if (cycles > 0) {
 
-                while (frametime < targetFrameTime) {
-                    frametime = (int)(System.nanoTime() - frameStart);
-//                    if (frametime > targetFrameTime) {
-//                        Log.d(TAG, "Overtime " + frametime + " -- " + targetFrameTime);
-//                    }
+                    if (cycles < expectedCyclesPerFrameLowerBound || cycles > expectedCyclesPerFrameUpperBound) {
+                        numConsecFramesWithUnexpectedCycles++;
+                        if (numConsecFramesWithUnexpectedCycles >= numConsecFramesWithUnexpectedCyclesThreshold) {
+                            calculateSleepTimeMillis();
+                            expectedCyclesPerFrameLowerBound = (int) (cycles * 0.95);
+                            expectedCyclesPerFrameUpperBound = (int) (cycles * 1.05);
+                            numConsecFramesWithUnexpectedCycles = 0;
+                        }
+                    }
+
+                    nextUpdateTime = frameStart + targetFrameTime - frameRenderTime / 100;
+
+                    SystemClock.sleep(sleepTimeMillis);
+
+                    while (System.nanoTime() < nextUpdateTime) {}
+
                 }
 
                 frame++;
@@ -143,6 +158,10 @@ public class EmuThread extends Thread {
 
     public void setFrameskip(int frameskip) {
         this.frameskip = frameskip;
+    }
+
+    private void calculateSleepTimeMillis() {
+        sleepTimeMillis = (long) (targetFrameTime / 1000000. * sleepTimeMillisFactor);
     }
 
 }

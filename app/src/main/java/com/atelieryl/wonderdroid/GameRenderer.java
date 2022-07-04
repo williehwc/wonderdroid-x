@@ -60,16 +60,17 @@ public class GameRenderer implements EmuThread.Renderer {
     private int mSurfaceHeight;
 
     private boolean mPortrait;
+    private boolean mMask;
 
-    public GameRenderer(int[] gameInfo, int sharpness, boolean portrait) {
+    public GameRenderer(long[] gameInfo, int sharpness, boolean portrait) {
 
-        mNominalWidth = gameInfo[1];
-        mNominalHeight = gameInfo[2];
+        mNominalWidth = (int) gameInfo[1];
+        mNominalHeight = (int) gameInfo[2];
 
-        int fbWidth = gameInfo[3];
-        int fbHeight = gameInfo[4];
+        int fbWidth = (int) gameInfo[3];
+        int fbHeight = (int) gameInfo[4];
 
-        int soundChan = gameInfo[5];
+        int soundChan = (int) gameInfo[5];
 
         mSharpness = sharpness;
 
@@ -140,8 +141,9 @@ public class GameRenderer implements EmuThread.Renderer {
     }
 
     @Override
-    public void update(boolean skip) {
-        short[] frameInfo = WonderSwan.execute_frame(frameone, skip);
+    public int update(boolean skip) {
+        int[] frameInfo = WonderSwan.execute_frame(frameone, skip);
+        if (frameInfo == null) return 0;
         audio.write(WonderSwan.audiobuffer, 0, WonderSwan.samples * mSoundChan);
         if (!scaleGenerated) {
             scale.reset();
@@ -149,17 +151,32 @@ public class GameRenderer implements EmuThread.Renderer {
                 scale.postScale((float) mNominalWidth / frameInfo[3], (float) mNominalHeight / frameInfo[4]);
             }
             scale.postTranslate(-frameInfo[1], -frameInfo[2]);
+            float sx;
+            float sy;
+            float dx;
+            float dy;
             if (mPortrait) {
-                scale.postScale((float) mScaling * mSurfaceWidth / mNominalWidth, mSharpness * (float) mScaling);
-                scale.postTranslate((mSurfaceWidth - mSurfaceWidth * (float) mScaling) / 2, 10 * mSharpness);
+                sx = mSharpness * (float) mScaling;
+                sy = mSharpness * (float) mScaling;
+                dx = (mSurfaceWidth - mNominalWidth * mSharpness * (float) mScaling) / 2;
+                dy = 10 * mSharpness;
             } else if (stretchToFill) {
-                scale.postScale((float) mScaling * mSurfaceWidth / mNominalWidth, mSharpness * (float) mScaling);
-                scale.postTranslate((mSurfaceWidth - mSurfaceWidth * (float) mScaling) / 2,
-                        (mSurfaceHeight - mNominalHeight * mSharpness * (float) mScaling) / 2);
+                sx = (float) mScaling * mSurfaceWidth / mNominalWidth;
+                sy = mSharpness * (float) mScaling;
+                dx = (mSurfaceWidth - mSurfaceWidth * (float) mScaling) / 2;
+                dy = (mSurfaceHeight - mNominalHeight * mSharpness * (float) mScaling) / 2;
             } else {
-                scale.postScale(mSharpness * (float) mScaling, mSharpness * (float) mScaling);
-                scale.postTranslate((mSurfaceWidth - mNominalWidth * mSharpness * (float) mScaling) / 2,
-                        (mSurfaceHeight - mNominalHeight * mSharpness * (float) mScaling) / 2);
+                sx = mSharpness * (float) mScaling;
+                sy = mSharpness * (float) mScaling;
+                dx = (mSurfaceWidth - mNominalWidth * mSharpness * (float) mScaling) / 2;
+                dy = (mSurfaceHeight - mNominalHeight * mSharpness * (float) mScaling) / 2;
+            }
+            scale.postScale(sx, sy);
+            scale.postTranslate(dx, dy);
+            if (mMask) {
+                drawThread.setMask((int) dx, (int) dy, (int) (sx * mNominalWidth + dx), (int) (sy * mNominalHeight + dy));
+            } else {
+                drawThread.setMask(0, 0, 0, 0);
             }
             scaleGenerated = true;
         }
@@ -167,6 +184,7 @@ public class GameRenderer implements EmuThread.Renderer {
             frameone.rewind();
             framebuffer.copyPixelsFromBuffer(frameone);
         }
+        return frameInfo[5];
     }
 
     @Override
@@ -216,5 +234,10 @@ public class GameRenderer implements EmuThread.Renderer {
             volumeFloat = 0;
         }
         audio.setVolume(volumeFloat);
+    }
+
+    public void setMask(boolean mask) {
+        mMask = mask;
+        scaleGenerated = false;
     }
 }

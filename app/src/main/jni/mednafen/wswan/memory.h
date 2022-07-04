@@ -5,9 +5,23 @@ namespace MDFN_IEN_WSWAN
 {
 
 extern uint8 wsRAM[65536];
+extern uint8 *wsSRAM; ///
 extern uint8 *wsCartROM;
 extern uint32 eeprom_size;
 extern uint8 wsEEPROM[2048];
+
+extern uint8 ButtonWhich, ButtonReadLatch; ///
+
+extern uint32 DMASource; ///
+extern uint16 DMADest; ///
+extern uint16 DMALength; ///
+extern uint8 DMAControl; ///
+
+extern uint32 SoundDMASource; ///
+extern uint32 SoundDMALength; ///
+extern uint8 SoundDMAControl; ///
+
+extern uint8 BankSelector[4]; ///
 
 MDFN_FASTCALL uint8 WSwan_readmem20(uint32);
 MDFN_FASTCALL void WSwan_writemem20(uint32 address,uint8 data);

@@ -26,13 +26,13 @@ namespace MDFN_IEN_WSWAN
 static const uint8 LevelTriggeredMask = (1U << WSINT_SERIAL_RECV);
 
 static uint8 IAsserted;
-static uint8 IStatus;
-static uint8 IEnable;
-static uint8 IVectorBase;
+uint8 IStatus;
+uint8 IEnable;
+uint8 IVectorBase;
 
-static bool IOn_Cache;
-static uint32 IOn_Which;
-static uint32 IVector_Cache;
+bool IOn_Cache;
+uint32 IOn_Which;
+uint32 IVector_Cache;
 
 static void RecalcInterrupt(void)
 {

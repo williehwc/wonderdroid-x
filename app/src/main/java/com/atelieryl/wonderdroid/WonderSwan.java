@@ -50,6 +50,8 @@ public class WonderSwan {
 
     public static final int audiofreq = 24000;
 
+    public static boolean running;
+
     public WonderSwan() {
         throw new UnsupportedOperationException();
     }
@@ -58,7 +60,7 @@ public class WonderSwan {
         System.loadLibrary("mednafen");
     }
 
-    static public native int[] load(String rom_path, String dir_path, String name, int year, int month,
+    static public native long[] load(String rom_path, String dir_path, String name, int year, int month,
                                     int day, String blood, String sex, String language);
 
     static public native void reset();
@@ -95,7 +97,7 @@ public class WonderSwan {
         }
     }*/
 
-    static public short[] execute_frame(IntBuffer framebuffer, boolean skipframe) {
+    static public int[] execute_frame(IntBuffer framebuffer, boolean skipframe) {
         if (buttonsDirty) {
             WonderSwan.updatebuttons(WonderSwanButton.Y1.down, WonderSwanButton.Y2.down,
                     WonderSwanButton.Y3.down, WonderSwanButton.Y4.down, WonderSwanButton.X1.down,
@@ -104,15 +106,16 @@ public class WonderSwan {
             buttonsDirty = false;
         }
 
-        short[] frameInfo = _execute_frame(skipframe, audioEnabled, framebuffer, audioEnabled ? audiobuffer : null);
-        samples = frameInfo[0];
+        int[] frameInfo = _execute_frame(skipframe, audioEnabled, framebuffer, audioEnabled ? audiobuffer : null);
+        running = (frameInfo != null);
+        if (running) samples = frameInfo[0];
 //        synchronized (audiobuffer) {
 //            audiobuffer.notify();
 //        }
         return frameInfo;
     }
 
-    static private native short[] _execute_frame(boolean skipframe, boolean audio,
+    static private native int[] _execute_frame(boolean skipframe, boolean audio,
             IntBuffer framebuffer, short[] audiobuffer);
 
     static public native void updatebuttons(boolean y1, boolean y2, boolean y3, boolean y4,

@@ -13,9 +13,10 @@
 
 using namespace Mednafen;
 
-const int GAME_INFO_ARRAY_SIZE = 8;
-const int FRAME_INFO_ARRAY_SIZE = 5;
+const int GAME_INFO_ARRAY_SIZE = 9;
+const int FRAME_INFO_ARRAY_SIZE = 6;
 const int SOUND_BUF_SIZE = 4096;
+const double SAMPLE_RATE = 24000;
 
 bool _initialized = false;
 bool _runGame = false;
@@ -23,8 +24,9 @@ bool _runGame = false;
 static MDFNGI *_game;
 static MDFN_Surface *_surf;
 
-double _sampleRate = 24000;
 uint32_t *_inputBuffer[13];
+
+double _masterClock;
 
 extern "C" {
 
@@ -38,7 +40,7 @@ extern "C" {
         MDFNI_Reset();
     }
 
-    JNIEXPORT jintArray JNICALL
+    JNIEXPORT jlongArray JNICALL
     Java_com_atelieryl_wonderdroid_WonderSwan_load(JNIEnv *env, jclass obj, jstring rom_path,
                                                    jstring dir_path, jstring name, jint year, jint month, jint day,
                                                    jstring blood, jstring sex, jstring language) {
@@ -48,8 +50,9 @@ extern "C" {
             std::vector<MDFNSetting> settings;
             MDFNI_Initialize(env->GetStringUTFChars(dir_path, NULL), settings);
             MDFNI_SetSetting("filesys.path_sav", env->GetStringUTFChars(dir_path, NULL));
-            MDFNI_SetSetting("filesys.path_state", env->GetStringUTFChars(dir_path, NULL));
+            //MDFNI_SetSetting("filesys.path_state", env->GetStringUTFChars(dir_path, NULL));
             MDFNI_SetSetting("filesys.fname_sav", "%f%e.%x");
+            MDFNI_SetSetting("filesys.fname_state", "%f%e.%X");
             MDFNI_SetSetting("wswan.name", env->GetStringUTFChars(name, NULL));
             MDFNI_SetSetting("wswan.byear", std::to_string(year).c_str());
             MDFNI_SetSetting("wswan.bmonth", std::to_string(month).c_str());
@@ -68,7 +71,7 @@ extern "C" {
         // Prevent Master System games from running
         if (strcmp(_game->shortname, "sms") == 0) {
             MDFNI_CloseGame();
-            return env->NewIntArray(GAME_INFO_ARRAY_SIZE);
+            return env->NewLongArray(GAME_INFO_ARRAY_SIZE);
         }
 
         // Set up input
@@ -82,7 +85,7 @@ extern "C" {
 
         _runGame = true;
 
-        jint gameInfo[GAME_INFO_ARRAY_SIZE];
+        jlong gameInfo[GAME_INFO_ARRAY_SIZE];
         gameInfo[0] = _game->fps;
         gameInfo[1] = _game->nominal_width;
         gameInfo[2] = _game->nominal_height;
@@ -91,17 +94,18 @@ extern "C" {
         gameInfo[5] = _game->soundchan;
         gameInfo[6] = _game->rotated;
         gameInfo[7] = _game->shortname[0];
+        gameInfo[8] = _game->MasterClock >> 32;
 
-        jintArray gameInfoArray = env->NewIntArray(GAME_INFO_ARRAY_SIZE);
-        env->SetIntArrayRegion(gameInfoArray, 0, GAME_INFO_ARRAY_SIZE, gameInfo);
+        jlongArray gameInfoArray = env->NewLongArray(GAME_INFO_ARRAY_SIZE);
+        env->SetLongArrayRegion(gameInfoArray, 0, GAME_INFO_ARRAY_SIZE, gameInfo);
         return gameInfoArray;
     }
 
-    JNIEXPORT jshortArray JNICALL
+    JNIEXPORT jintArray JNICALL
     Java_com_atelieryl_wonderdroid_WonderSwan__1execute_1frame(JNIEnv *env, jclass obj, jboolean skip,
                                                                jboolean audio, jobject framebuffer,
                                                                jshortArray audiobuffer) {
-        if (!_runGame) return 0;
+        if (!_runGame) return NULL;
 
         // Mednafen emulate
         static int16_t sound_buf[SOUND_BUF_SIZE];
@@ -111,7 +115,7 @@ extern "C" {
         rects[0] = ~0;
         EmulateSpecStruct spec;
         spec.surface = _surf;
-        spec.SoundRate = _sampleRate;
+        spec.SoundRate = SAMPLE_RATE;
         spec.SoundBuf = sound_buf;
         spec.LineWidths = rects;
         spec.SoundBufMaxSize = sizeof(sound_buf) / 2;
@@ -127,7 +131,7 @@ extern "C" {
         // Audio
         env->SetShortArrayRegion(audiobuffer, 0, spec.SoundBufSize * _game->soundchan, sound_buf);
 
-        jshort frameInfo[FRAME_INFO_ARRAY_SIZE];
+        jint frameInfo[FRAME_INFO_ARRAY_SIZE];
         frameInfo[0] = spec.SoundBufSize;
         frameInfo[1] = spec.DisplayRect.x;
         frameInfo[2] = spec.DisplayRect.y;
@@ -137,9 +141,10 @@ extern "C" {
             frameInfo[3] = spec.DisplayRect.w;
         }
         frameInfo[4] = spec.DisplayRect.h;
+        frameInfo[5] = spec.MasterCycles;
 
-        jshortArray frameInfoArray = env->NewShortArray(FRAME_INFO_ARRAY_SIZE);
-        env->SetShortArrayRegion(frameInfoArray, 0, FRAME_INFO_ARRAY_SIZE, frameInfo);
+        jintArray frameInfoArray = env->NewIntArray(FRAME_INFO_ARRAY_SIZE);
+        env->SetIntArrayRegion(frameInfoArray, 0, FRAME_INFO_ARRAY_SIZE, frameInfo);
         return frameInfoArray;
     }
 
@@ -196,9 +201,17 @@ extern "C" {
     Java_com_atelieryl_wonderdroid_WonderSwan_savebackup(JNIEnv *env, jclass obj, jstring filename) {}
 
     JNIEXPORT void JNICALL
-    Java_com_atelieryl_wonderdroid_WonderSwan_loadstate(JNIEnv *env, jclass obj, jstring filename) {}
+    Java_com_atelieryl_wonderdroid_WonderSwan_loadstate(JNIEnv *env, jclass obj, jstring filename) {
+        _runGame = false;
+        MDFNI_LoadState(env->GetStringUTFChars(filename, NULL), "");
+        _runGame = true;
+    }
 
     JNIEXPORT void JNICALL
-    Java_com_atelieryl_wonderdroid_WonderSwan_savestate(JNIEnv *env, jclass obj, jstring filename) {}
+    Java_com_atelieryl_wonderdroid_WonderSwan_savestate(JNIEnv *env, jclass obj, jstring filename) {
+        _runGame = false;
+        MDFNI_SaveState(env->GetStringUTFChars(filename, NULL), "", NULL, NULL, NULL);
+        _runGame = true;
+    }
 
 }

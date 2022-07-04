@@ -46,23 +46,21 @@
             android:defaultValue="true"
             android:key="showbackground"
             android:title="@string/showbackground" />
-        
-        <EditTextPreference
-            android:key="emu_rompath"
-            android:maxLength="256"
-            android:defaultValue="wonderdroid"
-            android:title="@string/overriderompath" />
-        
-        <EditTextPreference
-            android:key="emu_mempath"
-            android:maxLength="256"
-            android:defaultValue="wonderdroid/cartmem"
-            android:title="@string/overridemempath" />
-        <Preference android:title="@string/sdcardinfo">
-		    <intent android:action="android.intent.action.VIEW"
-		            android:data="http://yearbooklabs.com/sd/" />
-		</Preference>
-        
+
+        <Preference
+            android:key="changedrive"
+            android:title="@string/change_drive" />
+
+        <Preference
+            android:key="backupfiles"
+            android:title="@string/backup_files" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="downloadboxart"
+            android:title="@string/downloadboxart"
+            android:summary="@string/downloadboxartdescription" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/settings_cat_controls" >
@@ -127,6 +125,10 @@
             android:key="stretchtofill"
             android:title="@string/stretchtofill"
             android:summary="@string/stretchtofilldescription" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="mask"
+            android:title="@string/mask" />
         <ListPreference
             android:entries="@array/sharpness"
             android:entryValues="@array/sharpnessvalues"

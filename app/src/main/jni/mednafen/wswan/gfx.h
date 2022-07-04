@@ -22,6 +22,39 @@ void wsSetVideo(int, bool);
 
 void wsScanline(uint32 *target);
 
+extern uint32 wsMonoPal[16][4]; ///
+extern uint32 wsColors[8]; ///
+extern uint32 wsCols[16][16]; ///
+
+extern uint32 ColorMapG[16]; ///
+extern uint32 ColorMap[16*16*16]; ///
+
+extern uint8 wsLine; ///
+
+extern uint8 SpriteTable[2][0x80][4]; ///
+extern uint32 SpriteCountCache[2]; ///
+extern uint8 DispControl; ///
+extern uint8 BGColor; ///
+extern uint8 LineCompare; ///
+extern uint8 SPRBase; ///
+extern uint8 SpriteStart, SpriteCount; ///
+extern uint8 FGBGLoc; ///
+extern uint8 FGx0, FGy0, FGx1, FGy1; ///
+extern uint8 SPRx0, SPRy0, SPRx1, SPRy1; ///
+
+extern uint8 BGXScroll, BGYScroll; ///
+extern uint8 FGXScroll, FGYScroll; ///
+extern uint8 LCDControl, LCDIcons; ///
+
+extern uint8 BTimerControl; ///
+extern uint16 HBTimerPeriod; ///
+extern uint16 VBTimerPeriod; ///
+
+extern uint16 HBCounter, VBCounter; ///
+extern uint8 VideoMode; ///
+
+extern uint8	tiles[256][256][2][8]; ///
+
 extern uint32		dx_r,dx_g,dx_b,dx_sr,dx_sg,dx_sb;
 extern uint32		dx_bits,dx_pitch,cmov,dx_linewidth_blit,dx_buffer_line;
 

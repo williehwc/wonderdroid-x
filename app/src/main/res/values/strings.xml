@@ -54,7 +54,7 @@
     <string name="showbackground">Show game select background</string>
     <string name="showbackgrounddescription">Disable for smoother scrolling</string>
     <string name="about">About</string>
-    <string name="aboutdescription">Developed by Willie Chang\nPublished by Yearbook Labs\nWonderDroid is originally written by Daniel Palmer.\nLicensed under GPL 2.0\nThis product includes other open-source software including ActionBarSherlock, Blip_Buffer, Bryan McPhail\'s NEC V30MZ emulator, Cygne, and Mednafen.\nOriginal icon designed by Bostwickenator on DeviantArt.\nCertain icons made by Freepik and Vaadin from www.flaticon.com, with typeface by Sammi De Guzman.\nJapanese translation by volunteer users (thank you!).</string>
+    <string name="aboutdescription">Developed by Willie Chang\nPublished by Yearbook Labs\nWonderDroid is originally written by Daniel Palmer.\nLicensed under GPL 2.0\nPowered by Mednafen. Includes software from Cygne, Bryan McPhail\'s NEC V30MZ emulator, Blip_Buffer, and Charles MacDonald\'s SMS Plus. \nOriginal icon designed by Bostwickenator on DeviantArt.\nCertain icons made by Freepik and Vaadin from www.flaticon.com, with typeface by Sammi De Guzman.\nJapanese translation by volunteer users (thank you!).</string>
     <string name="visit">Visit our website</string>
     <string name="close">Close</string>
     <string name="report">Report an issue</string>
@@ -107,7 +107,7 @@
     <string name="free_total">free, total</string>
     <string name="in_use">selected</string>
     <string name="add_a_game">Add a game</string>
-    <string name="add_a_game_note">Supported file extensions:\n.ws. .wsc, .gg, .pce, .ngp, .ngc, and .zip containing files with any of the preceding extensions. You can also add save files and game states for games already added.</string>
+    <string name="add_a_game_note">Supported file extensions:\n.ws. .wsc, .gg, .pce, .ngp, .ngc, and .zip containing files with any of the preceding extensions. You can also add save files (.sav and .mem) for games already added.</string>
     <string name="select_file">Select file…</string>
     <string name="scan_folder">Add all games in a folder</string>
     <string name="scan_folder_note">Due to restrictions set by Android, not all folders can be scanned.</string>
@@ -128,11 +128,12 @@
     <string name="pending">Pending</string>
     <string name="canceled">Canceled</string>
     <string name="file_error">File error, press for details</string>
-    <string name="file_exists">File already exists but overwrite is disabled</string>
+    <string name="file_exists">File already exists but overwrite is OFF</string>
     <string name="file_exists_description">Files with identical names are not overwritten by default. If you want to overwrite the existing file, please turn on the switch labeled "Overwrite files with identical names" at the bottom of the Add Games screen.</string>
     <string name="game_select_view">Game selection view</string>
     <string name="gallery_view">Gallery view</string>
     <string name="list_view">List view</string>
+    <string name="grid_view">Grid view</string>
     <string name="game_select_sort">Sort games</string>
     <string name="date_added_sort">By most recently added</string>
     <string name="date_played_sort">By most recently played</string>
@@ -150,5 +151,23 @@
     <string name="no_sms">Master System games are not supported, but Game Gear games are.</string>
     <string name="orientation">Orientation</string>
     <string name="language">Digimon Battle Spirit &amp; NGP language</string>
+    <string name="mask">Mask PCE and GG overscan areas</string>
+    <string name="legacystate">Attempting to load WonderDroid X state. If it doesn\'t work, please try again.</string>
+    <string name="no_matching_ext">Error: no matching extension</string>
+    <string name="change_drive">Change drive…</string>
+    <string name="backup_files">Back up files…</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="downloadboxart">Download and show box art</string>
+    <string name="downloadboxartdescription">Game titles will be sent to third-party services specified in OpenVGDB</string>
+    <string name="deleteboxart">Downloaded box art will be deleted.</string>
+    <string name="rename">Rename</string>
+    <string name="select_all">Select all</string>
+    <string name="select_none">Select none</string>
+    <string name="delete">Delete</string>
+    <string name="back_up">Back up</string>
+    <string name="cannot_rename_zip">Games in ZIP files cannot be renamed.</string>
+    <string name="important">Important</string>
+    <string name="uninstall_warning">Uninstalling this app will delete all files, such as save files. In the event that you wish to uninstall this app, use Backup and Delete (in Preferences) to back up your files first.</string>
+    <string name="delete_confirm">Delete selected files?</string>
 
 </resources>

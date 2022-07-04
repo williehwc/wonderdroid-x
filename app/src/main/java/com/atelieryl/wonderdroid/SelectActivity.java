@@ -2,6 +2,7 @@
 package com.atelieryl.wonderdroid;
 
 import java.io.File;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.app.DownloadManager;
@@ -87,10 +88,11 @@ public class SelectActivity extends BaseActivity {
             }
         });
 
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         // Help translate button
-        /*if (Locale.getDefault().getLanguage().equals("ja")) {
-        	final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            boolean hideTranslate = prefs.getBoolean("hidetranslate", false);
+        if (Locale.getDefault().getLanguage().equals("ja")) {
+            boolean hideTranslate = prefs.getBoolean("hidetranslate2", false);
             if (!hideTranslate) {
             	findViewById(R.id.helptranslate).setVisibility(View.VISIBLE);
             	findViewById(R.id.helptranslate).bringToFront();
@@ -105,14 +107,12 @@ public class SelectActivity extends BaseActivity {
 	        	    public void onClick(View v) {
 	        	    	findViewById(R.id.helptranslate).setVisibility(View.GONE);
 	        	    	SharedPreferences.Editor editor = prefs.edit();
-	        	    	editor.putBoolean("hidetranslate", true);
+	        	    	editor.putBoolean("hidetranslate2", true);
 	        	    	editor.commit();
 	        	    }
 	        	});
             }
-        }*/
-
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        }
 
         // Onboarding
         String storageVolume = prefs.getString("storage_path", null);
@@ -204,6 +204,7 @@ public class SelectActivity extends BaseActivity {
         try {
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra(MainActivity.ROM, mRAdapter.getItem(romIndex));
+            intent.putExtra(MainActivity.HEADER, mRAdapter.getHeader(romIndex));
             startActivity(intent);
         } catch (Exception e) {
             Toast.makeText(this, R.string.cannotloadrom, Toast.LENGTH_SHORT).show();
@@ -252,7 +253,7 @@ public class SelectActivity extends BaseActivity {
 
             @Override
             public void onError(Error error) {
-                Log.e("WonderDroid Box Art", error.getServerErrorMessage());
+                Log.e("WonderDroid Box Art", error.toString());
             }
         };
 
@@ -285,6 +286,23 @@ public class SelectActivity extends BaseActivity {
             });
 
             mBG1 = (ImageView)this.findViewById(R.id.select_bg1);
+
+            // Uninstall warning
+            boolean uninstallWarning = prefs.getBoolean("uninstallwarning", false);
+            if (!uninstallWarning) {
+                AlertDialog.Builder builder;
+                builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.important)
+                    .setMessage(R.string.uninstall_warning)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {}
+                    })
+                    .show();
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("uninstallwarning", true);
+                editor.commit();
+            }
+
         } else {
             ((TextView)this.findViewById(R.id.select_noroms)).setText(R.string.noroms);
         }
