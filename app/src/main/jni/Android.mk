@@ -206,37 +206,6 @@ LOCAL_SRC_FILES := \
     mednafen/sound/SwiftResampler.cpp \
     mednafen/sound/WAVRecord.cpp \
     mednafen/sound/okiadpcm.cpp \
-    mednafen/ss/cart.cpp \
-    mednafen/ss/cart/ar4mp.cpp \
-    mednafen/ss/cart/backup.cpp \
-    mednafen/ss/cart/cs1ram.cpp \
-    mednafen/ss/cart/debug.cpp \
-    mednafen/ss/cart/extram.cpp \
-    mednafen/ss/cart/rom.cpp \
-    mednafen/ss/cdb.cpp \
-    mednafen/ss/db.cpp \
-    mednafen/ss/input/3dpad.cpp \
-    mednafen/ss/input/gamepad.cpp \
-    mednafen/ss/input/gun.cpp \
-    mednafen/ss/input/jpkeyboard.cpp \
-    mednafen/ss/input/keyboard.cpp \
-    mednafen/ss/input/mission.cpp \
-    mednafen/ss/input/mouse.cpp \
-    mednafen/ss/input/multitap.cpp \
-    mednafen/ss/input/wheel.cpp \
-    mednafen/ss/scu_dsp_gen.cpp \
-    mednafen/ss/scu_dsp_jmp.cpp \
-    mednafen/ss/scu_dsp_misc.cpp \
-    mednafen/ss/scu_dsp_mvi.cpp \
-    mednafen/ss/smpc.cpp \
-    mednafen/ss/sound.cpp \
-    mednafen/ss/ss.cpp \
-    mednafen/ss/vdp1.cpp \
-    mednafen/ss/vdp1_line.cpp \
-    mednafen/ss/vdp1_poly.cpp \
-    mednafen/ss/vdp1_sprite.cpp \
-    mednafen/ss/vdp2.cpp \
-    mednafen/ss/vdp2_render.cpp \
     mednafen/string/escape.cpp \
     mednafen/string/string.cpp \
     mednafen/tremor/bitwise.c \
