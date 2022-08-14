@@ -2,6 +2,7 @@
 package com.atelieryl.wonderdroid.views;
 
 import com.atelieryl.wonderdroid.Button;
+import com.atelieryl.wonderdroid.MainActivity;
 import com.atelieryl.wonderdroid.TouchInputHandler;
 import com.atelieryl.wonderdroid.TouchInputHandler.Pointer;
 import com.atelieryl.wonderdroid.WonderSwan;
@@ -26,6 +27,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -122,7 +124,7 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		mThread = new EmuThread(renderer, mMasterClock, mFps);
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		sharpness = Integer.parseInt(prefs.getString("sharpness", "3"));
+		//sharpness = Integer.parseInt(prefs.getString("sharpness", "3"));
 		mThread.setFrameskip(Integer.parseInt(prefs.getString("frameskip", "0")));
 		stretchToFill = prefs.getBoolean("stretchtofill", false);
 		scaling = (prefs.getInt("scaling", 95) + 5) / 100.;

@@ -69,9 +69,7 @@ public class SelectActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            galleryPosition = savedInstanceState.getInt("galleryPosition");
-        }
+
         setContentView(R.layout.activity_select);
         gallery = (Gallery)this.findViewById(R.id.select_gallery);
         /*if (gallery == null)
@@ -89,6 +87,12 @@ public class SelectActivity extends BaseActivity {
         });
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (savedInstanceState != null) {
+            galleryPosition = savedInstanceState.getInt("galleryPosition");
+        } else {
+            galleryPosition = prefs.getInt("lastplayedromindex", 0);
+        }
 
         // Help translate button
         if (Locale.getDefault().getLanguage().equals("ja")) {
@@ -206,6 +210,10 @@ public class SelectActivity extends BaseActivity {
             intent.putExtra(MainActivity.ROM, mRAdapter.getItem(romIndex));
             intent.putExtra(MainActivity.HEADER, mRAdapter.getHeader(romIndex));
             startActivity(intent);
+            // Save gallery position
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("lastplayedromindex", romIndex);
+            editor.commit();
         } catch (Exception e) {
             Toast.makeText(this, R.string.cannotloadrom, Toast.LENGTH_SHORT).show();
         }
@@ -271,6 +279,16 @@ public class SelectActivity extends BaseActivity {
                     startEmu(arg2);
                 }
 
+            }, new AdapterView.OnItemLongClickListener() {
+
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getApplicationContext(), FileMgmtActivity.class);
+                    intent.putExtra(MainActivity.ROM, mRAdapter.getItem(position));
+                    startActivity(intent);
+                    return true;
+                }
+
             }, new OnItemSelectedListener() {
 
                 @Override
@@ -320,16 +338,18 @@ public class SelectActivity extends BaseActivity {
     }
 
     private final void setUpGallery(RomAdapter adapter,
-            OnItemClickListener itemClickListener, OnItemSelectedListener itemSelectedListener) {
+                                    OnItemClickListener itemClickListener, AdapterView.OnItemLongClickListener itemLongClickListener, OnItemSelectedListener itemSelectedListener) {
         if (gallery == null) {
             grid.setAdapter(mRAdapter);
             grid.setOnItemClickListener(itemClickListener);
+            grid.setOnItemLongClickListener(itemLongClickListener);
             grid.setOnItemSelectedListener(itemSelectedListener);
         }
 
         else {
             gallery.setAdapter(mRAdapter);
             gallery.setOnItemClickListener(itemClickListener);
+            gallery.setOnItemLongClickListener(itemLongClickListener);
             gallery.setOnItemSelectedListener(itemSelectedListener);
             try {
                 gallery.setSelection(galleryPosition);

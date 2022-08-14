@@ -14,7 +14,7 @@ include $(CLEAR_VARS)
 LOCAL_PATH := $(TOP_PATH)/libsndfile
 include $(CLEAR_VARS)
 LOCAL_MODULE := libsndfile
-LOCAL_SRC_FILES := $(LOCAL_PATH)/lib/libsndfile.a
+LOCAL_SRC_FILES := $(LOCAL_PATH)/lib/$(TARGET_ARCH_ABI)/libsndfile.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 # mednafen

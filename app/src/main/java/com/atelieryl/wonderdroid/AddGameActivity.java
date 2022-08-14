@@ -118,7 +118,7 @@ public class AddGameActivity extends AppCompatActivity {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         includeSubfolders = prefs.getBoolean("include_subfolders", true);
         overwrite = prefs.getBoolean("overwrite", false);
-        copyMode = prefs.getBoolean("copy_mode", true);
+        copyMode = prefs.getBoolean("copy_mode", false);
         lastFolderUri = prefs.getString("last_folder_uri", null);
         if (lastFolderUri != null) {
             uri = Uri.parse(lastFolderUri);
@@ -460,6 +460,7 @@ public class AddGameActivity extends AppCompatActivity {
                     fileQueueDisplay.set(i, "f\0" + filename + "\0" + e.getMessage());
                 }
             }
+            publishProgress();
             return null;
         }
         @Override
@@ -542,6 +543,9 @@ public class AddGameActivity extends AppCompatActivity {
         for (String extension : RomAdapter.Rom.stateExtensions) {
             if (filename.endsWith(extension)) return true;
         }
+        for (String extension : RomAdapter.Rom.boxArtExtensions) {
+            if (filename.endsWith(extension)) return true;
+        }
         if (filename.endsWith(".sav") || filename.endsWith(".mem")) {
             return true;
         }
@@ -609,7 +613,7 @@ public class AddGameActivity extends AppCompatActivity {
         } else if (filename.endsWith(".sav")) {
             // Mednafen backup save or WonderDroid X state
             Pattern pattern = Pattern.compile("\\d+-\\d+-\\d+_a?\\d_\\d.sav");
-            if (!pattern.matcher(filename).matches() || fileExists(filename.substring(0, filename.length() - 4), null) == 'v') {
+            if (!pattern.matcher(filename).matches() && fileExists(filename.substring(0, filename.length() - 4), null) == 'v') {
                 return 'n';
             }
         } else if (filename.endsWith(".mem")) {
@@ -619,11 +623,7 @@ public class AddGameActivity extends AppCompatActivity {
                 return 'n';
             }
         } else {
-            for (String extension : RomAdapter.Rom.stateExtensions) {
-                if (filename.endsWith(extension) && fileExists(filename.substring(0, filename.length() - 4), null) == 'v') {
-                    return 'n';
-                }
-            }
+            return fileExists(filename.substring(0, filename.length() - 4), null);
         }
         return 'v';
     }

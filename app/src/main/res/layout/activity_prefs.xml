@@ -47,9 +47,9 @@
             android:key="showbackground"
             android:title="@string/showbackground" />
 
-        <Preference
-            android:key="changedrive"
-            android:title="@string/change_drive" />
+<!--        <Preference-->
+<!--            android:key="changedrive"-->
+<!--            android:title="@string/change_drive" />-->
 
         <Preference
             android:key="backupfiles"
@@ -129,13 +129,13 @@
             android:defaultValue="false"
             android:key="mask"
             android:title="@string/mask" />
-        <ListPreference
-            android:entries="@array/sharpness"
-            android:entryValues="@array/sharpnessvalues"
-            android:key="sharpness"
-            android:title="@string/sharpness"
-            android:defaultValue="3"
-            android:summary="@string/sharpnessdescription" />
+<!--        <ListPreference-->
+<!--            android:entries="@array/sharpness"-->
+<!--            android:entryValues="@array/sharpnessvalues"-->
+<!--            android:key="sharpness"-->
+<!--            android:title="@string/sharpness"-->
+<!--            android:defaultValue="3"-->
+<!--            android:summary="@string/sharpnessdescription" />-->
         <ListPreference
             android:entries="@array/frameskip"
             android:entryValues="@array/frameskipvalues"

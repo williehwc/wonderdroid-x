@@ -39,6 +39,13 @@ public class PrefsActivity extends PreferenceActivity {
             this.addPreferencesFromResource(R.layout.prefs_size_position);
         } else {
             this.addPreferencesFromResource(R.layout.activity_prefs);
+
+            // Intent extras
+            Intent intent = getIntent();
+            if (intent.getBooleanExtra(MainActivity.PLAYING, false)) {
+                findPreference("backupfiles").setEnabled(false);
+            }
+
             findPreference("mapcontrols").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -60,11 +67,20 @@ public class PrefsActivity extends PreferenceActivity {
                 }
             });
 
-            findPreference("changedrive").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+//            findPreference("changedrive").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+//                @Override
+//                public boolean onPreferenceClick(Preference preference) {
+//                    Intent intent = new Intent(getApplicationContext(), OnboardingActivity.class);
+//                    intent.putExtra("changedrive", true);
+//                    startActivity(intent);
+//                    return true;
+//                }
+//            });
+
+            findPreference("backupfiles").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    Intent intent = new Intent(getApplicationContext(), OnboardingActivity.class);
-                    intent.putExtra("changedrive", true);
+                    Intent intent = new Intent(getApplicationContext(), FileMgmtActivity.class);
                     startActivity(intent);
                     return true;
                 }

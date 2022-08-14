@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ワンダドロイド X</string>
+    <string name="app_name">ワンダドロイドウルトラ</string>
     <string name="nosdcard">注意: 携帯のディスクがないか、または使用できません</string>
     <string name="noroms">ロムのファイルを見つけられませんでした</string>
     <string name="colour">カラー –\u00A0</string>
@@ -88,5 +88,18 @@
     <string name="opacity">不透明度</string>
     <string name="buttoncolor">ボタンの色</string>
     <string name="showbuttonlabels">ボタンのラベル</string>
+    <string name="language">デジモンテイマーズ　バトルスピリット &amp; NGP 言語</string>
+    <string name="cancel">キャンセル</string>
+    <string name="back_up">バックアップ</string>
+    <string name="delete">削除</string>
+    <string name="please_wait">お待ちください……</string>
+    <string name="total">合計</string>
+    <string name="backup_files">ファイルをバックアップ…</string>
+    <string name="next">次へ</string>
+    <string name="select_all">全選択</string>
+    <string name="rename_game">ゲームの名前を変更する</string>
+    <string name="add_a_game">ゲームを追加する</string>
+    <string name="select_none">選択解除</string>
+    <string name="help">ヘルプ</string>
 
 </resources>

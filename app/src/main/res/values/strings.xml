@@ -54,7 +54,7 @@
     <string name="showbackground">Show game select background</string>
     <string name="showbackgrounddescription">Disable for smoother scrolling</string>
     <string name="about">About</string>
-    <string name="aboutdescription">Developed by Willie Chang\nPublished by Yearbook Labs\nWonderDroid is originally written by Daniel Palmer.\nLicensed under GPL 2.0\nPowered by Mednafen. Includes software from Cygne, Bryan McPhail\'s NEC V30MZ emulator, Blip_Buffer, and Charles MacDonald\'s SMS Plus. \nOriginal icon designed by Bostwickenator on DeviantArt.\nCertain icons made by Freepik and Vaadin from www.flaticon.com, with typeface by Sammi De Guzman.\nJapanese translation by volunteer users (thank you!).</string>
+    <string name="aboutdescription">Developed by Willie Chang\nPublished by Yearbook Labs\nWonderDroid is originally written by Daniel Palmer.\nLicensed under GPL 2.0\nPowered by Mednafen. Includes software from Cygne, Bryan McPhail\'s NEC V30MZ emulator, Blip_Buffer, and Charles MacDonald\'s SMS Plus.\nCertain design based on OpenEmu.\nOriginal icon designed by Bostwickenator on DeviantArt.\nCertain icons made by Freepik and Vaadin from www.flaticon.com, with typeface by Sammi De Guzman.\nJapanese translation by volunteer users (thank you!).</string>
     <string name="visit">Visit our website</string>
     <string name="close">Close</string>
     <string name="report">Report an issue</string>
@@ -71,7 +71,7 @@
     <string name="gotopreferences">Go to Preferences</string>
     <string name="readmemfileerror">Cannot read save file</string>
     <string name="writememfileerror">Cannot write save file</string>
-    <string name="helptranslate">\u00A0\u00A0\u00A0Help translate to Japanese »</string>
+    <string name="helptranslate">\u00A0\u00A0\u00A0Help translate to Japanese 幫忙翻到日文 »</string>
     <string name="needpermissions">Please turn on the file access permission for WonderDroid X in your device settings.</string>
     <string name="askpermissions">File access permission is required for reading ROMs.</string>
     <string name="ok">OK</string>
@@ -107,7 +107,7 @@
     <string name="free_total">free, total</string>
     <string name="in_use">selected</string>
     <string name="add_a_game">Add a game</string>
-    <string name="add_a_game_note">Supported file extensions:\n.ws. .wsc, .gg, .pce, .ngp, .ngc, and .zip containing files with any of the preceding extensions. You can also add save files (.sav and .mem) for games already added.</string>
+    <string name="add_a_game_note">Supported file extensions: .ws. .wsc, .gg, .pce, .ngp, .ngc, and .zip containing files with any of the preceding extensions. You can also add save files (.sav and .mem), states (.sav and .mc[0-5,9]), and box art (.jpg and .png) for games already added.</string>
     <string name="select_file">Select file…</string>
     <string name="scan_folder">Add all games in a folder</string>
     <string name="scan_folder_note">Due to restrictions set by Android, not all folders can be scanned.</string>
@@ -146,7 +146,7 @@
     <string name="privacy">We do not collect any usage data. However, to download box art for the game selection screen, it is necessary to transmit game titles to third-party services. This feature is optional; check the box below to opt out.</string>
     <string name="no_boxart">Do NOT download box art</string>
     <string name="unrecognized_extension">Unrecognized extension</string>
-    <string name="already_in_zip">File already exists in a ZIP, which can only be overwritten by another ZIP.</string>
+    <string name="already_in_zip">Game already exists in a ZIP, which can only be overwritten by another ZIP.</string>
     <string name="no_corresponding_game">No corresponding game exists</string>
     <string name="no_sms">Master System games are not supported, but Game Gear games are.</string>
     <string name="orientation">Orientation</string>
@@ -160,14 +160,20 @@
     <string name="downloadboxart">Download and show box art</string>
     <string name="downloadboxartdescription">Game titles will be sent to third-party services specified in OpenVGDB</string>
     <string name="deleteboxart">Downloaded box art will be deleted.</string>
-    <string name="rename">Rename</string>
+    <string name="rename_game">Rename game</string>
     <string name="select_all">Select all</string>
     <string name="select_none">Select none</string>
     <string name="delete">Delete</string>
     <string name="back_up">Back up</string>
     <string name="cannot_rename_zip">Games in ZIP files cannot be renamed.</string>
     <string name="important">Important</string>
-    <string name="uninstall_warning">Uninstalling this app will delete all files, such as save files. In the event that you wish to uninstall this app, use Backup and Delete (in Preferences) to back up your files first.</string>
+    <string name="uninstall_warning">Uninstalling this app will delete all files, such as save files. In the event that you wish to uninstall this app, use "Back up files" (in Preferences) to back up your files first.</string>
     <string name="delete_confirm">Delete selected files?</string>
+    <string name="cannot_delete">Cannot delete the game without also deleting its associated files. You can back them up first if you want to keep them, and add them back in later.</string>
+    <string name="total">Total</string>
+    <string name="not_backed_up">file(s) not backed up.</string>
+    <string name="not_moved">file(s) not moved.</string>
+    <string name="no_files_selected">No files selected</string>
+    <string name="help">Help</string>
 
 </resources>

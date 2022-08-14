@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView
+        android:id="@+id/fileList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/toolbar" />
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <Button
+                android:id="@+id/selectAll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/select_all"
+                android:layout_weight="1" />
+            <Button
+                android:id="@+id/selectNone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/select_none"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+            <Button
+                android:id="@+id/help"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/help"
+                android:layout_weight="1" />
+            <Button
+                android:id="@+id/delete"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/delete"
+                android:layout_weight="1" />
+            <Button
+                android:id="@+id/backUp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/back_up"
+                android:layout_weight="1" />
+            <Button
+                android:id="@+id/renameGame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/rename_game"
+                android:layout_weight="1"
+                android:visibility="gone" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fileMgmtBackup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="10dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:text="@string/please_wait" />
+
+        <ProgressBar
+            android:id="@+id/fileMgmtProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="?android:attr/progressBarStyleHorizontal" />
+
+        <TextView
+            android:id="@+id/fileMgmtCurrentFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minLines="2"
+            android:maxLines="2" />
+
+        <Button
+            android:id="@+id/fileMgmtCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel" />
+
+    </LinearLayout>
+
+</RelativeLayout>
