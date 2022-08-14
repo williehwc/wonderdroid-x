@@ -236,7 +236,12 @@ public class OnboardingActivity extends AppCompatActivity {
 
     private void load_choose_drive_screen() {
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("storage_path", getFilesDir().getPath());
+        File[] externalStorageVolumes = ContextCompat.getExternalCacheDirs(getApplicationContext());
+        storagePath = getFilesDir().getPath();
+        if (externalStorageVolumes.length > 0 && externalStorageVolumes[0] != null && !externalStorageVolumes[0].getPath().equals("")) {
+            storagePath = externalStorageVolumes[0].getPath();
+        }
+        editor.putString("storage_path", storagePath);
         editor.commit();
         renderNextStep();
 //        listView.setVisibility(View.VISIBLE);
