@@ -100,6 +100,6 @@
     <string name="rename_game">ゲームの名前を変更する</string>
     <string name="add_a_game">ゲームを追加する</string>
     <string name="select_none">選択解除</string>
-    <string name="help">ヘルプ</string>
+    <string name="help">❓ ヘルプ</string>
 
 </resources>

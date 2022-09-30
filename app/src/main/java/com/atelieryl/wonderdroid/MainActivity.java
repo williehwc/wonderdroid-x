@@ -120,7 +120,8 @@ public class MainActivity extends BaseActivity {
             // Check legacy save file
             for (String extension : Rom.wsRomExtensions) {
                 if (romFile.getName().endsWith(extension)) {
-                    File saveFile = new File(romFile.getAbsolutePath() + ".sav");
+                    String storagePath = prefs.getString("storage_path", "");
+                    File saveFile = new File(storagePath + "/" + romFile.getName() + ".sav");
                     if (!saveFile.exists()) {
                         File legacySaveFile = new File(dirPath + "/" + mHeader.internalname + ".mem");
                         if (legacySaveFile.exists()) {

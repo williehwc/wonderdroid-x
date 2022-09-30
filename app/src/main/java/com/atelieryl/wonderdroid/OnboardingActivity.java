@@ -1,7 +1,9 @@
 package com.atelieryl.wonderdroid;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -29,7 +31,10 @@ import android.widget.Toast;
 import com.atelieryl.wonderdroid.utils.RomFilter;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class OnboardingActivity extends AppCompatActivity {
@@ -40,6 +45,7 @@ public class OnboardingActivity extends AppCompatActivity {
     private ListView listView;
     private Button nextButton;
     private Button refreshButton;
+    private Button helpButton;
     private Button cancelButton;
     private ImageView heroImageView;
     private CheckBox noBoxArtCheckBox;
@@ -79,6 +85,7 @@ public class OnboardingActivity extends AppCompatActivity {
         listView = findViewById(R.id.onboardingListView);
         nextButton = findViewById(R.id.onboardingNextButton);
         refreshButton = findViewById(R.id.onboardingRefreshButton);
+        helpButton = findViewById(R.id.onboardingHelpButton);
         cancelButton = findViewById(R.id.onboardingCancelButton);
         heroImageView = findViewById(R.id.heroImageView);
         noBoxArtCheckBox = findViewById(R.id.noBoxArtCheckBox);
@@ -89,6 +96,9 @@ public class OnboardingActivity extends AppCompatActivity {
         // Prefs
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         storagePath = prefs.getString("storage_path", "");
+        if (!prefs.getBoolean("downloadboxart", true)) {
+            noBoxArtCheckBox.setChecked(true);
+        }
 
         // Listeners
         nextButton.setOnClickListener(new View.OnClickListener() {
@@ -101,6 +111,17 @@ public class OnboardingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 renderCurrentStep();
+            }
+        });
+        helpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String emuRomPath = prefs.getString("emu_rompath", "wonderdroid");
+                String param = URLEncoder.encode(emuRomPath);
+                try {
+                    param = URLEncoder.encode(emuRomPath, "GB2312");
+                } catch (Exception e) {}
+                openURL("http://yearbooklabs.com/sd/import.php?path=" + param);
             }
         });
         cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -119,7 +140,7 @@ public class OnboardingActivity extends AppCompatActivity {
             }
         });
 
-        // Intent extras (upgrading from WonderDroid X)
+        // Intent extras
         Intent intent = getIntent();
         changeDrive = intent.getBooleanExtra("changedrive", false);
         if (changeDrive) currentStep = Steps.PRIVACY;
@@ -131,6 +152,12 @@ public class OnboardingActivity extends AppCompatActivity {
         boolean setreversehorizontalorientation = prefs.getBoolean("setreversehorizontalorientation", false);
         String romPath = prefs.getString("emu_rompath", "\0");
         upgrade = (storagePermission || setreversehorizontalorientation || !romPath.equals("\0")) && storagePath == "";
+
+        if (intent.getBooleanExtra("upgrade_prompt", false)) {
+            currentStep = Steps.CHOOSE_DRIVE;
+            upgrade = true;
+        }
+
         renderNextStep();
     }
 
@@ -154,16 +181,19 @@ public class OnboardingActivity extends AppCompatActivity {
                 currentStep = Steps.CHOOSE_DRIVE;
                 break;
             case CHOOSE_DRIVE:
-                if (changeDrive)
+                if (changeDrive) {
+                    commitStoragePath();
                     currentStep = Steps.MIGRATE;
-                else if (upgrade)
+                } else if (upgrade) {
                     currentStep = Steps.UPGRADE_PROMPT;
-                else {
+                } else {
+                    commitStoragePath();
                     finish();
                     return;
                 }
                 break;
             case UPGRADE_PROMPT:
+                commitStoragePath();
                 Intent intent = new Intent(this, AddGameActivity.class);
                 intent.putExtra("upgrade", true);
                 startActivity(intent);
@@ -186,7 +216,7 @@ public class OnboardingActivity extends AppCompatActivity {
                     finish();
                 break;
             case UPGRADE_PROMPT:
-                currentStep = Steps.CHOOSE_DRIVE;
+                currentStep = Steps.PRIVACY;
                 break;
             case MIGRATE:
                 backupTask.cancel(true);
@@ -220,6 +250,7 @@ public class OnboardingActivity extends AppCompatActivity {
         listView.setVisibility(View.GONE);
         nextButton.setVisibility(View.VISIBLE);
         refreshButton.setVisibility(View.GONE);
+        helpButton.setVisibility(View.GONE);
         textView.setText(R.string.upgrade_welcome);
         heroImageView.setImageDrawable(getResources().getDrawable(R.drawable.onboarding_upgrade));
         noBoxArtCheckBox.setVisibility(View.GONE);
@@ -229,24 +260,23 @@ public class OnboardingActivity extends AppCompatActivity {
         listView.setVisibility(View.GONE);
         nextButton.setVisibility(View.VISIBLE);
         refreshButton.setVisibility(View.GONE);
+        helpButton.setVisibility(View.GONE);
         textView.setText(R.string.privacy);
         heroImageView.setImageDrawable(getResources().getDrawable(R.drawable.onboarding_privacy));
         noBoxArtCheckBox.setVisibility(View.VISIBLE);
     }
 
     private void load_choose_drive_screen() {
-        SharedPreferences.Editor editor = prefs.edit();
         File[] externalStorageVolumes = ContextCompat.getExternalCacheDirs(getApplicationContext());
         storagePath = getFilesDir().getPath();
         if (externalStorageVolumes.length > 0 && externalStorageVolumes[0] != null && !externalStorageVolumes[0].getPath().equals("")) {
             storagePath = externalStorageVolumes[0].getPath();
         }
-        editor.putString("storage_path", storagePath);
-        editor.commit();
         renderNextStep();
 //        listView.setVisibility(View.VISIBLE);
 //        nextButton.setVisibility(View.GONE);
 //        refreshButton.setVisibility(View.VISIBLE);
+//        helpButton.setVisibility(View.GONE);
 //        textView.setText(R.string.select_drive_prompt);
 //        heroImageView.setImageDrawable(getResources().getDrawable(R.drawable.onboarding_drive));
 //        noBoxArtCheckBox.setVisibility(View.GONE);
@@ -306,7 +336,8 @@ public class OnboardingActivity extends AppCompatActivity {
         listView.setVisibility(View.GONE);
         nextButton.setVisibility(View.VISIBLE);
         refreshButton.setVisibility(View.GONE);
-        textView.setText(getString(R.string.upgrade_prompt_1) + "\n\n" + getString(R.string.upgrade_prompt_2));
+        helpButton.setVisibility(View.VISIBLE);
+        textView.setText(getString(R.string.upgrade_prompt_1).replace("???", prefs.getString("emu_rompath", "wonderdroid")));
         heroImageView.setImageDrawable(getResources().getDrawable(R.drawable.onboarding_prompt));
         noBoxArtCheckBox.setVisibility(View.GONE);
     }
@@ -315,6 +346,7 @@ public class OnboardingActivity extends AppCompatActivity {
         listView.setVisibility(View.GONE);
         nextButton.setVisibility(View.GONE);
         refreshButton.setVisibility(View.GONE);
+        helpButton.setVisibility(View.GONE);
         textView.setVisibility(View.GONE);
         migrateView.setVisibility(View.VISIBLE);
 
@@ -330,6 +362,31 @@ public class OnboardingActivity extends AppCompatActivity {
             cancelButton.setVisibility(View.VISIBLE);
         } else {
             finish();
+        }
+    }
+
+    private void commitStoragePath() {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("storage_path", storagePath);
+        editor.commit();
+    }
+
+    private void openURL(String url) {
+        try {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(browserIntent);
+        } catch (Exception e) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(url);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.cannotopenurl)
+                    .setMessage(R.string.cannotopenurldescription)
+                    .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                        }
+                    })
+                    .show();
         }
     }
 

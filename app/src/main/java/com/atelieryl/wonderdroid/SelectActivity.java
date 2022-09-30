@@ -2,19 +2,25 @@
 package com.atelieryl.wonderdroid;
 
 import java.io.File;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.atelieryl.wonderdroid.utils.RomAdapter;
+import com.atelieryl.wonderdroid.utils.RomFilter;
 import com.downloader.Error;
 import com.downloader.OnDownloadListener;
 
@@ -65,6 +71,8 @@ public class SelectActivity extends BaseActivity {
     private FloatingActionButton floatingActionButton;
 
     private SharedPreferences prefs;
+
+    private boolean onboarding;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -120,7 +128,8 @@ public class SelectActivity extends BaseActivity {
 
         // Onboarding
         String storageVolume = prefs.getString("storage_path", null);
-        if (storageVolume == null) {
+        onboarding = (storageVolume == null);
+        if (onboarding) {
             Intent intent = new Intent(this, OnboardingActivity.class);
             startActivity(intent);
             return;
@@ -239,17 +248,32 @@ public class SelectActivity extends BaseActivity {
             File testFile = new File(storagePath + "/" + "test.txt");
             testFile.createNewFile();
             testFile.delete();
+            File[] sourceFiles = new File(storagePath).listFiles(new RomFilter(false, false, false));
+            if (sourceFiles.length == 0) throw new Exception();
         } catch (Exception e) {
-            AlertDialog.Builder builder;
-            builder = new AlertDialog.Builder(this);
-            builder.setMessage(getString(R.string.storage_error) + "\n" + e.getMessage());
-            builder.setPositiveButton(R.string.gotopreferences, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    Intent intent = new Intent(SelectActivity.this, AddGameActivity.class);
-                    startActivity(intent);
+//            AlertDialog.Builder builder;
+//            builder = new AlertDialog.Builder(this);
+//            builder.setMessage(getString(R.string.storage_error) + "\n" + e.getMessage());
+//            builder.setPositiveButton(R.string.gotopreferences, new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int which) {
+//                    Intent intent = new Intent(SelectActivity.this, AddGameActivity.class);
+//                    startActivity(intent);
+//                }
+//            });
+//            return;
+
+            // Reset the storage path
+            if (!onboarding) {
+                File[] externalStorageVolumes = ContextCompat.getExternalCacheDirs(getApplicationContext());
+                storagePath = getFilesDir().getPath();
+                if (externalStorageVolumes.length > 0 && externalStorageVolumes[0] != null && !externalStorageVolumes[0].getPath().equals("")) {
+                    storagePath = externalStorageVolumes[0].getPath();
                 }
-            });
-            return;
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString("storage_path", storagePath);
+                editor.commit();
+                Log.e("WonderDroid", "Storage path was reset");
+            }
         }
 
         OnDownloadListener onDownloadListener = new OnDownloadListener() {
@@ -313,16 +337,44 @@ public class SelectActivity extends BaseActivity {
                 builder.setTitle(R.string.important)
                     .setMessage(R.string.uninstall_warning)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {}
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putBoolean("uninstallwarning", true);
+                            editor.commit();
+                        }
                     })
                     .show();
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean("uninstallwarning", true);
-                editor.commit();
             }
 
         } else {
-            ((TextView)this.findViewById(R.id.select_noroms)).setText(R.string.noroms);
+            // Check if user is upgrading from WonderDroid X.
+            // Either storage permission is enabled or "setreversehorizontalorientation" is set, while storagePath is null
+            boolean storagePermission = PackageManager.PERMISSION_GRANTED == ContextCompat
+                    .checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            boolean setreversehorizontalorientation = prefs.getBoolean("setreversehorizontalorientation", false);
+            String romPath = prefs.getString("emu_rompath", "\0");
+            boolean upgrade = (storagePermission || setreversehorizontalorientation || !romPath.equals("\0"));
+
+            String emptyState = getResources().getString(R.string.noroms);
+
+            if (upgrade) {
+                String emuRomPath = prefs.getString("emu_rompath", "wonderdroid");
+                emptyState += "\n\n" + getResources().getString(R.string.noroms_upgrade).replace("???", emuRomPath);
+                View helpButton = findViewById(R.id.helpButton);
+                helpButton.setVisibility(View.VISIBLE);
+                helpButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String param = URLEncoder.encode(emuRomPath);
+                        try {
+                            param = URLEncoder.encode(emuRomPath, "GB2312");
+                        } catch (Exception e) {}
+                        openURL("http://yearbooklabs.com/sd/import.php?path=" + param);
+                    }
+                });
+            }
+
+            ((TextView)this.findViewById(R.id.select_noroms_text)).setText(emptyState);
         }
 
     }

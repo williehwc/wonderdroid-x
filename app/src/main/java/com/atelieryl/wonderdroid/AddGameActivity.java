@@ -62,7 +62,7 @@ public class AddGameActivity extends AppCompatActivity {
     private Button addGameCloseButton;
     private CheckBox includeSubfoldersCheckBox;
     private TextView scanFolderNoteRescan;
-    private Switch overwriteSwitch;
+//    private Switch overwriteSwitch;
     private Switch copyModeSwitch;
     private ListView listView;
 
@@ -110,7 +110,7 @@ public class AddGameActivity extends AppCompatActivity {
         addGameCloseButton = findViewById(R.id.addGameCloseButton);
         includeSubfoldersCheckBox = findViewById(R.id.includeSubfoldersCheckBox);
         scanFolderNoteRescan = findViewById(R.id.scanFolderNoteRescan);
-        overwriteSwitch = findViewById(R.id.overwriteSwitch);
+//        overwriteSwitch = findViewById(R.id.overwriteSwitch);
         copyModeSwitch = findViewById(R.id.copyModeSwitch);
         listView = findViewById(R.id.addGameListView);
 
@@ -129,7 +129,7 @@ public class AddGameActivity extends AppCompatActivity {
 
         // Set views
         includeSubfoldersCheckBox.setChecked(includeSubfolders);
-        overwriteSwitch.setChecked(overwrite);
+//        overwriteSwitch.setChecked(overwrite);
         copyModeSwitch.setChecked(copyMode);
         if (lastFolderPath != null) {
             scanFolderNoteRescan.setText(getString(R.string.scan_folder_note_rescan) + " " + lastFolderPath);
@@ -166,15 +166,15 @@ public class AddGameActivity extends AppCompatActivity {
                 editor.commit();
             }
         });
-        overwriteSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                overwrite = isChecked;
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean("overwrite", overwrite);
-                editor.commit();
-            }
-        });
+//        overwriteSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                overwrite = isChecked;
+//                SharedPreferences.Editor editor = prefs.edit();
+//                editor.putBoolean("overwrite", overwrite);
+//                editor.commit();
+//            }
+//        });
         copyModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -205,16 +205,17 @@ public class AddGameActivity extends AppCompatActivity {
         upgrade = intent.getBooleanExtra("upgrade", false);
         openvgdbOnly = intent.getBooleanExtra("openvgdb", false);
         if (upgrade) {
-            String romPath = null;
-            File romdirx = ((WonderDroid)getApplication()).getRomDir();
-            if (romdirx != null) {
-                String sdpath = romdirx.getAbsolutePath();
-                romPath = prefs.getString("emu_rompath", "wonderdroid");
-                if (!romPath.startsWith("/")) {
-                    romPath = sdpath + "/" + romPath;
-                }
-            }
-            selectFolder(romPath);
+//            String romPath = null;
+//            File romdirx = ((WonderDroid)getApplication()).getRomDir();
+//            if (romdirx != null) {
+//                String sdpath = romdirx.getAbsolutePath();
+//                romPath = prefs.getString("emu_rompath", "wonderdroid");
+//                if (!romPath.startsWith("/")) {
+//                    romPath = sdpath + "/" + romPath;
+//                }
+//            }
+//            selectFolder(romPath);
+            selectFolder(null);
         } else if (openvgdbOnly) {
             startFileOpTask();
         }
@@ -291,8 +292,11 @@ public class AddGameActivity extends AppCompatActivity {
 
     public void selectFolder(String romPath) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        if (romPath != null)
-            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, romPath);
+        //if (romPath != null) {
+        //    Uri romPathUri = Uri.fromFile(new File(romPath));
+        //    Uri documentUri = DocumentsContract.buildDocumentUriUsingTree(romPathUri, DocumentsContract.getTreeDocumentId(romPathUri));
+        //    intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, documentUri);
+        //}
         startActivityForResult(intent, 1);
     }
 
@@ -323,6 +327,11 @@ public class AddGameActivity extends AppCompatActivity {
                 scanFolder = (requestCode == 1);
                 fileOrFolderSelected();
             }
+        } else if (upgrade) {
+            Intent intent = new Intent(this, OnboardingActivity.class);
+            intent.putExtra("upgrade_prompt", true);
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -623,7 +632,11 @@ public class AddGameActivity extends AppCompatActivity {
                 return 'n';
             }
         } else {
-            return fileExists(filename.substring(0, filename.length() - 4), null);
+            // Mednafen state?
+            for (String extension : RomAdapter.Rom.stateExtensions) {
+                if (filename.endsWith(extension) && fileExists(filename.substring(0, filename.length() - 4), null) == 'v')
+                    return 'n';
+            }
         }
         return 'v';
     }

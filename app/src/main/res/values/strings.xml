@@ -99,8 +99,7 @@
     <string name="buttoncolor">Button color</string>
     <string name="showbuttonlabels">Show button labels</string>
     <string name="upgrade_welcome">WonderDroid X is now WonderDroid Ultra! In addition to WonderSwan games, you will be able to play Game Gear, Turbografx 16 / PC Engine (cartridges only), and Neo Geo Pocket games.</string>
-    <string name="upgrade_prompt_1">Now, let\'s add your WonderSwan games from WonderDroid X to WonderDroid Ultra. On the next screen, please confirm your WonderDroid X ROMs folder. You won\'t need it anymore afterwards, because WonderDroid Ultra uses an internal folder to store games and save files.</string>
-    <string name="upgrade_prompt_2">Note: Game states from WonderDroid X are not compatible with WonderDroid Ultra and will not be transferred. If you have important game states, please contact us at http://yearbooklabs.com/support/ for assistance.</string>
+    <string name="upgrade_prompt_1">Now, let\'s add your WonderSwan games from WonderDroid X to WonderDroid Ultra. On the next screen, please navigate to and select your WonderDroid X ROMs folder (???). You won\'t need it anymore afterwards, because WonderDroid Ultra uses an internal folder to store games and save files.</string>
     <string name="select_drive_prompt">Please select a drive to store your games and save files. Make sure it has enough space.</string>
     <string name="next">Next</string>
     <string name="refresh">Refresh</string>
@@ -128,7 +127,7 @@
     <string name="pending">Pending</string>
     <string name="canceled">Canceled</string>
     <string name="file_error">File error, press for details</string>
-    <string name="file_exists">File already exists but overwrite is OFF</string>
+    <string name="file_exists">File or game already exists</string>
     <string name="file_exists_description">Files with identical names are not overwritten by default. If you want to overwrite the existing file, please turn on the switch labeled "Overwrite files with identical names" at the bottom of the Add Games screen.</string>
     <string name="game_select_view">Game selection view</string>
     <string name="gallery_view">Gallery view</string>
@@ -174,6 +173,7 @@
     <string name="not_backed_up">file(s) not backed up.</string>
     <string name="not_moved">file(s) not moved.</string>
     <string name="no_files_selected">No files selected</string>
-    <string name="help">Help</string>
+    <string name="help">❓ Help</string>
+    <string name="noroms_upgrade">If you are looking to transfer your games from WonderDroid X, press +, then \"Select Folder…\", then navigate to and select your WonderDroid X ROMs folder (???).</string>
 
 </resources>

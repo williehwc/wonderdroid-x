@@ -118,7 +118,7 @@
     <LinearLayout
         android:id="@+id/addGamePrefs"
         android:layout_width="match_parent"
-        android:layout_height="96dp"
+        android:layout_height="48dp"
         android:layout_alignParentBottom="true"
         android:background="#ff444444"
         android:orientation="vertical"
@@ -127,24 +127,24 @@
         android:paddingRight="10dp"
         android:paddingBottom="10dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:orientation="horizontal">
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:paddingBottom="10dp"-->
+<!--            android:orientation="horizontal">-->
 
-            <Switch
-                android:id="@+id/overwriteSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp" />
+<!--            <Switch-->
+<!--                android:id="@+id/overwriteSwitch"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginEnd="10dp" />-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/overwrite" />
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/overwrite" />-->
 
-        </LinearLayout>
+<!--        </LinearLayout>-->
 
         <LinearLayout
             android:layout_width="match_parent"
