@@ -74,7 +74,7 @@
     <string name="needpermissions">あなたの端末設定からWonderDroid Xのファイルアクセス許可を有効にして下さい。</string>
     <string name="askpermissions">ROMの読み込みにはファイルアクセス許可が必要です。</string>
     <string name="mempatherror">セーブフォルダーエラー</string>
-    <string name="statewarning">[1] ステートセーブ及びロードは実験的な機能です。??? に保存された通常のセーブデータのバックアップを推奨します。\n[2] ステートをロードする場合、対応するカートリッジのセーブデータが現在のカートリッジのセーブデータと異なる場合は、後者が置き換えられます。\n[3] ステートをロードすると、ゲームがフリーズまたはクラッシュすることがあります。このような場合は、再度ステートをロードしてみて下さい。</string>
+    <string name="statewarning">ステートをロードする場合、対応するカートリッジのセーブデータが現在のカートリッジのセーブデータと異なる場合は、後者が置き換えられます。</string>
     <string name="rompatherrordescription">フォルダー ??? は利用不可です。設定のゲームフォルダから別の場所を指定して下さい。</string>
     <string name="mempatherrordescription">フォルダー ??? は利用不可/読み取り専用です。設定のゲームフォルダから別の場所を指定して下さい。</string>
     <string name="vibratedowndescription"></string>
