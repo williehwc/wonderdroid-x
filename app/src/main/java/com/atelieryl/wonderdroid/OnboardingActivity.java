@@ -121,7 +121,7 @@ public class OnboardingActivity extends AppCompatActivity {
                 try {
                     param = URLEncoder.encode(emuRomPath, "GB2312");
                 } catch (Exception e) {}
-                openURL("http://yearbooklabs.com/sd/import.php?path=" + param);
+                openURL("http://yearbooklabs.com/sd/import.php?activity=onboarding&path=" + param);
             }
         });
         cancelButton.setOnClickListener(new View.OnClickListener() {

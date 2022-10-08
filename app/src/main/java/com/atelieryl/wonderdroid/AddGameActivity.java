@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.ParcelFileDescriptor;
+import android.os.storage.StorageManager;
 import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.support.annotation.NonNull;
@@ -205,17 +206,12 @@ public class AddGameActivity extends AppCompatActivity {
         upgrade = intent.getBooleanExtra("upgrade", false);
         openvgdbOnly = intent.getBooleanExtra("openvgdb", false);
         if (upgrade) {
-//            String romPath = null;
-//            File romdirx = ((WonderDroid)getApplication()).getRomDir();
-//            if (romdirx != null) {
-//                String sdpath = romdirx.getAbsolutePath();
-//                romPath = prefs.getString("emu_rompath", "wonderdroid");
-//                if (!romPath.startsWith("/")) {
-//                    romPath = sdpath + "/" + romPath;
-//                }
-//            }
-//            selectFolder(romPath);
-            selectFolder(null);
+            String romPathInternal = null;
+            String romPath = prefs.getString("emu_rompath", "wonderdroid");
+            if (!romPath.startsWith("/")) {
+                romPathInternal = romPath;
+            }
+            selectFolder(romPathInternal);
         } else if (openvgdbOnly) {
             startFileOpTask();
         }
@@ -292,12 +288,27 @@ public class AddGameActivity extends AppCompatActivity {
 
     public void selectFolder(String romPath) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        //if (romPath != null) {
-        //    Uri romPathUri = Uri.fromFile(new File(romPath));
-        //    Uri documentUri = DocumentsContract.buildDocumentUriUsingTree(romPathUri, DocumentsContract.getTreeDocumentId(romPathUri));
-        //    intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, documentUri);
-        //}
-        startActivityForResult(intent, 1);
+        if (romPath != null) {
+            try {
+                String scheme = "content://com.android.externalstorage.documents/document/primary";
+                romPath = romPath.replace("/", "%2F");
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    StorageManager sm = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+                    intent = sm.getPrimaryStorageVolume().createOpenDocumentTreeIntent();
+                    Uri uri = intent.getParcelableExtra(DocumentsContract.EXTRA_INITIAL_URI);
+                    scheme = uri.toString();
+                    scheme = scheme.replace("/root/", "/document/");
+                }
+                scheme += "%3A" + romPath;
+                uri = Uri.parse(scheme);
+                intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
+                startActivityForResult(intent, 1);
+            } catch (Exception e) {
+                startActivityForResult(intent, 1);
+            }
+        } else {
+            startActivityForResult(intent, 1);
+        }
     }
 
     private void fileOrFolderSelected() {

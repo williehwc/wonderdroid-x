@@ -291,11 +291,11 @@ public class EmuView extends SurfaceView implements SurfaceHolder.Callback {
 		}
 
 		// Fix for gesture conflicts: https://stackoverflow.com/questions/65056838
-		if (Build.VERSION.SDK_INT >= 29) {
-			List<Rect> exclusionRects = new ArrayList<>();
-			exclusionRects.add(new Rect(0, 0, 200, 2048));
-			this.setSystemGestureExclusionRects(exclusionRects);
-		}
+//		if (Build.VERSION.SDK_INT >= 29) {
+//			List<Rect> exclusionRects = new ArrayList<>();
+//			exclusionRects.add(new Rect(0, 0, 200, 2048));
+//			this.setSystemGestureExclusionRects(exclusionRects);
+//		}
 
 		double multiplier = 1;
 		if (mPortrait) multiplier = 0.5;

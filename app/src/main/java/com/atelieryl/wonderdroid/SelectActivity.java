@@ -369,7 +369,7 @@ public class SelectActivity extends BaseActivity {
                         try {
                             param = URLEncoder.encode(emuRomPath, "GB2312");
                         } catch (Exception e) {}
-                        openURL("http://yearbooklabs.com/sd/import.php?path=" + param);
+                        openURL("http://yearbooklabs.com/sd/import.php?activity=select&path=" + param);
                     }
                 });
             }
