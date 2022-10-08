@@ -7,37 +7,7 @@
 	<item android:id="@+id/main_exitmi" android:title="@string/selectgame"/>
 	<item android:id="@+id/main_prefsmi" android:title="@string/preferences"/>
 	<item android:id="@+id/main_togcntrlmi" android:title="@string/togglescreencontrols"/>
-	<item android:id="@+id/main_savestate" android:title="@string/savestate">
-		<menu>
-			<item android:id="@+id/save_1"
-				android:title="" />
-			<item android:id="@+id/save_2"
-				android:title="" />
-			<item android:id="@+id/save_3"
-				android:title="" />
-			<item android:id="@+id/save_4"
-				android:title="" />
-			<item android:id="@+id/save_5"
-				android:title="" />
-		</menu>
-	</item>
-	<item android:id="@+id/main_loadstate" android:title="@string/loadstate">
-		<menu>
-			<item android:id="@+id/load_a1"
-				android:title="" />
-			<item android:id="@+id/load_0"
-				android:title="" />
-			<item android:id="@+id/load_1"
-				android:title="" />
-			<item android:id="@+id/load_2"
-				android:title="" />
-			<item android:id="@+id/load_3"
-				android:title="" />
-			<item android:id="@+id/load_4"
-				android:title="" />
-			<item android:id="@+id/load_5"
-				android:title="" />
-		</menu>
-	</item>
+	<item android:id="@+id/main_savestate" android:title="@string/savestate" />
+	<item android:id="@+id/main_loadstate" android:title="@string/loadstate" />
 </group>
 </menu>

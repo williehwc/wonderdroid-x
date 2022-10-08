@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -230,10 +231,10 @@ public class MainActivity extends BaseActivity {
                 return true;
 
             case R.id.main_savestate:
-                updateStateMenuTitles();
+                showStateDialog(false);
                 return true;
             case R.id.main_loadstate:
-                updateStateMenuTitles();
+                showStateDialog(true);
                 if (showStateWarning) {
                     AlertDialog.Builder builder;
                     builder = new AlertDialog.Builder(this);
@@ -250,43 +251,6 @@ public class MainActivity extends BaseActivity {
                             .show();
                 }
                 return true;
-            case R.id.load_a1:
-                loadState(-1);
-                return true;
-            case R.id.load_0:
-                loadState(0);
-                return true;
-            case R.id.load_1:
-                loadState(1);
-                return true;
-            case R.id.load_2:
-                loadState(2);
-                return true;
-            case R.id.load_3:
-                loadState(3);
-                return true;
-            case R.id.load_4:
-                loadState(4);
-                return true;
-            case R.id.load_5:
-                loadState(5);
-                return true;
-            case R.id.save_1:
-                saveState(1);
-                return true;
-            case R.id.save_2:
-                saveState(2);
-                return true;
-            case R.id.save_3:
-                saveState(3);
-                return true;
-            case R.id.save_4:
-                saveState(4);
-                return true;
-            case R.id.save_5:
-                saveState(5);
-                return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -300,9 +264,11 @@ public class MainActivity extends BaseActivity {
         return true;
     }
 
-    public void updateStateMenuTitles() {
+    public void showStateDialog(boolean loadState) {
         boolean fileAccessible;
         boolean wscLegacyState = false;
+        ArrayList<String> displayText = new ArrayList<>();
+        ArrayList<Integer> stateNos = new ArrayList<Integer>();
         for (int i = -1; i <= 5; i++) {
             String statePath;
             if (wscLegacyState) {
@@ -318,29 +284,41 @@ public class MainActivity extends BaseActivity {
             }
             menuTitle += ": ";
             File stateFile = new File(statePath);
-            int loadStateMenuItemId = getResources().getIdentifier("load_" + Integer.toString(i).replace("-", "a"), "id", packageName);
-            MenuItem loadStateMenuItem = menu.findItem(loadStateMenuItemId);
             fileAccessible = checkFileAccess(stateFile, false, true);
             if (fileAccessible) {
                 menuTitle += formatDate(stateFile.lastModified());
-                loadStateMenuItem.setEnabled(true);
             } else {
                 menuTitle += getResources().getString(R.string.empty);
-                loadStateMenuItem.setEnabled(false);
-            }
-            loadStateMenuItem.setTitle(menuTitle);
-            if (i > 0) {
-                int saveStateMenuItemId = getResources().getIdentifier("save_" + Integer.toString(i), "id", packageName);
-                MenuItem saveStateMenuItem = menu.findItem(saveStateMenuItemId);
-                saveStateMenuItem.setTitle(menuTitle);
             }
             if (wscLegacyState) {
                 wscLegacyState = false;
             } else if (isWSC && !fileAccessible) {
                 wscLegacyState = true;
                 i--;
+                continue;
+            }
+            if (loadState) {
+                displayText.add(menuTitle);
+                stateNos.add(fileAccessible ? i : null);
+            } else if (i > 0) {
+                displayText.add(menuTitle);
+                stateNos.add(i);
             }
         }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if (loadState)
+            builder.setTitle(R.string.loadstate);
+        else
+            builder.setTitle(R.string.savestate);
+        builder.setItems(displayText.toArray(new CharSequence[displayText.size()]), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                if (loadState) {
+                    if (stateNos.get(which) != null) loadState(stateNos.get(which));
+                } else {
+                    saveState(stateNos.get(which));
+                }
+            }
+        }).create().show();
     }
 
     @Override
