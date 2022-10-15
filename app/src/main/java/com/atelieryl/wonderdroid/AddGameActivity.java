@@ -1,5 +1,7 @@
 package com.atelieryl.wonderdroid;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -194,7 +196,10 @@ public class AddGameActivity extends AppCompatActivity {
         addGameCloseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                Intent intent = new Intent(mContext, SelectActivity.class);
+                intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(intent);
+                Runtime.getRuntime().exit(0);
             }
         });
 
@@ -304,6 +309,7 @@ public class AddGameActivity extends AppCompatActivity {
                 intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
                 startActivityForResult(intent, 1);
             } catch (Exception e) {
+                intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
                 startActivityForResult(intent, 1);
             }
         } else {
@@ -515,7 +521,10 @@ public class AddGameActivity extends AppCompatActivity {
                         Toast.makeText(mContext, R.string.upgrade_save_warning, Toast.LENGTH_LONG).show();
                     }
                 }
-                finish();
+                Intent intent = new Intent(mContext, SelectActivity.class);
+                intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(intent);
+                Runtime.getRuntime().exit(0);
             }
         }
         @Override
