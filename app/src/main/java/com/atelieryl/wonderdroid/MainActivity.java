@@ -269,7 +269,7 @@ public class MainActivity extends BaseActivity {
         boolean wscLegacyState = false;
         ArrayList<String> displayText = new ArrayList<>();
         ArrayList<Integer> stateNos = new ArrayList<Integer>();
-        for (int i = -1; i <= 5; i++) {
+        for (int i = -1; i <= 8; i++) {
             String statePath;
             if (wscLegacyState) {
                 statePath = dirPath + "/" + mHeader.internalname + "_" + Integer.toString(i).replace("-", "a") + "_0.sav";

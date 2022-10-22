@@ -138,7 +138,7 @@
     <string name="reportdescription">如果游戏性能及速度不佳，可尝试调整跳帧或锐利度，如果无效请留问题于 GitHub，谢谢。</string>
     <string name="upgrade_prompt_1">来转入您的WonderSwan游戏。在下个画面，请选择您的WonderDroid X游戏资料夹 (???)。应为WonderDroid Ultra有自己的内存资料夹，WonderDroid X游戏资料夹以后就不需要了。</string>
     <string name="select_drive_prompt">您想用哪一个储存装置？请确认有足够的空间。</string>
-    <string name="add_a_game_note">档案扩展名：.ws. .wsc, .gg, .pce, .ngp, .ngc 与有之前指定扩展名档案的 .zip。您也可以转入已转入游戏的存档 (.sav 与 .mem)，记忆状态 (.sav 与 .mc[0-5,9])，与封面 (.jpg 与 .png)。</string>
+    <string name="add_a_game_note">档案扩展名：.ws. .wsc, .gg, .pce, .ngp, .ngc 与有之前指定扩展名档案的 .zip。您也可以转入已转入游戏的存档 (.sav 与 .mem)，记忆状态 (.sav 与 .mc[0-9])，与封面 (.jpg 与 .png)。</string>
     <string name="scan_folder_note">安卓有限制可以扫描的资料夹，不是每一个都能扫描。</string>
     <string name="scan_folder_note_rescan">您也可以重新扫描上一次选择的资料夹：</string>
     <string name="privacy">我们不收集使用数据，但是如果要下载游戏封面，游戏名字会传送给第三方服务。如果不要下载封面，请打勾。</string>

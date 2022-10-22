@@ -57,7 +57,7 @@ public class RomAdapter extends BaseAdapter {
         };
 
         public static String[] stateExtensions = new String[] {
-                "mc0", "mc1", "mc2", "mc3", "mc4", "mc5", "mc9"
+                "mc0", "mc1", "mc2", "mc3", "mc4", "mc5", "mc6", "mc7", "mc8", "mc9"
         };
 
         public enum Type {

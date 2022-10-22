@@ -106,7 +106,7 @@
     <string name="free_total">free, total</string>
     <string name="in_use">selected</string>
     <string name="add_a_game">Add a game</string>
-    <string name="add_a_game_note">Supported file extensions: .ws. .wsc, .gg, .pce, .ngp, .ngc, and .zip containing files with any of the preceding extensions. You can also add save files (.sav and .mem), states (.sav and .mc[0-5,9]), and box art (.jpg and .png) for games already added.</string>
+    <string name="add_a_game_note">Supported file extensions: .ws. .wsc, .gg, .pce, .ngp, .ngc, and .zip containing files with any of the preceding extensions. You can also add save files (.sav and .mem), states (.sav and .mc[0-9]), and box art (.jpg and .png) for games already added.</string>
     <string name="select_file">Select file…</string>
     <string name="scan_folder">Add all games in a folder</string>
     <string name="scan_folder_note">Due to restrictions set by Android, not all folders can be scanned.</string>

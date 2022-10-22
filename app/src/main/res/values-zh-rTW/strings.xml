@@ -144,7 +144,7 @@
     <string name="uninstall_warning">卸載本APP會刪除所有遊戲檔案，包括存檔。如果您要卸載，請先用設定裡的檔案備份工具。</string>
     <string name="no_matching_ext">沒有一個檔案有匹配的擴展名</string>
     <string name="upgrade_prompt_1">來轉入您的WonderSwan遊戲。在下個畫面，請選擇您的WonderDroid X遊戲資料夾 (???)。應為WonderDroid Ultra有自己的內存資料夾，WonderDroid X遊戲資料夾以後就不需要了。</string>
-    <string name="add_a_game_note">檔案擴展名：.ws. .wsc, .gg, .pce, .ngp, .ngc 與有之前指定擴展名檔案的 .zip。您也可以轉入已轉入遊戲的存檔 (.sav 與 .mem)，記憶狀態 (.sav 與 .mc[0-5,9])，與封面 (.jpg 與 .png)。</string>
+    <string name="add_a_game_note">檔案擴展名：.ws. .wsc, .gg, .pce, .ngp, .ngc 與有之前指定擴展名檔案的 .zip。您也可以轉入已轉入遊戲的存檔 (.sav 與 .mem)，記憶狀態 (.sav 與 .mc[0-9])，與封面 (.jpg 與 .png)。</string>
     <string name="scan_folder_note">安卓有限制可以掃描的資料夾，不是每一個都能掃描。</string>
     <string name="unrecognized_extension">無法識別檔案擴展名</string>
     <string name="cannot_delete">無法只刪除遊戲，也需要刪除相關檔案。您可以先備份，以後在轉入。</string>

@@ -123,10 +123,12 @@ public class AddGameActivity extends AppCompatActivity {
         overwrite = prefs.getBoolean("overwrite", false);
         copyMode = prefs.getBoolean("copy_mode", false);
         lastFolderUri = prefs.getString("last_folder_uri", null);
-        if (lastFolderUri != null) {
-            uri = Uri.parse(lastFolderUri);
-            lastFolderPath = uri.getPath().split(":")[1];
-        }
+        try {
+            if (lastFolderUri != null) {
+                uri = Uri.parse(lastFolderUri);
+                lastFolderPath = uri.getPath().split(":")[1];
+            }
+        } catch (Exception e) {}
         noBoxArt = !prefs.getBoolean("downloadboxart", true);
         storagePath = prefs.getString("storage_path", "");
 
