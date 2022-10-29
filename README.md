@@ -11,18 +11,4 @@ WonderDroid Ultra (formerly WonderDroid X) is an emulator of the Bandai Wondersw
 
 ## Fork naming policy
 
-Forks or other derivatives of this project may not be called "WonderDroid Ultra", or such confusingly similar name as "WonderDroid Ultimate", or a translation in another language (e.g., "ワンダドロイドウルトラ"). If you publish your app to an app store/repository with a name that violates this policy, we will file a report to the owner of the store/repository against your app.
-
-## How to use
-
-  1. Open WonderDroid at least once so that it can create the directories for ROMs, etc.
-  1. Copy your game ROMs in either zip archives or plain .wsc or .ws files into the `wonderdroid` directory* that has been automatically created. Zips with multiple files should work but it's not been tested.
-  1. Open WonderDroid again, it should now have a gallery of the roms you put into it's directoy. Wonderdroid uses the metadata in the rom to select a screenshot. If a game has a question mark it will probably still work. It just hasn't been screenshot'ed yet
-
-(*) On older phones with minimal internal storage, this directory may be located on your SD card.
-
-## 使い方
-
-  1. インストールしたあと、一回ワンダードロイドを開けてください。そうすれば自動にsdカードに必要なフォルダが作られます。
-  1. 内部ディスク/SDカードにあるwonderdroidというフォルダにロムファイルをコピーしてください。.zipと.wscと.wsが使えます。
-  1. ワンダードロイドのフォルダにロムファイルをコピーしたあと、またワンダードロイドを開けたら、フォルダに入ってるゲームがメニューに出ます。好きなゲームを選んでクリックすれば遊べます。
+Forks or other derivatives of this project may not be called "WonderDroid Ultra", or such confusingly similar name as "WonderDroid Ultimate", or a translation in another language (e.g., "ワンダドロイドウルトラ"). If you publish your app to an app store/catalogue with a name that violates this policy, we will file a report to the owner of the store/catalogue against your app.

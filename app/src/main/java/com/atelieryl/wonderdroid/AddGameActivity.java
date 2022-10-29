@@ -551,6 +551,7 @@ public class AddGameActivity extends AppCompatActivity {
 
     public boolean precheckDocumentFile(@NonNull DocumentFile documentFile) {
         String filename = documentFile.getName();
+        if (filename == null) return false;
         if (filename.endsWith(".zip")) {
             // https://stackoverflow.com/questions/23869228
             try {
@@ -577,10 +578,7 @@ public class AddGameActivity extends AppCompatActivity {
         for (String extension : RomAdapter.Rom.boxArtExtensions) {
             if (filename.endsWith(extension)) return true;
         }
-        if (filename.endsWith(".sav") || filename.endsWith(".mem")) {
-            return true;
-        }
-        return false;
+        return filename.endsWith(".sav") || filename.endsWith(".mem");
     }
 
     public char fileExists(String filename, String currentZipName) {
