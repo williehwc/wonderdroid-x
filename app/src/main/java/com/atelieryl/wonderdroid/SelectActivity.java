@@ -403,10 +403,12 @@ public class SelectActivity extends BaseActivity {
             gallery.setOnItemClickListener(itemClickListener);
             gallery.setOnItemLongClickListener(itemLongClickListener);
             gallery.setOnItemSelectedListener(itemSelectedListener);
-            try {
-                gallery.setSelection(galleryPosition);
-            } catch (Exception e) {
+            if (galleryPosition < mRAdapter.getCount()) {
+                try {
+                    gallery.setSelection(galleryPosition);
+                } catch (Exception e) {
 
+                }
             }
         }
     }
