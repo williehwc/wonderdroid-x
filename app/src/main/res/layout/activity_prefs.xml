@@ -61,6 +61,13 @@
             android:title="@string/downloadboxart"
             android:summary="@string/downloadboxartdescription" />
 
+        <ListPreference
+            android:entries="@array/sort"
+            android:entryValues="@array/sortvalues"
+            android:defaultValue="alpha"
+            android:key="sort"
+            android:title="@string/game_select_sort" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/settings_cat_controls" >

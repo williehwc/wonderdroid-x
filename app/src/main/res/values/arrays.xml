@@ -117,5 +117,17 @@
         <item>japanese</item>
         <item>english</item>
     </string-array>
+    <string-array name="sort">
+        <item>Name (A-Z)</item>
+        <item>Name (Z-A)</item>
+        <item>Date added (newest first)</item>
+        <item>Date added (oldest first)</item>
+    </string-array>
+    <string-array name="sortvalues">
+        <item>alpha</item>
+        <item>alpharev</item>
+        <item>datemodrev</item>
+        <item>datemod</item>
+    </string-array>
 
 </resources>

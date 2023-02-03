@@ -106,7 +106,7 @@ public class WonderSwan {
             buttonsDirty = false;
         }
 
-        int[] frameInfo = _execute_frame(skipframe, audioEnabled, framebuffer, audioEnabled ? audiobuffer : null);
+        int[] frameInfo = _execute_frame(skipframe, audioEnabled, framebuffer, audiobuffer);
         running = (frameInfo != null);
         if (running) samples = frameInfo[0];
 //        synchronized (audiobuffer) {

@@ -290,7 +290,7 @@ public class SelectActivity extends BaseActivity {
         };
 
         mAssetManager = this.getAssets();
-        mRAdapter = new RomAdapter(this.getBaseContext(), storagePath, mAssetManager, onDownloadListener);
+        mRAdapter = new RomAdapter(this.getBaseContext(), storagePath, mAssetManager, onDownloadListener, prefs.getString("sort", "alpha"));
 
         if (mRAdapter.getCount() != 0) {
 

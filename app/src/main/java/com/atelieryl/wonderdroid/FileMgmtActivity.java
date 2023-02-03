@@ -83,7 +83,7 @@ public class FileMgmtActivity extends AppCompatActivity {
                         mRomNames.add(entry);
                         if (isWsRom(mRom)) {
                             try {
-                                WonderSwanHeader header = RomAdapter.Rom.getHeader(this, new RomAdapter.Rom(RomAdapter.Rom.Type.ZIP, mRom.sourcefile, entry, entry + " (ZIP)"));
+                                WonderSwanHeader header = RomAdapter.Rom.getHeader(this, new RomAdapter.Rom(RomAdapter.Rom.Type.ZIP, mRom.sourcefile, entry, entry + " (ZIP)", mRom.sourcefile.lastModified()));
                                 mHeaderInternalNames.add(header.internalname);
                             } catch (Exception ex) {}
                         }

@@ -59,6 +59,7 @@ public class RomAdapter extends BaseAdapter {
         public static String[] stateExtensions = new String[] {
                 "mc0", "mc1", "mc2", "mc3", "mc4", "mc5", "mc6", "mc7", "mc8", "mc9"
         };
+        private final long lastModified;
 
         public enum Type {
             ZIP, RAW
@@ -72,11 +73,12 @@ public class RomAdapter extends BaseAdapter {
 
         public final String fileName;
 
-        public Rom(Type type, File sourceFile, String fileName, String displayName) {
+        public Rom(Type type, File sourceFile, String fileName, String displayName, long lastModified) {
             this.type = type;
             this.sourcefile = sourceFile;
             this.fileName = fileName;
             this.displayName = displayName;
+            this.lastModified = lastModified;
         }
 
         public static File getRomFile(Context context, Rom rom) {
@@ -148,15 +150,15 @@ public class RomAdapter extends BaseAdapter {
 
     private final OnDownloadListener mOnDownloadListener;
 
-    public RomAdapter(Context context, String romdir, AssetManager assetManager, OnDownloadListener onDownloadListener) {
+    public RomAdapter(Context context, String romdir, AssetManager assetManager, OnDownloadListener onDownloadListener, String sort) {
         mAssetManager = assetManager;
         mRomDir = new File(romdir);
         mContext = context;
-        mRoms = findRoms();
+        mRoms = findRoms(sort);
         mOnDownloadListener = onDownloadListener;
     }
 
-    private Rom[] findRoms() {
+    private Rom[] findRoms(String sort) {
         File[] sourceFiles = mRomDir.listFiles(new RomFilter(false, false, false));
         ArrayList<Rom> roms = new ArrayList<>();
         if (sourceFiles != null) {
@@ -165,14 +167,14 @@ public class RomAdapter extends BaseAdapter {
                 if (sourceFile.getName().endsWith("zip")) {
                     try {
                         for (String entry : ZipUtils.getValidEntries(new ZipFile(sourceFile), Rom.allRomExtensions)) {
-                            roms.add(new Rom(Rom.Type.ZIP, sourceFile, entry, entry + " (ZIP)"));
+                            roms.add(new Rom(Rom.Type.ZIP, sourceFile, entry, entry + " (ZIP)", sourceFile.lastModified()));
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         break;
                     }
                 } else {
-                    roms.add(new Rom(Rom.Type.RAW, sourceFile, sourceFile.getName(), sourceFile.getName()));
+                    roms.add(new Rom(Rom.Type.RAW, sourceFile, sourceFile.getName(), sourceFile.getName(), sourceFile.lastModified()));
                 }
 
             }
@@ -181,7 +183,18 @@ public class RomAdapter extends BaseAdapter {
 
         Arrays.sort(allRoms, new Comparator<Rom>() {
             public int compare(Rom lhs, Rom rhs) {
-                return lhs.sourcefile.compareTo(rhs.sourcefile);
+                switch (sort) {
+                    case "alpha":
+                        return lhs.sourcefile.compareTo(rhs.sourcefile);
+                    case "alpharev":
+                        return -1 * lhs.sourcefile.compareTo(rhs.sourcefile);
+                    case "datemod":
+                        return (int) ((lhs.lastModified % Integer.MAX_VALUE) - (rhs.lastModified % Integer.MAX_VALUE));
+                    case "datemodrev":
+                        return (int) ((rhs.lastModified % Integer.MAX_VALUE) - (lhs.lastModified % Integer.MAX_VALUE));
+                    default:
+                        return lhs.sourcefile.compareTo(rhs.sourcefile);
+                }
             }
         });
 
