@@ -35,8 +35,6 @@
 
 #include <zlib.h>
 
-MDFN_HIDE extern MDFNGI EmulatedPSX;
-
 namespace MDFN_IEN_PSX
 {
 
@@ -1119,7 +1117,7 @@ static void Emulate(EmulateSpecStruct *espec)
   if(frame_counter > 0)
   {
    cycle_counter += espec->MasterCycles;
-   printf("moo: %f %f\n", EmulatedPSX.fps / 65536.0 / 256.0, (double)44100 * 768.0 * frame_counter / cycle_counter);
+   printf("moo: %f %f\n", MDFNGameInfo->fps / 65536.0 / 256.0, (double)44100 * 768.0 * frame_counter / cycle_counter);
   }
  }
 */
@@ -1665,7 +1663,7 @@ static MDFN_COLD void InitCommon(std::vector<CDInterface*> *CDInterfaces, const 
 
  DMA_Init();
 
- GPU_SetGetVideoParams(&EmulatedPSX, correct_aspect, sls, sle, MDFN_GetSettingB("psx.h_overscan"));
+ GPU_SetGetVideoParams(MDFNGameInfo, correct_aspect, sls, sle, MDFN_GetSettingB("psx.h_overscan"));
 
  CDC->SetDisc(true, NULL, NULL);
 
@@ -1718,7 +1716,7 @@ static MDFN_COLD void InitCommon(std::vector<CDInterface*> *CDInterfaces, const 
   FileStream BIOSFile(biospath, FileStream::MODE_READ);
 
   if(BIOSFile.size() != 524288)
-   throw MDFN_Error(0, _("BIOS file \"%s\" is of an incorrect size."), biospath.c_str());
+   throw MDFN_Error(0, _("BIOS file \"%s\" is of an incorrect size."), MDFN_strhumesc(biospath).c_str());
 
   BIOSFile.read(BIOSROM->data8, 512 * 1024);
   BIOS_SHA256 = sha256(BIOSROM->data8, 512 * 1024);
@@ -1732,10 +1730,10 @@ static MDFN_COLD void InitCommon(std::vector<CDInterface*> *CDInterfaces, const 
     if(BIOS_SHA256 == dbe.sd)
     {
      if(dbe.bad)
-      throw MDFN_Error(0, _("BIOS file \"%s\" is a known bad dump."), biospath.c_str());
+      throw MDFN_Error(0, _("BIOS file \"%s\" is a known bad dump."), MDFN_strhumesc(biospath).c_str());
 
      if(dbe.region != region)
-      throw MDFN_Error(0, _("BIOS file \"%s\" is not the proper BIOS for the region of PS1 being emulated."), biospath.c_str());
+      throw MDFN_Error(0, _("BIOS file \"%s\" is not the proper BIOS for the region of PS1 being emulated."), MDFN_strhumesc(biospath).c_str());
 
      bios_recognized = true;
      break;
@@ -2018,6 +2016,7 @@ static MDFN_COLD void Load(GameFile* gf)
 
    SongNames.push_back(psf_loader->tags.GetTag("title"));
 
+   MDFNGameInfo->ExtraVideoFormatSupport = EVFSUPPORT_RGB555 | EVFSUPPORT_RGB565;
    Player_Init(1, psf_loader->tags.GetTag("game"), psf_loader->tags.GetTag("artist"), psf_loader->tags.GetTag("copyright"), SongNames);
   }
   else
@@ -2143,7 +2142,7 @@ static void StateAction(StateMem *sm, const unsigned load, const bool data_only)
 
   SFORMAT SRDStateRegs[] = 
   {
-   SFPTR8(sr_dig.data(), sr_dig.size()),
+   SFPTR8(sr_dig.data(), sr_dig.size(), SFORMAT::FORM::CONFIG_VALIDATE),
    SFEND
   };
 
@@ -2192,7 +2191,7 @@ static void StateAction(StateMem *sm, const unsigned load, const bool data_only)
 
 static void SetMedia(uint32 drive_idx, uint32 state_idx, uint32 media_idx, uint32 orientation_idx)
 {
- const RMD_Layout* rmd = EmulatedPSX.RMD;
+ const RMD_Layout* rmd = MDFNGameInfo->RMD;
  const RMD_Drive* rd = &rmd->Drives[drive_idx];
  const RMD_State* rs = &rd->PossibleStates[state_idx];
 
@@ -2302,7 +2301,7 @@ static const MDFNSetting PSXSettings[] =
 // Note for the future: If we ever support PSX emulation with non-8-bit RGB color components, or add a new linear RGB colorspace to MDFN_PixelFormat, we'll need
 // to buffer the intermediate 24-bit non-linear RGB calculation into an array and pass that into the GPULineHook stuff, otherwise netplay could break when
 // an emulated GunCon is used.
-MDFNGI EmulatedPSX =
+MDFN_HIDE extern const MDFNGI EmulatedPSX =
 {
  "psx",
  "Sony PlayStation",
@@ -2321,8 +2320,8 @@ MDFNGI EmulatedPSX =
  TestMagicCD,
  CloseGame,
 
- NULL,	//ToggleLayer,
- "GPU\0",	//"Background Scroll\0Foreground Scroll\0Sprites\0",
+ NULL,
+ "GPU\0",
 
  NULL,
  NULL,
@@ -2343,6 +2342,8 @@ MDFNGI EmulatedPSX =
  PSXSettings,
  MDFN_MASTERCLOCK_FIXED(33868800),
  0,
+
+ EVFSUPPORT_NONE,
 
  true, // Multires possible?
 

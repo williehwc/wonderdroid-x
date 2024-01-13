@@ -34,7 +34,7 @@ LOCAL_SRC_FILES := \
     mednafen/NativeVFS.cpp \
     mednafen/PSFLoader.cpp \
     mednafen/Stream.cpp \
-    mednafen/Time.cpp \
+    mednafen/time/Time_POSIX.cpp \
     mednafen/VirtualFS.cpp \
     mednafen/debug.cpp \
     mednafen/endian.cpp \
@@ -53,10 +53,11 @@ LOCAL_SRC_FILES := \
     mednafen/state.cpp \
     mednafen/state_rewind.cpp \
     mednafen/tests.cpp \
+    mednafen/testsexp.cpp \
     mednafen/cdplay/cdplay.cpp \
     mednafen/cdrom/CDAFReader.cpp \
     mednafen/cdrom/CDAFReader_MPC.cpp \
-    mednafen/cdrom/CDAFReader_SF.cpp \
+    mednafen/cdrom/CDAFReader_PCM.cpp \
     mednafen/cdrom/CDAFReader_Vorbis.cpp \
     mednafen/cdrom/CDAccess.cpp \
     mednafen/cdrom/CDAccess_CCD.cpp \
@@ -74,9 +75,12 @@ LOCAL_SRC_FILES := \
     mednafen/cheat_formats/gb.cpp \
     mednafen/cheat_formats/psx.cpp \
     mednafen/cheat_formats/snes.cpp \
+    mednafen/compress/ArchiveReader.cpp \
+    mednafen/compress/DecompressFilter.cpp \
     mednafen/compress/GZFileStream.cpp \
     mednafen/compress/ZIPReader.cpp \
     mednafen/compress/ZLInflateFilter.cpp \
+    mednafen/compress/ZstdDecompressFilter.cpp \
     mednafen/cputest/cputest.c \
     mednafen/demo/demo.cpp \
     mednafen/hash/crc.cpp \
@@ -231,6 +235,7 @@ LOCAL_SRC_FILES := \
     mednafen/vb/vb.cpp \
     mednafen/vb/vip.cpp \
     mednafen/vb/vsu.cpp \
+    mednafen/video/convert.cpp \
     mednafen/video/Deinterlacer.cpp \
     mednafen/video/Deinterlacer_Blend.cpp \
     mednafen/video/Deinterlacer_Simple.cpp \
@@ -256,6 +261,15 @@ LOCAL_SRC_FILES := \
     mednafen/wswan/sound.cpp \
     mednafen/wswan/tcache.cpp \
     mednafen/wswan/v30mz.cpp \
+    mednafen/zstd/common/entropy_common.c \
+    mednafen/zstd/common/error_private.c \
+    mednafen/zstd/common/fse_decompress.c \
+    mednafen/zstd/common/xxhash.c \
+    mednafen/zstd/common/zstd_common.c \
+    mednafen/zstd/decompress/huf_decompress.c \
+    mednafen/zstd/decompress/zstd_ddict.c \
+    mednafen/zstd/decompress/zstd_decompress.c \
+    mednafen/zstd/decompress/zstd_decompress_block.c \
     stubs.cpp \
     com_atelieryl_wonderdroid_WonderSwan.cpp
 
@@ -268,7 +282,7 @@ LOCAL_CFLAGS := \
     -DHAVE_MKDIR \
     -DMEDNAFEN_VERSION=\"1.26.1\" \
     -DPACKAGE=\"mednafen\" \
-    -DMEDNAFEN_VERSION_NUMERIC=0x00102601 \
+    -DMEDNAFEN_VERSION_NUMERIC=0x00102900 \
     -DPSS_STYLE=1 \
     -DMPC_FIXED_POINT \
     -DWANT_NGP_EMU \

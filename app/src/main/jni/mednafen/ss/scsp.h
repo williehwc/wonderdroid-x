@@ -29,10 +29,19 @@ class SS_SCSP
  void StateAction(StateMem* sm, const unsigned load, const bool data_only, const char* sname) MDFN_COLD;
 
  void Reset(bool powering_up) MDFN_COLD;
- void RunSample(int16* outlr);
+
+ // Use int16 if the SCSP is connected to a 16-bit DAC, int32 if an 18-bit DAC
+ template<typename T_out = int16>
+ void RunSample(T_out* outlr);
 
  template<typename T, bool IsWrite>
  void RW(uint32 A, T& V); //, void (*time_sucker)();
+
+ // Caller must ensure appropriate timing.
+ INLINE void WriteMIDI(uint8 V)
+ {
+  MIDI_WriteInput(V);
+ }
 
  INLINE uint16* GetEXTSPtr(void)
  {
@@ -49,9 +58,16 @@ class SS_SCSP
   GSREG_MVOL = 0,
   GSREG_DAC18B,
   GSREG_MEM4MB,
-  GSREG_RBP,
-  GSREG_RBL,
+  GSREG_RBC,
   GSREG_MSLC,
+
+  GSREG_SCIEB,
+  GSREG_SCIPD,
+  GSREG_MCIEB,
+  GSREG_MCIPD,
+
+  GSREG_EFREG0, GSREG_EFREG1, GSREG_EFREG2, GSREG_EFREG3, GSREG_EFREG4, GSREG_EFREG5, GSREG_EFREG6, GSREG_EFREG7,
+  GSREG_EFREG8, GSREG_EFREG9, GSREG_EFREGA, GSREG_EFREGB, GSREG_EFREGC, GSREG_EFREGD, GSREG_EFREGE, GSREG_EFREGF
  };
 
  uint32 GetRegister(const unsigned id, char* const special, const uint32 special_len) MDFN_COLD;
@@ -148,7 +164,6 @@ class SS_SCSP
   bool WFAllowAccess;
   uint8 EnvPhase;	// ENV_PHASE_ATTACK ... ENV_PHASE_RELEASE (0...3)
   uint32 EnvLevel;	// 0 ... 0x3FF
-  bool EnvGCBTPrev;
 
   uint8 LFOCounter;
   uint16 LFOTimeCounter;
@@ -158,7 +173,7 @@ class SS_SCSP
 
  void RecalcShortWaveMask(Slot* s);
 
- void RunEG(Slot* s, const unsigned key_eg_scale);
+ void RunEG(Slot* s, const unsigned key_eg_scale, const uint32 sc, const uint32 scxc);
 
  uint8 GetALFO(Slot* s);
  int GetPLFO(Slot* s);
@@ -191,7 +206,7 @@ class SS_SCSP
   MIDIF_OUTPUT_EMPTY= 0x08,
   MIDIF_OUTPUT_FULL = 0x10
  };
- struct
+ struct MIDIS
  {
   uint8 InputFIFO[4];
   uint8 InputRP, InputWP, InputCount;
@@ -200,49 +215,16 @@ class SS_SCSP
   uint8 OutputRP, OutputWP, OutputCount;
 
   uint8 Flags;
-
   //
-  INLINE uint8 ReadInput(void)
-  {
-   uint8 ret = InputFIFO[InputRP]; // May not be correct for InputCount == 0; test.
-
-   if(InputCount)
-   {
-    InputRP = (InputRP + 1) & 0x3;
-    InputCount--;
-    Flags &= ~MIDIF_INPUT_FULL;
-    if(!InputCount)
-     Flags |= MIDIF_INPUT_EMPTY;
-   }
-
-   return ret;
-  }
-
-  INLINE void WriteOutput(uint8 V)
-  {
-   if(OutputCount == 4)	// May not be correct; test.
-    return;
-
-   OutputFIFO[OutputWP] = V;
-   OutputWP = (OutputWP + 1) & 0x3;
-   OutputCount++;
-
-   Flags &= ~MIDIF_OUTPUT_EMPTY;
-   if(OutputCount == 4)
-    Flags |= MIDIF_OUTPUT_FULL;
-  }
-
-  void Reset(void)
-  {
-   memset(InputFIFO, 0, sizeof(InputFIFO));
-   memset(OutputFIFO, 0, sizeof(OutputFIFO));
-
-   InputRP = InputWP = InputCount = 0;
-   OutputRP = OutputWP = OutputCount = 0;
-
-   Flags = MIDIF_INPUT_EMPTY | MIDIF_OUTPUT_EMPTY;
-  }
+  uint8 SimuClockDivider;
+  uint8 TransmitBitCounter;
+  uint16 TransmitBuffer;
  } MIDI;
+ uint8 MIDI_ReadInput(void);
+ void MIDI_WriteInput(uint8 V);
+ void MIDI_WriteOutput(uint8 V);
+ void MIDI_Reset(void);
+ void MIDI_Run(void);
  //
  //
  uint16 SCIEB;
@@ -258,7 +240,6 @@ class SS_SCSP
  {
   uint8 Control;
   uint8 Counter;
-  bool PrevClockIn;
   int32 Reload;
  } Timers[3];
  //

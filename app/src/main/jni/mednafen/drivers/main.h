@@ -3,7 +3,6 @@
 
 #include <mednafen/driver.h>
 #include <mednafen/mednafen.h>
-#include <mednafen/settings.h>
 #include <mednafen/Time.h>
 #include <mednafen/MThreading.h>
 #include "config.h"
@@ -48,7 +47,6 @@ MDFN_HIDE extern int NoWaiting;
 MDFN_HIDE extern bool MDFNDHaveFocus;
 
 MDFN_HIDE extern MDFNGI *CurGame;
-int CloseGame(void);
 
 void RefreshThrottleFPS(double);
 void PumpWrap(void);
@@ -71,7 +69,7 @@ bool GT_ReinitVideo(void);
 bool GT_ReinitSound(void);
 
 
-void BuildSystemSetting(MDFNSetting *setting, const char *system_name, const char *name, const char *description, const char *description_extra, MDFNSettingType type, 
+void AddSystemSetting(const char *system_name, const char *name, const char *description, const char *description_extra, MDFNSettingType type, 
 	const char *default_value, const char *minimum = NULL, const char *maximum = NULL,
 	bool (*validate_func)(const char *name, const char *value) = NULL, void (*ChangeNotification)(const char *name) = NULL, 
         const MDFNSetting_EnumList *enum_list = NULL, uint32 extra_flags = 0);

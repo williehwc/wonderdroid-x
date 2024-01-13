@@ -2,7 +2,7 @@
 /* Mednafen Sega Saturn Emulation Module                                      */
 /******************************************************************************/
 /* ss.cpp - Saturn Core Emulation and Support Functions
-**  Copyright (C) 2015-2020 Mednafen Team
+**  Copyright (C) 2015-2021 Mednafen Team
 **
 ** This program is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License
@@ -35,16 +35,12 @@
 
 #include <mednafen/trio/trio.h>
 
-#include <zlib.h>
-
 #if defined(HAVE_SSE2_INTRINSICS)
  #include <xmmintrin.h>
  #include <emmintrin.h>
 #endif
 
 using namespace Mednafen;
-
-MDFN_HIDE extern MDFNGI EmulatedSS;
 
 #include "ss.h"
 #include "sound.h"
@@ -181,23 +177,36 @@ static INLINE void BusRW_DB_CS0(const uint32 A, uint32& DB, const bool BurstHax,
  //
  if(A >= 0x00200000 && A <= 0x003FFFFF)
  {
-  if(A & 0x100000)
+  if(!SH2DMAHax)
+   SH7095_mem_timestamp += 7;
+  else
+   *SH2DMAHax += 7;
+
+  //
+  // VA0 and VA1 don't map DRAM in the upper 1MiB of the 2MiB region, and return 0xFFFF(~0) on reads.
+  // VA2 mirrors DRAM into the upper 1MiB for both reads and writes, which incidentally breaks "Myst" in the generator room due to
+  //	it trying to load a file that's too large to fit, wrapping around and corrupting essential data in the process.
+  // VA3+ behavior is untested.
+  //
+  // VA0/VA1 behavior is emulated here.
+  //
+  if(MDFN_UNLIKELY(A & 0x100000))
   {
    if(IsWrite)
-    SS_DBG(SS_DBG_WARNING, "[RAM] %zu-byte write of 0x%08x to mirrored address 0x%08x\n", sizeof(T), DB >> (((A & 1) ^ (2 - sizeof(T))) << 3), A);
+    SS_DBG(SS_DBG_WARNING, "[RAM] %zu-byte write of 0x%08x to revision-dependent address 0x%08x\n", sizeof(T), DB >> (((A & 1) ^ (2 - sizeof(T))) << 3), A);
    else
-    SS_DBG(SS_DBG_WARNING, "[RAM] %zu-byte read from mirrored address 0x%08x\n", sizeof(T), A);
+   {
+    SS_DBG(SS_DBG_WARNING, "[RAM] %zu-byte read from revision-dependent address 0x%08x\n", sizeof(T), A);
+    DB = DB | 0xFFFF;
+   }
+
+   return;
   }
 
   if(IsWrite)
    ne16_wbo_be<T>(WorkRAML, A & 0xFFFFF, DB >> (((A & 1) ^ (2 - sizeof(T))) << 3));
   else
    DB = (DB & 0xFFFF0000) | ne16_rbo_be<uint16>(WorkRAML, A & 0xFFFFE);
-
-  if(!SH2DMAHax)
-   SH7095_mem_timestamp += 7;
-  else
-   *SH2DMAHax += 7;
 
   return;
  }
@@ -471,6 +480,7 @@ static MDFN_COLD void InitEvents(void)
 
  events[SS_EVENT_SCU_DMA].event_handler = SCU_UpdateDMA;
  events[SS_EVENT_SCU_DSP].event_handler = SCU_UpdateDSP;
+ /*events[SS_EVENT_SCU_INT].event_handler = SCU_UpdateInt;*/
 
  events[SS_EVENT_SMPC].event_handler = SMPC_Update;
 
@@ -484,7 +494,9 @@ static MDFN_COLD void InitEvents(void)
  events[SS_EVENT_CART].event_handler = CART_GetEventHandler();
 
  events[SS_EVENT_MIDSYNC].event_handler = MidSync;
- events[SS_EVENT_MIDSYNC].event_time = SS_EVENT_DISABLED_TS;
+ //
+ //
+ SS_SetEventNT(&events[SS_EVENT_MIDSYNC], SS_EVENT_DISABLED_TS);
 }
 
 static void RebaseTS(const sscpu_timestamp_t timestamp)
@@ -562,6 +574,17 @@ void SS_SetEventNT(event_list_entry* e, const sscpu_timestamp_t next_timestamp)
 // Called from debug.cpp too.
 void ForceEventUpdates(const sscpu_timestamp_t timestamp)
 {
+#ifdef MDFN_ENABLE_DEV_BUILD
+ for(unsigned i = SS_EVENT__SYNFIRST + 1; i < SS_EVENT__SYNLAST; i++)
+ {
+  if(events[i].event_time > events[i].next->event_time)
+  {
+   printf("%u=%u, %u=%u\n", i, events[i].event_time, (unsigned)(events[i].next - events), events[i].next->event_time);
+   abort();
+  }
+ }
+#endif
+
  for(unsigned c = 0; c < 2; c++)
   CPU[c].ForceInternalEventUpdates();
 
@@ -745,9 +768,9 @@ static int32 cur_clock_div;
 static int64 UpdateInputLastBigTS;
 static INLINE void UpdateSMPCInput(const sscpu_timestamp_t timestamp)
 {
- int32 elapsed_time = (((int64)timestamp * cur_clock_div * 1000 * 1000) - UpdateInputLastBigTS) / (EmulatedSS.MasterClock / MDFN_MASTERCLOCK_FIXED(1));
+ int32 elapsed_time = (((int64)timestamp * cur_clock_div * 1000 * 1000) - UpdateInputLastBigTS) / (MDFNGameInfo->MasterClock / MDFN_MASTERCLOCK_FIXED(1));
 
- UpdateInputLastBigTS += (int64)elapsed_time * (EmulatedSS.MasterClock / MDFN_MASTERCLOCK_FIXED(1));
+ UpdateInputLastBigTS += (int64)elapsed_time * (MDFNGameInfo->MasterClock / MDFN_MASTERCLOCK_FIXED(1));
 
  SMPC_UpdateInput(elapsed_time);
 }
@@ -794,7 +817,7 @@ static void Emulate(EmulateSpecStruct* espec_arg)
  UpdateSMPCInput(0);
  VDP2::StartFrame(espec, cur_clock_div == 61);
  SOUND_StartFrame(espec->SoundRate / espec->soundmultiplier, MDFN_GetSettingUI("ss.scsp.resamp_quality"));
- CART_SetCPUClock(EmulatedSS.MasterClock / MDFN_MASTERCLOCK_FIXED(1), cur_clock_div);
+ CART_SetCPUClock(MDFNGameInfo->MasterClock / MDFN_MASTERCLOCK_FIXED(1), cur_clock_div);
  espec->SoundBufSize = 0;
  espec->MasterCycles = 0;
  espec->soundmultiplier = 1;
@@ -854,7 +877,7 @@ static void Emulate(EmulateSpecStruct* espec_arg)
  //
  if(BackupRAM_Dirty)
  {
-  BackupRAM_SaveDelay = (int64)3 * (EmulatedSS.MasterClock / MDFN_MASTERCLOCK_FIXED(1));	// 3 second delay
+  BackupRAM_SaveDelay = (int64)3 * (MDFNGameInfo->MasterClock / MDFN_MASTERCLOCK_FIXED(1));	// 3 second delay
   BackupRAM_Dirty = false;
  }
  else if(BackupRAM_SaveDelay > 0)
@@ -870,13 +893,13 @@ static void Emulate(EmulateSpecStruct* espec_arg)
    catch(std::exception& e)
    {
     MDFND_OutputNotice(MDFN_NOTICE_ERROR, e.what());
-    BackupRAM_SaveDelay = (int64)60 * (EmulatedSS.MasterClock / MDFN_MASTERCLOCK_FIXED(1));	// 60 second retry delay.
+    BackupRAM_SaveDelay = (int64)60 * (MDFNGameInfo->MasterClock / MDFN_MASTERCLOCK_FIXED(1));	// 60 second retry delay.
    }
   }
  }
 
  if(CART_GetClearNVDirty())
-  CartNV_SaveDelay = (int64)3 * (EmulatedSS.MasterClock / MDFN_MASTERCLOCK_FIXED(1));	// 3 second delay
+  CartNV_SaveDelay = (int64)3 * (MDFNGameInfo->MasterClock / MDFN_MASTERCLOCK_FIXED(1));	// 3 second delay
  else if(CartNV_SaveDelay > 0)
  {
   CartNV_SaveDelay -= espec->MasterCycles;
@@ -890,7 +913,7 @@ static void Emulate(EmulateSpecStruct* espec_arg)
    catch(std::exception& e)
    {
     MDFND_OutputNotice(MDFN_NOTICE_ERROR, e.what());
-    CartNV_SaveDelay = (int64)60 * (EmulatedSS.MasterClock / MDFN_MASTERCLOCK_FIXED(1));	// 60 second retry delay.
+    CartNV_SaveDelay = (int64)60 * (MDFNGameInfo->MasterClock / MDFN_MASTERCLOCK_FIXED(1));	// 60 second retry delay.
    }
   }
  }
@@ -1284,7 +1307,7 @@ static void MDFN_COLD InitCommon(const unsigned cpucache_emumode, const unsigned
   FileStream BIOSFile(biospath, FileStream::MODE_READ);
 
   if(BIOSFile.size() != 524288)
-   throw MDFN_Error(0, _("BIOS file \"%s\" is of an incorrect size."), biospath.c_str());
+   throw MDFN_Error(0, _("BIOS file \"%s\" is of an incorrect size."), MDFN_strhumesc(biospath).c_str());
 
   BIOSFile.read(BIOSROM, 512 * 1024);
   BIOS_SHA256 = sha256(BIOSROM, 512 * 1024);
@@ -1314,13 +1337,13 @@ static void MDFN_COLD InitCommon(const unsigned cpucache_emumode, const unsigned
    for(auto const& dbe : BIOSDB)
    {
     if(fn == dbe.fn && BIOS_SHA256 != dbe.hash)
-     throw MDFN_Error(0, _("The BIOS ROM data loaded from \"%s\" does not match what is expected by its filename(possibly due to erroneous file renaming by the user)."), biospath.c_str());
+     throw MDFN_Error(0, _("The BIOS ROM data loaded from \"%s\" does not match what is expected by its filename(possibly due to erroneous file renaming by the user)."), MDFN_strhumesc(biospath).c_str());
    }
 
    for(auto const& dbe : BIOSDB)
    {
     if(BIOS_SHA256 == dbe.hash && !(dbe.areas & (1U << smpc_area)))
-     throw MDFN_Error(0, _("The BIOS loaded from \"%s\" is the wrong BIOS for the region being emulated(possibly due to changing setting \"%s\" to point to the wrong file)."), biospath.c_str(), biospath_sname);
+     throw MDFN_Error(0, _("The BIOS loaded from \"%s\" is the wrong BIOS for the region being emulated(possibly due to changing setting \"%s\" to point to the wrong file)."), MDFN_strhumesc(biospath).c_str(), biospath_sname);
    }
   }
   //
@@ -1329,7 +1352,7 @@ static void MDFN_COLD InitCommon(const unsigned cpucache_emumode, const unsigned
    BIOSROM[i] = MDFN_de16msb(&BIOSROM[i]);
  }
 
- EmulatedSS.MasterClock = MDFN_MASTERCLOCK_FIXED(MasterClock);
+ MDFNGameInfo->MasterClock = MDFN_MASTERCLOCK_FIXED(MasterClock);
 
  SCU_Init();
  SMPC_Init(smpc_area, MasterClock);
@@ -1356,7 +1379,7 @@ static void MDFN_COLD InitCommon(const unsigned cpucache_emumode, const unsigned
   MDFN_printf(_("Show H Overscan: %s\n"), h_overscan ? _("Enabled") : _("Disabled"));
   MDFN_printf(_("H Blend: %s\n"), h_blend ? _("Enabled") : _("Disabled"));
 
-  VDP2::SetGetVideoParams(&EmulatedSS, correct_aspect, sls, sle, h_overscan, h_blend);
+  VDP2::SetGetVideoParams(MDFNGameInfo, correct_aspect, sls, sle, h_overscan, h_blend);
  }
 
  MDFN_printf("\n");
@@ -1658,8 +1681,8 @@ static MDFN_COLD void LoadCD(std::vector<CDInterface*>* CDInterfaces)
 static MDFN_COLD void CloseGame(void)
 {
 #ifdef MDFN_ENABLE_DEV_BUILD
- VDP1::MakeDump("/tmp/vdp1_dump.h");
- VDP2::MakeDump("/tmp/vdp2_dump.h");
+ try { VDP1::MakeDump("/tmp/vdp1_dump.h"); } catch(std::exception& e) { MDFND_OutputNotice(MDFN_NOTICE_ERROR, e.what()); }
+ try { VDP2::MakeDump("/tmp/vdp2_dump.h"); } catch(std::exception& e) { MDFND_OutputNotice(MDFN_NOTICE_ERROR, e.what()); }
 #endif
  //
  //
@@ -1815,6 +1838,14 @@ INLINE bool EventsPacker::Restore(const unsigned state_version)
    et = SS_EVENT_DISABLED_TS;
   }
 
+/*
+  if(state_version < 0x00102800 && i == SS_EVENT_SCU_INT)
+  {
+   eo = i;
+   et = SS_EVENT_DISABLED_TS;
+  }
+*/
+
   if(eo < eventcopy_first || eo >= eventcopy_bound)
    return false;
 
@@ -1881,8 +1912,8 @@ static MDFN_COLD void StateAction(StateMem* sm, const unsigned load, const bool 
 
   SFORMAT SRDStateRegs[] = 
   {
-   SFPTR8(sr_dig.data(), sr_dig.size()),
-   SFVAR(cart_type),
+   SFPTR8(sr_dig.data(), sr_dig.size(), SFORMAT::FORM::CONFIG_VALIDATE),
+   SFVAR(cart_type, SFORMAT::FORM::CONFIG_VALIDATE),
    SFEND
   };
 
@@ -1912,6 +1943,8 @@ static MDFN_COLD void StateAction(StateMem* sm, const unsigned load, const bool 
  EventsPacker ep;
  ep.Save();
 
+ /* static_assert(sizeof(ep.event_order) == 12 && (SS_EVENT_SCU_INT - (SS_EVENT__SYNFIRST + 1)) == 11, "baaah"); */
+
  SFORMAT StateRegs[] = 
  {
   // cur_clock_div
@@ -1920,6 +1953,12 @@ static MDFN_COLD void StateAction(StateMem* sm, const unsigned load, const bool 
   SFVAR(next_event_ts),
   SFVARN(ep.event_times, "event_times"),
   SFVARN(ep.event_order, "event_order"),
+/*
+  SFPTR32N(ep.event_times, 11, "event_times"),
+  SFPTR8N(ep.event_order, 11, "event_order"),
+  SFVARN(ep.event_times[11], "event_times[11]"),
+  SFVARN(ep.event_order[11], "event_order[11]"),
+*/
 
   SFVAR(SH7095_mem_timestamp),
   SFVAR(SH7095_BusLock),
@@ -1927,7 +1966,7 @@ static MDFN_COLD void StateAction(StateMem* sm, const unsigned load, const bool 
 
   SFVAR(WorkRAML),
   SFVAR(WorkRAMH),
-  SFVAR(BackupRAM),
+  SFVAR(BackupRAM, SFORMAT::FORM::NVMEM),
 
   SFVAR(RecordedNeedEmuICache),
 
@@ -1954,7 +1993,7 @@ static MDFN_COLD void StateAction(StateMem* sm, const unsigned load, const bool 
 
   if(!ep.Restore(load))
   {
-   printf("Bad state events data.");
+   printf("Bad state events data.\n");
    InitEvents();
   }
 
@@ -1965,7 +2004,7 @@ static MDFN_COLD void StateAction(StateMem* sm, const unsigned load, const bool 
 
 static MDFN_COLD void SetMedia(uint32 drive_idx, uint32 state_idx, uint32 media_idx, uint32 orientation_idx)
 {
- const RMD_Layout* rmd = EmulatedSS.RMD;
+ const RMD_Layout* rmd = MDFNGameInfo->RMD;
  const RMD_Drive* rd = &rmd->Drives[drive_idx];
  const RMD_State* rs = &rd->PossibleStates[state_idx];
 
@@ -2098,6 +2137,7 @@ static const MDFNSetting_EnumList DBGMask_List[] =
 
  { "scsp",	SS_DBG_SCSP,		gettext_noop("SCSP")			},
  { "scsp_regw", SS_DBG_SCSP_REGW,	gettext_noop("SCSP register writes")	},
+ { "scsp_mobuf",SS_DBG_SCSP_MOBUF,	gettext_noop("SCSP MOBUF writes")	},
 
  { "bios",	SS_DBG_BIOS,		gettext_noop("BIOS")			},
 
@@ -2124,6 +2164,7 @@ static const MDFNSetting_EnumList HH_List[] =
  { "vdp1vram5000fix",	HORRIBLEHACK_VDP1VRAM5000FIX,	gettext_noop("vdp1vram5000fix")	},
  { "vdp1rwdrawslowdown",HORRIBLEHACK_VDP1RWDRAWSLOWDOWN,gettext_noop("vdp1rwdrawslowdown") },
  { "vdp1instant",	HORRIBLEHACK_VDP1INSTANT,	gettext_noop("vdp1instant") },
+ /*{ "scuintdelay",	HORRIBLEHACK_SCUINTDELAY,	gettext_noop("scuintdelay") },*/
 
  { NULL, 0 },
 };
@@ -2213,7 +2254,7 @@ static const CheatInfoStruct CheatInfo =
 
 using namespace MDFN_IEN_SS;
 
-MDFNGI EmulatedSS =
+MDFN_HIDE extern const MDFNGI EmulatedSS =
 {
  "ss",
  "Sega Saturn",
@@ -2254,6 +2295,8 @@ MDFNGI EmulatedSS =
  SSSettings,
  0,
  0,
+
+ EVFSUPPORT_NONE,
 
  true, // Multires possible?
 

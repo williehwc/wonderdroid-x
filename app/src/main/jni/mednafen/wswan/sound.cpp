@@ -34,32 +34,32 @@ static Blip_Synth<blip_good_quality, 4096> WaveSynth;
 
 static Blip_Buffer *sbuf[2] = { NULL };
 
-uint16 period[4];
-uint8 volume[4]; // left volume in upper 4 bits, right in lower 4 bits
-uint8 voice_volume;
+static uint16 period[4];
+static uint8 volume[4]; // left volume in upper 4 bits, right in lower 4 bits
+static uint8 voice_volume;
 
-uint8 sweep_step, sweep_value;
-uint8 noise_control;
-uint8 control;
-uint8 output_control;
+static uint8 sweep_step, sweep_value;
+static uint8 noise_control;
+static uint8 control;
+static uint8 output_control;
 
-int32 sweep_8192_divider;
-uint8 sweep_counter;
-uint8 SampleRAMPos;
+static int32 sweep_8192_divider;
+static uint8 sweep_counter;
+static uint8 SampleRAMPos;
 
-int32 sample_cache[4][2];
+static int32 sample_cache[4][2];
 
-int32 last_v_val;
+static int32 last_v_val;
 
-uint8 HyperVoice;
-int32 last_hv_val[2];
-uint8 HVoiceCtrl, HVoiceChanCtrl;
+static uint8 HyperVoice;
+static int32 last_hv_val[2];
+static uint8 HVoiceCtrl, HVoiceChanCtrl;
 
-int32 period_counter[4];
-int32 last_val[4][2]; // Last outputted value, l&r
-uint8 sample_pos[4];
-uint16 nreg;
-uint32 last_ts;
+static int32 period_counter[4];
+static int32 last_val[4][2]; // Last outputted value, l&r
+static uint8 sample_pos[4];
+static uint16 nreg;
+static uint32 last_ts;
 
 
 #define MK_SAMPLE_CACHE	\

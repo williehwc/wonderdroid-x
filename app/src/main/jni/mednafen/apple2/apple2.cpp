@@ -30,7 +30,6 @@
 #include <mednafen/FileStream.h>
 #include <mednafen/MemoryStream.h>
 #include <mednafen/compress/GZFileStream.h>
-#include <mednafen/compress/ZLInflateFilter.h>
 #include <mednafen/mempatcher.h>
 #include <mednafen/hash/sha256.h>
 #include <mednafen/SimpleBitset.h>
@@ -71,8 +70,6 @@ enum
 static INLINE void APPLE2_DBG(const char* format, ...) { }
 static INLINE void APPLE2_DBG_Dummy(const char* format, ...) { }
 #define APPLE2_DBG(which, ...) ((MDFN_UNLIKELY(apple2_dbg_mask & (which))) ? (void)trio_printf(__VA_ARGS__) : APPLE2_DBG_Dummy(__VA_ARGS__))
-
-extern MDFNGI EmulatedApple2;
 
 // Standardized signature byte @ $FBB3(Apple IIe = 06, autostart(II+) = EA)
 
@@ -126,7 +123,7 @@ static uint8 SoftSwitch;	// C050-C05F, xxx0 for off(0), xxx1 for on(1)
 
 static Core6502 CPU;
 static uint8 DB;
-int32 timestamp;
+static int32 timestamp;
 static bool ResetPending;
 static bool Jammed;
 
@@ -314,18 +311,21 @@ static INLINE void CPUTick0(void)
 
 #ifdef MDFN_ENABLE_DEV_BUILD
 static uint32 Tick1Counter;
-#endif
 static unsigned CPUTick1Called;
+#endif
+
 static INLINE void CPUTick1(void)
 {
+#ifdef MDFN_ENABLE_DEV_BUILD
  assert(!InHLPeek);
+#endif
  //
  timestamp += 7;
  //
  if(EnableDisk2)
   Disk2::Tick2M();	// Call after increasing timestamp
- CPUTick1Called++;
 #ifdef MDFN_ENABLE_DEV_BUILD
+ CPUTick1Called++;
  Tick1Counter++;
 #endif
 }
@@ -343,21 +343,26 @@ INLINE uint8 Core6502::MemRead(uint16 addr, bool junk)
  }
 #endif
  //
+#ifdef MDFN_ENABLE_DEV_BUILD
  CPUTick1Called = 0;
+#endif
  CPUTick0();
  //
  //
- assert(CPUTick1Called == 0);
 #ifdef MDFN_ENABLE_DEV_BUILD
+ assert(CPUTick1Called == 0);
  junkread = junk;
 #endif
+
  ReadFuncs[addr](addr);
 
+#ifdef MDFN_ENABLE_DEV_BUILD
  if(CPUTick1Called != 1)
  {
   fprintf(stderr, "r %04x", addr);
   assert(0);
  }
+#endif
 
  return DB;
 }
@@ -381,20 +386,26 @@ INLINE void Core6502::MemWrite(uint16 addr, uint8 value)
  }
 #endif
  //
+#ifdef MDFN_ENABLE_DEV_BUILD
  CPUTick1Called = 0;
+#endif
  CPUTick0();
  //
  //
+#ifdef MDFN_ENABLE_DEV_BUILD
  assert(CPUTick1Called == 0);
+#endif
 
  DB = value;
  WriteFuncs[addr](addr);
 
+#ifdef MDFN_ENABLE_DEV_BUILD
  if(CPUTick1Called != 1)
  {
   fprintf(stderr, "w %04x", addr);
   assert(0);
  }
+#endif
 }
 
 INLINE bool Core6502::GetIRQ(void)
@@ -1081,11 +1092,11 @@ static void Load(GameFile* gf)
 
   if(mai_load)
   {
-   EmulatedApple2.DesiredInput.clear();
-   EmulatedApple2.DesiredInput.resize(3);
-   EmulatedApple2.DesiredInput[0].device_name = "none";
-   EmulatedApple2.DesiredInput[1].device_name = "paddle";
-   EmulatedApple2.DesiredInput[2].device_name = "twopiece";
+   MDFNGameInfo->DesiredInput.clear();
+   MDFNGameInfo->DesiredInput.resize(3);
+   MDFNGameInfo->DesiredInput[0].device_name = "none";
+   MDFNGameInfo->DesiredInput[1].device_name = "paddle";
+   MDFNGameInfo->DesiredInput[2].device_name = "twopiece";
   }
 
   //
@@ -1148,9 +1159,9 @@ static void Load(GameFile* gf)
        auto const& disk_cfg = mai_cfg[std::string("disk2.disks.") + ds];
 
        if(disk_cfg.size() < 1)
-        throw MDFN_Error(0, _("Disk \"%s\" not defined."), ds);
+        throw MDFN_Error(0, _("Disk \"%s\" not defined."), MDFN_strhumesc(ds).c_str());
        else if(disk_cfg.size() < 3)
-        throw MDFN_Error(0, _("Disk \"%s\" definition is incomplete."), ds);
+        throw MDFN_Error(0, _("Disk \"%s\" definition is incomplete."), MDFN_strhumesc(ds).c_str());
        //
        const std::string disk_label = disk_cfg[1];
        const std::string disk_relpath = disk_cfg[2];
@@ -1189,7 +1200,7 @@ static void Load(GameFile* gf)
        if(write_protect >= 0)
         disk.write_protect = write_protect;
 
-       MDFNGameInfo->RMD->Media.push_back(RMD_Media({disk_label, drive}));
+       MDFNGameInfo->RMD->Media.push_back(RMD_Media({MDFN_strhumesc(disk_label), drive}));
        disk_already_loaded[ds] = MDFNGameInfo->RMD->Media.size() - 1;
 
        if(default_inserted)
@@ -1305,7 +1316,7 @@ static void Load(GameFile* gf)
        calced_hash = sha256(buf, 256);
 
        if(fwinf.hash != calced_hash)
-        throw MDFN_Error(0, _("Firmware data for \"%s\" in file \"%s\" is corrupt or otherwise wrong."), fwinf.purpose, path.c_str());
+        throw MDFN_Error(0, _("Firmware data for \"%s\" in file \"%s\" is corrupt or otherwise wrong."), fwinf.purpose, MDFN_strhumesc(path).c_str());
 
        if(i)
         Disk2::SetSeqROM(buf);
@@ -1456,12 +1467,12 @@ static void Load(GameFile* gf)
      {
       if(giotype == "none")
       {
-       EmulatedApple2.DesiredInput[0].device_name = "none";
+       MDFNGameInfo->DesiredInput[0].device_name = "none";
       }
       else if(giotype == "paddles")
       {
-       EmulatedApple2.DesiredInput[0].device_name = "paddle";
-       EmulatedApple2.DesiredInput[1].device_name = "paddle";
+       MDFNGameInfo->DesiredInput[0].device_name = "paddle";
+       MDFNGameInfo->DesiredInput[1].device_name = "paddle";
       }
       else if(giotype == "joystick" || giotype == "gamepad")
       {
@@ -1476,13 +1487,13 @@ static void Load(GameFile* gf)
         throw MDFN_Error(0, _("Invalid value for \"%s\" setting in MAI file."), "gameio");
        //
        //
-       EmulatedApple2.DesiredInput[0].device_name = (giotype == "joystick") ? "joystick" : "gamepad";
-       EmulatedApple2.DesiredInput[0].switches["resistance_select"] = rsel - 1;
+       MDFNGameInfo->DesiredInput[0].device_name = (giotype == "joystick") ? "joystick" : "gamepad";
+       MDFNGameInfo->DesiredInput[0].switches["resistance_select"] = rsel - 1;
       }
       else if(giotype == "atari")
       {
-       EmulatedApple2.DesiredInput[0].device_name = "atari";
-       EmulatedApple2.DesiredInput[1].device_name = "atari";
+       MDFNGameInfo->DesiredInput[0].device_name = "atari";
+       MDFNGameInfo->DesiredInput[1].device_name = "atari";
       }
       else
        throw MDFN_Error(0, _("Invalid value for \"%s\" setting in MAI file."), "gameio");
@@ -1553,7 +1564,7 @@ static void Load(GameFile* gf)
   //
   //
   //
-  assert(EmulatedApple2.DesiredInput.size() == 0 || mai_load);
+  assert(MDFNGameInfo->DesiredInput.size() == 0 || mai_load);
   //
   //
   //
@@ -1820,7 +1831,7 @@ static MDFN_COLD void SetInput(unsigned port, const char* type, uint8* ptr)
 
 static MDFN_COLD void SetMedia(uint32 drive_idx, uint32 state_idx, uint32 media_idx, uint32 orientation_idx)
 {
- const RMD_Layout* rmd = EmulatedApple2.RMD;
+ const RMD_Layout* rmd = MDFNGameInfo->RMD;
  const RMD_Drive* rd = &rmd->Drives[drive_idx];
  const RMD_State* rs = &rd->PossibleStates[state_idx];
 
@@ -1993,7 +2004,7 @@ static const CustomPalette_Spec CPInfo[] =
 
 using namespace MDFN_IEN_APPLE2;
 
-MDFNGI EmulatedApple2 =
+MDFN_HIDE extern const MDFNGI EmulatedApple2 =
 {
  "apple2",
  "Apple II/II+",
@@ -2034,7 +2045,10 @@ MDFNGI EmulatedApple2 =
  Settings,
  MDFN_MASTERCLOCK_FIXED(APPLE2_MASTER_CLOCK),
  1005336937,	// 65536*  256 * (14318181.81818 / ((456 * 2) * 262))
- -1,  // Multires possible?  Not really, but we need interpolation...
+
+ EVFSUPPORT_RGB555 | EVFSUPPORT_RGB565,
+
+ -1,  	// Multires possible?  Not really, but we need interpolation...
 
  584,   // lcm_width
  192,   // lcm_height

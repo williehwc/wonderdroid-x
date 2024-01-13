@@ -36,8 +36,6 @@
 
 #define PCE_DEBUG(x, ...) {  /* printf(x, ## __VA_ARGS__); */ }
 
-extern MDFNGI EmulatedPCE;
-
 namespace MDFN_IEN_PCE
 {
 
@@ -649,7 +647,7 @@ static MDFN_COLD void LoadCD(std::vector<CDInterface*> *CDInterfaces)
 
   const char *bios_sname = DetectGECD((*CDInterfaces)[0]) ? "pce.gecdbios" : "pce.cdbios";
   std::string bios_path = MDFN_MakeFName(MDFNMKF_FIRMWARE, 0, MDFN_GetSettingS(bios_sname));
-  MDFNFILE fp(&NVFS, bios_path.c_str(), KnownBIOSExtensions, _("CD BIOS"));
+  MDFNFILE fp(&NVFS, bios_path, KnownBIOSExtensions, _("CD BIOS"));
 
   bool disable_bram_cd = MDFN_GetSettingB("pce.disable_bram_cd");
 
@@ -1056,7 +1054,7 @@ void PCE_Power(void)
 
 static void SetMedia(uint32 drive_idx, uint32 state_idx, uint32 media_idx, uint32 orientation_idx)
 {
- const RMD_Layout* rmd = EmulatedPCE.RMD;
+ const RMD_Layout* rmd = MDFNGameInfo->RMD;
  const RMD_Drive* rd = &rmd->Drives[drive_idx];
  const RMD_State* rs = &rd->PossibleStates[state_idx];
 
@@ -1210,7 +1208,7 @@ static const CheatInfoStruct CheatInfo =
 
 using namespace MDFN_IEN_PCE;
 
-MDFNGI EmulatedPCE =
+MDFN_HIDE extern const MDFNGI EmulatedPCE =
 {
  "pce",
  "PC Engine (CD)/TurboGrafx 16 (CD)/SuperGrafx",
@@ -1251,6 +1249,9 @@ MDFNGI EmulatedPCE =
  PCESettings,
  MDFN_MASTERCLOCK_FIXED(PCE_MASTER_CLOCK),
  0,
+
+ EVFSUPPORT_NONE,
+
  true,  // Multires possible?
 
  0,   // lcm_width

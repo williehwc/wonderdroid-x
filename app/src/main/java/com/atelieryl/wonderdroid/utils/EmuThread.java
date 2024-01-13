@@ -2,14 +2,12 @@
 package com.atelieryl.wonderdroid.utils;
 
 import com.atelieryl.wonderdroid.Button;
-import com.atelieryl.wonderdroid.R;
 
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import android.widget.Toast;
 
 public class EmuThread extends Thread {
 
@@ -124,7 +122,7 @@ public class EmuThread extends Thread {
                         }
                     }
 
-                    nextUpdateTime = frameStart + targetFrameTime - frameRenderTime / 100;
+                    nextUpdateTime = frameStart + targetFrameTime;
 
                     SystemClock.sleep(sleepTimeMillis);
 

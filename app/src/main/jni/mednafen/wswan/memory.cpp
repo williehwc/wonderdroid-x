@@ -35,27 +35,27 @@
 namespace MDFN_IEN_WSWAN
 {
 
-uint32 wsRAMSize;
+static uint32 wsRAMSize;
 uint8 wsRAM[65536];
-uint8 *wsSRAM = NULL;
+static uint8 *wsSRAM = NULL;
 
 uint8 *wsCartROM;
 static uint32 sram_size;
 uint32 eeprom_size;
 
-uint8 ButtonWhich, ButtonReadLatch;
+static uint8 ButtonWhich, ButtonReadLatch;
 
-uint32 DMASource;
-uint16 DMADest;
-uint16 DMALength;
-uint8 DMAControl;
+static uint32 DMASource;
+static uint16 DMADest;
+static uint16 DMALength;
+static uint8 DMAControl;
 
-uint32 SoundDMASource, SoundDMASourceSaved;
-uint32 SoundDMALength, SoundDMALengthSaved;
-uint8 SoundDMAControl;
+static uint32 SoundDMASource, SoundDMASourceSaved;
+static uint32 SoundDMALength, SoundDMALengthSaved;
+static uint8 SoundDMAControl;
 static uint8 SoundDMATimer;
 
-uint8 BankSelector[4];
+static uint8 BankSelector[4];
 
 static bool language;
 
@@ -78,8 +78,6 @@ enum
 
 static uint8 WW_FWSM;
 //
-
-extern uint16 WSButtonStatus;
 
 template<bool WW>
 static INLINE void WriteMem(uint32 A, uint8 V)
@@ -680,7 +678,7 @@ void WSwan_MemoryLoadNV(void)
    const uint64 fp_size_tmp = savegame_fp->size();
 
    if(fp_size_tmp != ((uint64)eeprom_size + sram_size))
-    throw MDFN_Error(0, _("Save game memory file \"%s\" is an incorrect size(%llu bytes).  The correct size is %llu bytes."), path.c_str(), (unsigned long long)fp_size_tmp, ((unsigned long long)eeprom_size + sram_size));
+    throw MDFN_Error(0, _("Save game memory file \"%s\" is an incorrect size(%llu bytes).  The correct size is %llu bytes."), MDFN_strhumesc(path).c_str(), (unsigned long long)fp_size_tmp, ((unsigned long long)eeprom_size + sram_size));
 
    if(eeprom_size)
     savegame_fp->read(wsEEPROM, eeprom_size);
@@ -704,7 +702,7 @@ void WSwan_MemoryLoadNV(void)
    const uint64 fp_size_tmp = savegame_fp.size();
 
    if(fp_size_tmp != 524288)
-    throw MDFN_Error(0, _("Save game memory file \"%s\" is an incorrect size(%llu bytes).  The correct size is %llu bytes."), path.c_str(), (unsigned long long)fp_size_tmp, (unsigned long long)524288);
+    throw MDFN_Error(0, _("Save game memory file \"%s\" is an incorrect size(%llu bytes).  The correct size is %llu bytes."), MDFN_strhumesc(path).c_str(), (unsigned long long)fp_size_tmp, (unsigned long long)524288);
 
    savegame_fp.read(wsCartROM, 524288);
   }
@@ -828,7 +826,7 @@ void WSwan_MemoryStateAction(StateMem *sm, const unsigned load, const bool data_
  SFORMAT StateRegs[] =
  {
   SFVARN(wsRAM, "RAM"),
-  SFPTR8N(sram_size ? wsSRAM : NULL, sram_size, "SRAM"),
+  SFPTR8N(sram_size ? wsSRAM : NULL, sram_size, SFORMAT::FORM::NVMEM, "SRAM"),
   SFVAR(ButtonWhich),
   SFVAR(ButtonReadLatch),
   SFVAR(WSButtonStatus),
@@ -846,7 +844,7 @@ void WSwan_MemoryStateAction(StateMem *sm, const unsigned load, const bool data_
 
   SFVAR(BankSelector),
 
-  SFPTR8N(IsWW ? wsCartROM : NULL, 524288, "WW flash"),
+  SFPTR8N(IsWW ? wsCartROM : NULL, 524288, SFORMAT::FORM::NVMEM, "WW flash"),
   SFVAR(WW_FlashLock),
   SFVAR(WW_FWSM),
 

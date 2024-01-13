@@ -18,13 +18,17 @@
 #endif
 
 #include "git.h"
-#include "settings.h"
+#include "file.h"
+#include "settings-common.h"
 #include "NativeVFS.h"
 
 namespace Mednafen
 {
+
 MDFN_HIDE extern NativeVFS NVFS;
-MDFN_HIDE extern MDFNGI *MDFNGameInfo;
+
+// Points to a dynamically-allocated object, created with data from Emulated*.
+MDFN_HIDE extern MDFNGI* MDFNGameInfo;
 
 enum MDFN_NoticeType : uint8
 {
@@ -64,6 +68,23 @@ enum : unsigned
 void MDFN_MidSync(EmulateSpecStruct *espec, const unsigned flags = MIDSYNC_FLAG_UPDATE_INPUT | MIDSYNC_FLAG_SYNC_TIME);
 void MDFN_MidLineUpdate(EmulateSpecStruct *espec, int y);
 
+//
+uint64 MDFN_GetSettingUI(const char *name);
+int64 MDFN_GetSettingI(const char *name);
+double MDFN_GetSettingF(const char *name);
+bool MDFN_GetSettingB(const char *name);
+std::string MDFN_GetSettingS(const char *name);
+
+std::vector<uint64> MDFN_GetSettingMultiUI(const char *name);
+std::vector<int64> MDFN_GetSettingMultiI(const char *name);
+
+uint64 MDFN_GetSettingUI(const std::string& name);
+int64 MDFN_GetSettingI(const std::string& name);
+double MDFN_GetSettingF(const std::string& name);
+bool MDFN_GetSettingB(const std::string& name);
+std::string MDFN_GetSettingS(const std::string& name);
+std::vector<uint64> MDFN_GetSettingMultiUI(const std::string& name);
+std::vector<int64> MDFN_GetSettingMultiI(const std::string& name);
 }
 
 #include "state.h"

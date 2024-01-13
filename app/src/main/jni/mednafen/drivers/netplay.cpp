@@ -74,7 +74,7 @@ bool NetplayConsole::TextHook(const std::string &text)
 uint32 Netplay_GetLPM(void)
 {
  if(!MDFNDnetplay)
-  return ~(uint32)0;
+  return (uint32)-1;
 
  return lpm;
 }
@@ -190,7 +190,7 @@ void Netplay_MT_Draw(const MDFN_PixelFormat& pformat, const int32 screen_w, cons
   drect.w = srect.w * scale;
   drect.h = srect.h * scale;
 
-  BlitRaw(NetConsole.Draw(pformat, srect.w, srect.h, fontid), &srect, &drect);
+  BlitOSD(NetConsole.Draw(pformat, srect.w, srect.h, fontid), &srect, &drect);
  }
 }
 

@@ -213,7 +213,7 @@ static const int32 VTimings[2][4][VPHASE__COUNT] = // End lines
 static bool Out_VB;	// VB output signal
 
 static uint32 VPhase;
-/*static*/ int32 VCounter;
+/*static*/ MDFN_HIDE int32 VCounter;
 static bool InternalVB;
 static bool Odd;
 
@@ -309,7 +309,7 @@ static const int32 HTimings[2][HPHASE__COUNT] =
 };
 
 static uint32 HPhase;
-/*static*/ int32 HCounter;
+/*static*/ MDFN_HIDE int32 HCounter;
 
 static uint16 Latched_VCNT, Latched_HCNT;
 static bool HVIsExLatched;
@@ -1422,6 +1422,20 @@ void StateAction(StateMem* sm, const unsigned load, const bool data_only)
     Window[d].YIn = false;
    }
   }
+  //
+  //
+  InterlaceMode &= 0x3;
+  VRes &= 0x3;
+  HRes &= 0x7;
+
+  CRAM_Mode &= 0x3;
+  InterlaceMode &= 0x3;
+
+  HCounter &= 0x1FF;
+  VCounter &= 0x1FF;
+
+  HPhase %= HPHASE__COUNT;
+  VPhase %= VPHASE__COUNT;
  }
 
  VDP2REND_StateAction(sm, load, data_only, RawRegs, CRAM, VRAM);

@@ -21,7 +21,7 @@ using namespace Mednafen;
 
 #include <mednafen/trio/trio.h>
 
-namespace PCE_Fast
+namespace MDFN_IEN_PCE_FAST
 {
 
 void PCEFast_PSG::SetVolume(double new_volume)

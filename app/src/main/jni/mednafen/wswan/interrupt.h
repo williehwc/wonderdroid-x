@@ -33,14 +33,6 @@ enum
  WSINT_HBLANK_TIMER
 };
 
-extern uint8 IStatus; ///
-extern uint8 IEnable; ///
-extern uint8 IVectorBase; ///
-
-extern bool IOn_Cache; ///
-extern uint32 IOn_Which; ///
-extern uint32 IVector_Cache; ///
-
 void WSwan_InterruptAssert(unsigned which, bool asserted);
 void WSwan_Interrupt(unsigned);
 

@@ -37,13 +37,17 @@ class CDInterface
  // Creates a multi-threaded or single-threaded CD interface object, depending
  // on the value of "image_memcache", to read the CD image at "path".
  //
+ // If "image_memcache" is false, then the VirtualFS object must remain valid until
+ // the CDInterface object is deleted.  If "image_memcache" is true, then the VirtualFS object
+ // only needs to remain valid until Open() returns.
+ //
  static CDInterface* Open(VirtualFS* vfs, const std::string& path, bool image_memcache, const uint64 affinity);
 
  CDInterface();
  virtual ~CDInterface();
 
  //
- // LBA range limits for sector reading functions; MSF 00:00:00 to 99:57:74 
+ // LBA range limits for sector reading functions; MSF 00:00:00 to 99:59:74 
  //
  enum : int32 { LBA_Read_Minimum = -150 };
  enum : int32 { LBA_Read_Maximum = 449849 };

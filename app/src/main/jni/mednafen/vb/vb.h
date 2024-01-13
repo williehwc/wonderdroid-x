@@ -2,7 +2,7 @@
 /* Mednafen Virtual Boy Emulation Module                                      */
 /******************************************************************************/
 /* vb.h:
-**  Copyright (C) 2010-2016 Mednafen Team
+**  Copyright (C) 2010-2021 Mednafen Team
 **
 ** This program is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License
@@ -38,7 +38,9 @@ enum
  VB3DMODE_SIDEBYSIDE = 2,
  VB3DMODE_OVERUNDER = 3,
  VB3DMODE_VLI,
- VB3DMODE_HLI
+ VB3DMODE_HLI,
+ VB3DMODE_LEFT,
+ VB3DMODE_RIGHT
 };
 
 #define VB_MASTER_CLOCK       20000000.0
@@ -79,7 +81,7 @@ void MDFN_FASTCALL MemWrite16(v810_timestamp_t &timestamp, uint32 A, uint16 V);
 
 
 
-extern int32 VB_InDebugPeek;
+MDFN_HIDE extern int32 VB_InDebugPeek;
 }
 
 #endif

@@ -10,34 +10,8 @@ enum {
 };
 
 /* Public variables */
-extern int v30mz_ICount;
-extern uint32 v30mz_timestamp;
-
-typedef union
-{                   /* eight general registers */
-    uint16 w[8];    /* viewed as 16 bits registers */
-    uint8  b[16];   /* or as 8 bit registers */
-} v30mz_basicregs_t; ///
-
-typedef struct
-{
-	v30mz_basicregs_t regs;
- 	uint16	sregs[4];
-
-	uint16	pc;
-
-	int32	SignVal;
-	uint32  AuxVal, OverVal, ZeroVal, CarryVal, ParityVal; /* 0 or non-0 valued flags */
-	uint8 TF, IF, DF;
-} v30mz_regs_t; ///
-
-extern v30mz_regs_t I; ///
-extern bool InHLT; ///
-
-extern uint32 prefix_base; ///
-extern int8 seg_prefix; ///
-
-extern uint8 parity_table[256]; ///
+MDFN_HIDE extern int v30mz_ICount;
+MDFN_HIDE extern uint32 v30mz_timestamp;
 
 
 /* Public functions */

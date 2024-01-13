@@ -3,7 +3,6 @@
 //
 
 #include "mednafen/mednafen.h"
-#include "mednafen/settings-driver.h"
 #include "mednafen/state-driver.h"
 #include "mednafen/mednafen-driver.h"
 
@@ -46,9 +45,8 @@ extern "C" {
                                                    jstring blood, jstring sex, jstring language) {
         // Initialize Mednafen
         if (!_initialized) {
-            MDFNI_InitializeModules();
-            std::vector<MDFNSetting> settings;
-            MDFNI_Initialize(env->GetStringUTFChars(dir_path, NULL), settings);
+            MDFNI_Init();
+            MDFNI_InitFinalize(env->GetStringUTFChars(dir_path, NULL));
             MDFNI_SetSetting("filesys.path_sav", env->GetStringUTFChars(dir_path, NULL));
             //MDFNI_SetSetting("filesys.path_state", env->GetStringUTFChars(dir_path, NULL));
             MDFNI_SetSetting("filesys.fname_sav", "%f%e.%x");
@@ -80,7 +78,7 @@ extern "C" {
         _game->SetInput(0, "gamepad", (uint8_t *)_inputBuffer[0]);
 
         // Set up surface -- might move to execute_frame
-        MDFN_PixelFormat pix_fmt(MDFN_COLORSPACE_RGB, 0, 8, 16, 24);
+        MDFN_PixelFormat pix_fmt(MDFN_COLORSPACE_RGB, 4, 0, 8, 16, 24);
         _surf = new MDFN_Surface(NULL, _game->fb_width, _game->fb_height, _game->fb_width, pix_fmt);
 
         _runGame = true;

@@ -17,10 +17,10 @@
     <string name="pause">Pause</string>
     <string name="reset">Reset</string>
     <string name="settings_cat_controls">Hardware controls</string>
-    <string name="control_x2">X2 (Right)</string>
-    <string name="control_x3">X3 (Down)</string>
-    <string name="control_x4">X4 (Left)</string>
-    <string name="control_x1">X1 (Up)</string>
+    <string name="control_x2">X2/Right</string>
+    <string name="control_x3">X3/Down</string>
+    <string name="control_x4">X4/Left</string>
+    <string name="control_x1">X1/Up</string>
     <string name="set">Set</string>
     <string name="clear">Clear</string>
     <string name="pressakey">Press a key</string>
@@ -106,7 +106,7 @@
     <string name="free_total">free, total</string>
     <string name="in_use">selected</string>
     <string name="add_a_game">Add a game</string>
-    <string name="add_a_game_note">Supported file extensions: .ws. .wsc, .gg, .pce, .ngp, .ngc, and .zip containing files with any of the preceding extensions. You can also add save files (.sav and .mem), states (.sav and .mc[0-9]), and box art (.jpg and .png) for games already added.</string>
+    <string name="add_a_game_note">Supported file extensions: .ws. .wsc, .gg, .pce, .ngp, .ngc, and .zip containing files with any of the preceding extensions. You can also add save files (.sav), states (.mc[0–9]), and box art (.jpg and .png) for games already added (the file name without the extension must be the same, e.g., digimon02.ws and digimon02.sav).</string>
     <string name="select_file">Select file…</string>
     <string name="scan_folder">Add all games in a folder</string>
     <string name="scan_folder_note">Due to restrictions set by Android, not all folders can be scanned.</string>

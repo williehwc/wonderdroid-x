@@ -62,6 +62,11 @@ public class GameRenderer implements EmuThread.Renderer {
     private boolean mPortrait;
     private boolean mMask;
 
+    private int mLastX;
+    private int mLastY;
+    private int mLastW;
+    private int mLastH;
+
     public GameRenderer(long[] gameInfo, int sharpness, boolean portrait) {
 
         mNominalWidth = (int) gameInfo[1];
@@ -145,7 +150,7 @@ public class GameRenderer implements EmuThread.Renderer {
         int[] frameInfo = WonderSwan.execute_frame(frameone, skip);
         if (frameInfo == null) return 0;
         audio.write(WonderSwan.audiobuffer, 0, WonderSwan.samples * mSoundChan);
-        if (!scaleGenerated) {
+        if (!scaleGenerated || frameInfo[1] != mLastX || frameInfo[2] != mLastY || frameInfo[3] != mLastW || frameInfo[4] != mLastH) {
             scale.reset();
             if (frameInfo[4] > 0) {
                 scale.postScale((float) mNominalWidth / frameInfo[3], (float) mNominalHeight / frameInfo[4]);
@@ -179,6 +184,10 @@ public class GameRenderer implements EmuThread.Renderer {
                 drawThread.setMask(0, 0, 0, 0);
             }
             scaleGenerated = true;
+            mLastX = frameInfo[1];
+            mLastY = frameInfo[2];
+            mLastW = frameInfo[3];
+            mLastH = frameInfo[4];
         }
         if (!skip) {
             frameone.rewind();

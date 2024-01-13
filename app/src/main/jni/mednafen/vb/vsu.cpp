@@ -79,9 +79,12 @@ void VSU::Power(void)
   LatcherClockDivider[ch] = 120;
  }
 
+ ModWavePos = 0;
 
  NoiseLatcherClockDivider = 120;
  NoiseLatcher = 0;
+
+ lfsr = 0;
 
  memset(WaveData, 0, sizeof(WaveData));
  memset(ModData, 0, sizeof(ModData));
@@ -91,6 +94,12 @@ void VSU::Power(void)
 
 void VSU::Write(int32 timestamp, uint32 A, uint8 V)
 {
+ if(MDFN_UNLIKELY(A & 0x3))
+ {
+  return;
+ }
+ //
+ //
  A &= 0x7FF;
 
  Update(timestamp);
@@ -390,20 +399,9 @@ void VSU::Update(int32 timestamp)
 	 {
           ModWavePos &= 0x1F;
 
-          EffFreq[ch] = (EffFreq[ch] + (int8)ModData[ModWavePos]);
-	  if(EffFreq[ch] < 0)
-	  {
-	   //puts("Underflow");
-	   EffFreq[ch] = 0;
-	  }
-	  else if(EffFreq[ch] > 0x7FF)
- 	  {
-	   //puts("Overflow");
-	   EffFreq[ch] = 0x7FF;
-	  }
+	  EffFreq[ch] = (Frequency[ch] + (int8)ModData[ModWavePos]) & 0x7FF;
 	  ModWavePos++;
 	 }
- 	 //puts("Mod");
         }
         else				// Sweep
         {

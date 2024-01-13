@@ -31,40 +31,42 @@
 namespace MDFN_IEN_WSWAN
 {
 
-uint32 wsMonoPal[16][4];
-uint32 wsColors[8];
-uint32 wsCols[16][16];
+static void wsScanline(MDFN_Surface* surface);
 
-uint32 ColorMapG[16];
-uint32 ColorMap[16*16*16];
+static uint32 wsMonoPal[16][4];
+static uint32 wsColors[8];
+static uint32 wsCols[16][16];
+
+static uint32 ColorMapG[16];
+static uint32 ColorMap[16*16*16];
 static uint32 LayerEnabled;
 
-uint8 wsLine;                 /*current scanline*/
+static uint8 wsLine;                 /*current scanline*/
 static uint8 weppy;
 
-uint8 SpriteTable[2][0x80][4];
-uint32 SpriteCountCache[2];
-bool FrameWhichActive;
-uint8 DispControl;
-uint8 BGColor;
-uint8 LineCompare;
-uint8 SPRBase;
-uint8 SpriteStart, SpriteCount;
-uint8 FGBGLoc;
-uint8 FGx0, FGy0, FGx1, FGy1;
-uint8 SPRx0, SPRy0, SPRx1, SPRy1;
+static uint8 SpriteTable[2][0x80][4];
+static uint32 SpriteCountCache[2];
+static bool FrameWhichActive;
+static uint8 DispControl;
+static uint8 BGColor;
+static uint8 LineCompare;
+static uint8 SPRBase;
+static uint8 SpriteStart, SpriteCount;
+static uint8 FGBGLoc;
+static uint8 FGx0, FGy0, FGx1, FGy1;
+static uint8 SPRx0, SPRy0, SPRx1, SPRy1;
 
-uint8 BGXScroll, BGYScroll;
-uint8 FGXScroll, FGYScroll;
-uint8 LCDControl, LCDIcons;
+static uint8 BGXScroll, BGYScroll;
+static uint8 FGXScroll, FGYScroll;
+static uint8 LCDControl, LCDIcons;
 static uint8 LCDVtotal;
 
-uint8 BTimerControl;
-uint16 HBTimerPeriod;
-uint16 VBTimerPeriod;
+static uint8 BTimerControl;
+static uint16 HBTimerPeriod;
+static uint16 VBTimerPeriod;
 
-uint16 HBCounter, VBCounter;
-uint8 VideoMode;
+static uint16 HBCounter, VBCounter;
+static uint8 VideoMode;
 
 #ifdef WANT_DEBUGGER
 
@@ -515,7 +517,7 @@ bool wsExecuteLine(MDFN_Surface *surface, bool skip)
 	if(wsLine < 144)
 	{
 	 if(!skip)
-          wsScanline(surface->pixels + wsLine * surface->pitch32);
+          wsScanline(surface);
 	}
 
 	Comm_Process();
@@ -623,9 +625,24 @@ void WSwan_SetPixelFormat(const MDFN_PixelFormat &format)
  }
 }
 
-void wsScanline(uint32 *target)
+template<typename T>
+static INLINE void wsBlitScanline(T* MDFN_RESTRICT target, uint8* MDFN_RESTRICT bg, uint8* MDFN_RESTRICT bg_pal)
 {
-	uint32		start_tile_n,map_a,startindex,adrbuf,b1,b2,j,t,l;
+	if(wsVMode)
+	{
+	 for(size_t l = 0; l < 224; l++)
+	  target[l] = ColorMap[wsCols[bg_pal[l]][bg[l] & 0xF]];
+	}
+	else
+	{
+	 for(size_t l = 0; l < 224; l++)
+	  target[l] = ColorMapG[bg[l] & 0xF];
+	}
+}
+
+static void wsScanline(MDFN_Surface* surface)
+{
+	uint32		start_tile_n,map_a,startindex,adrbuf,b1,b2,j,t;
 	uint8		b_bg[256];
 	uint8		b_bg_pal[256];
 
@@ -885,19 +902,14 @@ void wsScanline(uint32 *target)
 		}
 
 	}	// End sprite drawing
-
-	if(wsVMode)
-	{
-	 for(l=0;l<224;l++)
-	  target[l] = ColorMap[wsCols[b_bg_pal[l+7]][b_bg[(l+7)]&0xf]];
-	}
+	//
+	//
+	//
+	if(surface->format.opp == 4)
+	 wsBlitScanline<uint32>(surface->pix<uint32>() + wsLine * surface->pitchinpix, b_bg + 7, b_bg_pal + 7);
 	else
-	{
-	 for(l=0;l<224;l++)
- 	  target[l] = ColorMapG[(b_bg[l+7])&15];
-	}
+	 wsBlitScanline<uint16>(surface->pix<uint16>() + wsLine * surface->pitchinpix, b_bg + 7, b_bg_pal + 7);
 }
-
 
 void WSwan_GfxReset(void)
 {

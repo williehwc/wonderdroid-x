@@ -428,6 +428,7 @@ static void CloseGame(void)
  Cleanup();
 }
 
+#pragma pack(push,1)
 struct DemoStateTest
 {
  uint8 a;
@@ -503,8 +504,11 @@ struct DemoStateTest
   bool alt_arr_i[7];
   float alt_arr_j[7];
   double alt_arr_k[7];
- } __attribute__((__packed__)) stt[15];
-} __attribute__((__packed__));
+ } stt[15];
+};
+#pragma pack(pop)
+
+//static_assert(sizeof(DemoStateTest) == 10320, "bad size");
 
 static void randomoo(DemoStateTest* ptr, size_t count)
 {
@@ -749,7 +753,7 @@ static const std::vector<InputPortInfoStruct> PortInfo =
 
 using namespace MDFN_IEN_DEMO;
 
-MDFNGI EmulatedDEMO =
+MDFN_HIDE extern const MDFNGI EmulatedDEMO =
 {
  "demo",
  "Mednafen Demo/Example Module",
@@ -786,6 +790,9 @@ MDFNGI EmulatedDEMO =
  DEMOSettings,
  MDFN_MASTERCLOCK_FIXED(DEMO_MASTER_CLOCK),
  (uint32)((double)DEMO_MASTER_CLOCK / (450 * 250) * 65536 * 256),
+
+ EVFSUPPORT_RGB555 | EVFSUPPORT_RGB565,
+
  true, // Multires possible?
 
  800,	// lcm_width
