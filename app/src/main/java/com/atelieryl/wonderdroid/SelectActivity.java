@@ -264,7 +264,7 @@ public class SelectActivity extends BaseActivity {
 
             // Reset the storage path
             if (!onboarding) {
-                File[] externalStorageVolumes = ContextCompat.getExternalCacheDirs(getApplicationContext());
+                File[] externalStorageVolumes = ContextCompat.getExternalFilesDirs(getApplicationContext(), null);
                 storagePath = getFilesDir().getPath();
                 if (externalStorageVolumes.length > 0 && externalStorageVolumes[0] != null && !externalStorageVolumes[0].getPath().equals("")) {
                     storagePath = externalStorageVolumes[0].getPath();
@@ -274,6 +274,15 @@ public class SelectActivity extends BaseActivity {
                 editor.commit();
                 Log.e("WonderDroid", "Storage path was reset");
             }
+        }
+
+        // Check if corrective migration needed
+        File[] externalStorageVolumes = ContextCompat.getExternalCacheDirs(getApplicationContext());
+        if (externalStorageVolumes.length > 0 && externalStorageVolumes[0] != null &&
+                !externalStorageVolumes[0].getPath().equals("") && storagePath.equals(externalStorageVolumes[0].getPath())) {
+            Intent intent = new Intent(this, CorrectiveMigrationActivity.class);
+            startActivity(intent);
+            return;
         }
 
         OnDownloadListener onDownloadListener = new OnDownloadListener() {

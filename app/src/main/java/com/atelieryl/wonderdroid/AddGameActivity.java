@@ -121,7 +121,7 @@ public class AddGameActivity extends AppCompatActivity {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         includeSubfolders = prefs.getBoolean("include_subfolders", true);
         overwrite = prefs.getBoolean("overwrite", false);
-        copyMode = prefs.getBoolean("copy_mode", false);
+        copyMode = prefs.getBoolean("copy_mode", true);
         lastFolderUri = prefs.getString("last_folder_uri", null);
         try {
             if (lastFolderUri != null) {
@@ -480,7 +480,7 @@ public class AddGameActivity extends AppCompatActivity {
                     fileQueue.remove(i);
                     fileQueueDisplay.remove(i);
                     // delete original file
-                    if (!copyMode && srcFile != null) {
+                    if ((!copyMode || upgrade) && srcFile != null) {
                         srcFile.delete();
                     }
                     i--;
@@ -540,7 +540,7 @@ public class AddGameActivity extends AppCompatActivity {
                 String title;
                 if (isCancelled())
                     title = getString(R.string.canceled);
-                else if (copyMode)
+                else if (copyMode && !upgrade)
                     title = getString(R.string.copy);
                 else
                     title = getString(R.string.move);

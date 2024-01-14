@@ -267,7 +267,7 @@ public class OnboardingActivity extends AppCompatActivity {
     }
 
     private void load_choose_drive_screen() {
-        File[] externalStorageVolumes = ContextCompat.getExternalCacheDirs(getApplicationContext());
+        File[] externalStorageVolumes = ContextCompat.getExternalFilesDirs(getApplicationContext(), null);
         storagePath = getFilesDir().getPath();
         if (externalStorageVolumes.length > 0 && externalStorageVolumes[0] != null && !externalStorageVolumes[0].getPath().equals("")) {
             storagePath = externalStorageVolumes[0].getPath();
